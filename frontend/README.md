@@ -1,21 +1,17 @@
-# 数有依据 · 前端
+# 数有依据前端 · v0.3
 
-在原有 React + TypeScript + Vite 工程上开发。当前完成完整滚动首页与独立登录／注册界面，版本 v0.2，更新于 2026-11-11。
+在原有 React + TypeScript + Vite 项目上增量开发，继续使用既有字体、蓝色按钮、首页及认证页设计。没有新建重复前端，没有引入生产依赖。
 
-## 启动
+## 运行
 
 ```powershell
 Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju\frontend'
-# 新环境首次运行
+# 新环境首次安装
 npm ci
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-首页：<http://127.0.0.1:5173/>  
-登录：<http://127.0.0.1:5173/auth>  
-注册：<http://127.0.0.1:5173/auth?mode=register>
-
-此地址仅用于本机预览。端口被占用时先检查是否已有本项目服务，不要终止未知进程。开发服务关闭后按上述命令重启。
+真实账户和项目操作需要同时启动 `../backend`。后台虚拟环境、依赖、启动及存储说明见[仓库 README](../README.md)。开发和预览的 `/api` 均代理到 `http://127.0.0.1:8000`，浏览器使用同源 HttpOnly 会话。
 
 ```powershell
 npm run build
@@ -23,46 +19,33 @@ npm run lint
 npm run preview -- --host 127.0.0.1 --port 4173 --strictPort
 ```
 
-生产产物位于 `dist/`。Vite 的开发与预览服务器支持 `/auth` 直接访问和刷新。部署到静态服务器时，需要将不存在的文件路径回退到 `index.html`，例如 Nginx 的 `try_files $uri $uri/ /index.html;`。尚未部署到公网。
+生产产物 `dist/` 需要静态托管；API 路径代理至后台，其余页面路径配置 SPA 回退。Vite dev/preview 已支持以下路径直接进入和刷新：
 
-## 当前功能
+| 路由 | 页面 |
+| --- | --- |
+| `/` | 完整首页、合成示例、案例和 FAQ |
+| `/auth` | 真实邮箱密码登录 |
+| `/auth?mode=register` | 真实测试账户注册，未验证邮箱 |
+| `/app` | 私有工作空间，项目创建、搜索、重命名和打开 |
+| `/app/projects/:projectId/materials` | 私有资料与口径页 |
 
-- 首页：居中首屏、数据分析、结论核验、宽幅证据追溯、修改与复核、三类案例、FAQ、最终入口、页脚。
-- 预设问题切换图表，点选柱形显示对应公式。
-- 点选报告原句，联动数字、来源字段与规则；切换学院后相关原句标记待复核。
-- 接受修订后为待复核，用户再次操作后执行本地示例数值复核。
-- 经营月报演示增长率与百分点；活动反馈演示加权与简单平均。
-- `/auth`：邮箱密码登录状态；邮箱、密码、确认密码注册状态；密码显示、输入校验、错误提示、返回入口。
-- 手机菜单、键盘焦点、原生可关闭对话框、减少动画偏好、未知路由返回页。
+私有页面先检查当前账户；未登录跳转 `/auth?next=...`，只允许白名单内部路径作为返回目标。界面保护之外，后台仍逐请求检查用户和资源归属。
 
-## 原型边界
+## 主要文件
 
-首页所有材料均为合成示例。数字由 `src/demoData.ts` 中的固定材料在本地计算，解释与核验场景为预设示例。表格中的来源位置是演示材料位置，当前未读取实际 CSV 或 Word 文件。
+- `src/api.ts`：类型、接口错误、真实上传进度、合法返回路径。
+- `src/components/WorkShell.tsx`：账户加载、退出和工作区壳层。
+- `src/pages/WorkspacePage.tsx`：真实列表与项目表单。
+- `src/pages/MaterialsPage.tsx`：资料状态轮询、工作表／分页预览、报告来源、上传和重试。
+- `src/components/MaterialEditors.tsx`：字段说明、统计规则、未保存提醒、并发版本处理。
+- `src/Work.css`：桌面三栏、平板重排、手机列表／预览／规则切换；表格在自身区域滚动。
+- `src/pages/AuthPage.tsx`：真实认证接口、输入校验和测试阶段说明。
+- `src/pages/HomePage.tsx` 及原示例组件：延续完整首页，FAQ 已同步当前真实能力。
 
-没有调用 AI、后端核验、上传解析、邮件、认证、数据库、云端保存或导出服务。登录和注册表单只校验格式；不发送或存储邮箱与密码，不创建账户或会话，不显示成功。没有第三方登录或找回密码入口。
+上传原件不被预览和说明编辑改写。上传、解析、成功、失败均使用真实状态；接口断开不会提示已保存。尚未实现的分析、核验、修改交付阶段明确标注开发中。首页仍为合成数据的本地示例，不调用 AI。
 
-首页交互保留在页面内存，刷新会重置；登录／注册模式通过 URL 保留，表单内容不持久化。案例目前在首页内体验，独立案例页、工作空间和四个核心操作页不在本轮范围。
+## 验收
 
-## 代码位置
+`scripts/check-workspace.cjs`：真实账户、项目、上传、规则、隔离、错误、响应式布局以及重启后的恢复。`scripts/check-home-auth.cjs`：公开首页交互、锚点、认证页校验／返回及响应式回归；已移除上轮“认证未接通”的过期断言。
 
-- `src/App.tsx`：两个公开页面的路径分发与未知路径处理。
-- `src/pages/HomePage.tsx`：首页编排、导航、FAQ、页脚。
-- `src/pages/AuthPage.tsx`：认证表单与校验。
-- `src/components/FeatureDemos.tsx`：分析、核验、修订演示。
-- `src/components/EvidenceDemo.tsx`：结论、范围、计算、数据、规则联动。
-- `src/components/Cases.tsx`：三类案例及弹窗交互。
-- `src/components/ui.tsx`：共享品牌、图标、状态、文案组件。
-- `src/demoData.ts`：保留上一轮校园调查数据，补充两类合成案例。
-- `src/App.css`、`src/index.css`：布局、设计变量、响应式与减少动画偏好。
-
-本轮未新增生产依赖，沿用原有包配置与锁文件。
-
-## 浏览器验收
-
-验收脚本：`scripts/check-home-auth.cjs`。需要开发环境提供 Playwright 和浏览器。可设置 `PLAYWRIGHT_MODULE_PATH` 指向已安装的 Playwright 包，`BROWSER_EXECUTABLE` 指向 Chrome/Chromium 可执行文件；`PREVIEW_URL` 默认为 `http://127.0.0.1:5173`。
-
-```powershell
-node scripts/check-home-auth.cjs
-```
-
-该脚本执行核心交互、表单、路由、锚点和响应式检查，并保存完整截图。截图、运行报告输出在 `artifacts/home-auth/`，已加入 Git 忽略。详细本轮交付记录见 [HOMEPAGE_PREVIEW.md](HOMEPAGE_PREVIEW.md)。
+Playwright 环境与命令见[后台测试说明](../backend/README.md#测试与重启复核)。本轮截图和实际结果见 [WORKSPACE_PREVIEW.md](../WORKSPACE_PREVIEW.md)。[HOMEPAGE_PREVIEW.md](HOMEPAGE_PREVIEW.md) 保留 v0.2 历史验收记录，不代表当前后台状态。

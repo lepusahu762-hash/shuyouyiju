@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const base = process.env.PREVIEW_URL || 'http://127.0.0.1:5173';
-const out = path.resolve(__dirname, '../artifacts/home-auth');
+const out = path.resolve(process.env.QA_PUBLIC_OUTPUT || path.join(__dirname, '../artifacts/home-auth'));
 const results = [];
 function check(name, condition) { assert.ok(condition, name); results.push(name); }
 async function main() {
@@ -91,8 +91,6 @@ async function main() {
   await page.getByRole('button',{name:'显示密码',exact:true}).click();
   check('显示密码开关有效',(await page.locator('#password').getAttribute('type'))==='text');
   await page.getByRole('button',{name:'隐藏密码',exact:true}).click();
-  await page.locator('.auth-submit').click();
-  check('有效登录输入仍提示未接通',(await text('.auth-submit-notice')).includes('暂时无法登录'));
   await page.getByRole('group',{name:'登录或注册'}).getByRole('button',{name:'注册',exact:true}).click();
   check('注册切换保留邮箱并清除密码',(await page.locator('#email').inputValue())==='demo@example.com' && (await page.locator('#password').inputValue())==='');
   await page.locator('#password').fill('123');await page.locator('#confirm').fill('456');await page.locator('.auth-submit').click();
@@ -102,10 +100,7 @@ async function main() {
   await page.locator('#password').fill('Example123');await page.locator('#confirm').fill('Example123');
   await page.getByRole('button',{name:'显示确认密码',exact:true}).click();
   check('确认密码显示开关有效',(await page.locator('#confirm').getAttribute('type'))==='text');
-  await page.locator('.auth-submit').click();await page.locator('.auth-submit').click();
-  check('有效注册及重复提交不伪造账户',(await text('.auth-submit-notice')).includes('暂时无法注册账户'));
-  check('表单没有请求认证接口',submissions.length===0);
-  check('认证信息未写入浏览器存储',await page.evaluate(()=>localStorage.length===0 && sessionStorage.length===0 && document.cookie===''));
+  check('表单未将密码写入浏览器存储',await page.evaluate(()=>localStorage.length===0 && sessionStorage.length===0));
   await page.reload();
   check('注册模式刷新保留，字段不持久化',await page.locator('#confirm').isVisible() && (await page.locator('#email').inputValue())==='');
   await page.getByRole('link',{name:'体验示例',exact:true}).click();
@@ -123,7 +118,7 @@ async function main() {
   for(const width of [320,390,768,1024,1440]) {
    await page.setViewportSize({width,height:width<680?844:1000});
    for(const [route,name] of [['/','homepage'],['/auth','login'],['/auth?mode=register','register']]) {
-    await page.goto(base+route);await page.evaluate(()=>document.fonts.ready);
+    await page.goto(base+route);await page.locator(name==='homepage'?'#hero-title':'#auth-title').waitFor();await page.evaluate(()=>document.fonts.ready);
     const dimensions=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
     check(`${name} ${width}px 无横向溢出`,dimensions.width===dimensions.scroll);layouts.push({route,...dimensions});
     if([390,768,1440].includes(width))await page.screenshot({path:path.join(out,`${name}-${width}.png`),fullPage:true});
@@ -150,7 +145,7 @@ async function main() {
   check('减少动画偏好已生效',await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches && getComputedStyle(document.documentElement).scrollBehavior==='auto'));
   await page.goto(base+'/not-a-page');
   check('未知路由有返回入口',await page.getByRole('link',{name:'返回首页',exact:true}).isVisible());
-  check('没有运行时错误',errors.length===0);check('没有控制台错误',consoleErrors.length===0);
+  check('没有运行时错误',errors.length===0);check('控制台仅有未登录会话检查的预期401',consoleErrors.every(line=>line.includes('401 (Unauthorized)')));
   const report={checkedAt:new Date().toISOString(),base,browser:await browser.version(),checks:results,layouts,errors,consoleErrors,submissions};
   fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify(report,null,2));
   console.log(`PASS: ${results.length} checks. Screenshots and report: ${out}`);

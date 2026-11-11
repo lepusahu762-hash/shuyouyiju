@@ -1,3 +1,5 @@
+> 历史记录（v0.2）：以下认证未接通等描述只反映上一轮状态。当前 v0.3 已接通真实账户、项目与资料持久化，请以 [本轮交付报告](../WORKSPACE_PREVIEW.md) 和 [README](../README.md) 为准。
+
 # 数有依据：完整首页与认证界面交付
 
 日期：2026-11-11（Asia/Shanghai）。代码更新于原项目 `D:\Desktop\chuanzhibei\shuyouyiju\frontend`，沿用 React + TypeScript + Vite。本轮范围为首页与认证界面，未开发四个核心业务工作页。
