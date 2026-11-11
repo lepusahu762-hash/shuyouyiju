@@ -5,11 +5,11 @@ import { EvidenceDemo } from '../components/EvidenceDemo'
 import { Cases } from '../components/Cases'
 
 const faqs = [
-  ['数有依据适合用来做什么？', '适合核对校园调查、经营月报、活动反馈等材料中的数量、比例、增减与统计口径。你可以从一份数据开始分析，也可以从一段报告开始核验。当前首页提供合成数据的交互演示，真实工作台将在后续接通。'],
-  ['现在可以上传自己的 Excel 或 Word 吗？', '当前版本暂未接通上传与解析。计划优先支持 CSV、XLSX 数据表和 DOCX、粘贴文本报告；定义资料与图表图片将分阶段接入。首页中的数据表和报告均为合成示例，不会上传你的文件。'],
+  ['数有依据适合用来做什么？', '适合核对校园调查、经营月报、活动反馈等材料中的数量、比例、增减与统计口径。你可以从一份数据开始分析，也可以从一段报告开始核验。当前首页提供合成数据的交互演示，登录后可创建个人项目、上传资料并保存统计口径；计算分析与 AI 核验正在开发。'],
+  ['现在可以上传自己的 Excel 或 Word 吗？', '可以。登录后支持 CSV、XLSX 数据表、DOCX 报告和粘贴报告文本，可选择工作表、预览数据与段落、补充字段含义和统计口径。PDF、图片、XLS 尚不支持。首页中的数据表和报告仍为合成示例。'],
   ['这些结果是 AI 实时生成的吗？', '不是。首页的解释与核验场景是预设示例，比例、汇总、图表及示例复核使用前端本地计算。自然语言 AI 分析、规则检索与后端核验尚未接通，不会把预设内容说成实时 AI 结果。'],
   ['“与数据一致”，就代表结论一定真实吗？', '它只表示结论在当前数据、范围与统计口径下得到支持，不能证明原始数据真实。缺少去年数据时，不能判断同比变化；仅有相关关系，也不能直接得出因果结论。'],
-  ['我的信息会被保存吗？需要登录才能体验吗？', '首页示例无需登录，操作仅保留在当前页面，刷新后重置。当前认证页只进行输入校验，不发送或保存邮箱和密码，也不会创建账户。真实账户、个人项目保存与文件处理将在服务接通后提供。'],
+  ['我的信息会被保存吗？需要登录才能体验吗？', '首页示例无需登录，操作仅保留在当前页面，刷新后重置。登录后的账户、项目、解析结果和已保存规则保存在后台，原文件单独保存，预览与字段说明不会改写原件。密码经安全哈希存储；后台验证每个项目和文件的归属。当前为测试阶段，尚未接通邮件验证与找回密码。'],
 ]
 
 export function HomePage() {
@@ -33,8 +33,8 @@ export function HomePage() {
 
       <section className="faq-section section-shell" id="faq" aria-labelledby="faq-title"><div className="section-heading"><p className="section-kicker">还有一些你可能想知道的</p><h2 id="faq-title">常见问题</h2><p>关于体验、数据与核验的边界。</p></div><div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<Icon name="plus" /></summary><p>{answer}</p></details>)}</div></section>
 
-      <section className="final-cta section-shell" aria-labelledby="cta-title"><span className="cta-symbol"><Icon name="link" /></span><h2 id="cta-title">好结论，从有依据开始。</h2><p>让一个数字的来处，成为一份报告的底气。</p><div className="hero-actions"><a className="button button-primary" href="#demo">体验示例<Icon name="arrow" /></a><a className="button button-secondary" href="/auth">新建我的项目<Icon name="plus" /></a></div><p className="cta-note">合成数据体验已开放 · 个人项目与认证服务待接通</p></section>
+      <section className="final-cta section-shell" aria-labelledby="cta-title"><span className="cta-symbol"><Icon name="link" /></span><h2 id="cta-title">好结论，从有依据开始。</h2><p>让一个数字的来处，成为一份报告的底气。</p><div className="hero-actions"><a className="button button-primary" href="#demo">体验示例<Icon name="arrow" /></a><a className="button button-secondary" href="/auth">新建我的项目<Icon name="plus" /></a></div><p className="cta-note">示例无需登录 · 注册后可保存个人项目与资料</p></section>
     </main>
-    <footer className="site-footer"><div className="footer-main section-shell"><div><a href="#top" aria-label="数有依据，返回顶部"><Brand /></a><p>让结论经得起核对。</p></div><nav aria-label="页脚导航"><a href="#analysis">产品能力</a><a href="#cases">案例体验</a><a href="#faq">使用与数据说明</a><a href="/auth">登录 / 注册</a></nav></div><div className="footer-bottom section-shell"><span>© 2026 数有依据</span><span>首页与认证界面 · v0.2 · 合成示例演示</span><a href="#top">回到顶部 ↑</a></div></footer>
+    <footer className="site-footer"><div className="footer-main section-shell"><div><a href="#top" aria-label="数有依据，返回顶部"><Brand /></a><p>让结论经得起核对。</p></div><nav aria-label="页脚导航"><a href="#analysis">产品能力</a><a href="#cases">案例体验</a><a href="#faq">使用与数据说明</a><a href="/auth">登录 / 注册</a></nav></div><div className="footer-bottom section-shell"><span>© 2026 数有依据</span><span>个人工作空间 · v0.3 · 首页为合成示例</span><a href="#top">回到顶部 ↑</a></div></footer>
   </>
 }
