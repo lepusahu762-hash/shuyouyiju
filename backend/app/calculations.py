@@ -300,7 +300,8 @@ def calculations_router(database, current_user):
         result = {"status": status, "message": message, "reported_value": body.reported_value,
                   "calculated_value": run.result["display_value"], "difference_pp": None, "exact_difference_pp": None,
                   "comparison_rule": COMPARE_RULE}
-        found = [Decimal(item) for item in re.findall(r"(?<![\d.])([0-9]{1,3}(?:\.[0-9]{1,6})?)\s*[%％]", paragraph["text"])]
+        tokens = re.findall(r"(?<![0-9A-Za-z_.,])([+\-−]?\s*[0-9]+(?:\.[0-9]+)?)\s*[%％]", paragraph["text"])
+        found = [Decimal(re.sub(r"\s", "", item).replace("−", "-")) for item in tokens]
         if stale_reasons(run, context):
             status, message = "stale", "资料或口径已变化，请重新计算后再核验；旧结果和证据仍保留。"
         elif run.spec["operation"] != "ratio" or run.result["status"] == "insufficient":

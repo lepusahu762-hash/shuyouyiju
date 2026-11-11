@@ -1,11 +1,13 @@
 import io
 import csv
 import sqlite3
+from decimal import Decimal
 from fastapi.testclient import TestClient
 from app.config import Settings
 from app.main import create_app
 from test_accounts import register, HEADERS
 from test_materials import upload
+from app.calculations import calculate, RunRequest
 
 
 def setup(client, raw=None):
@@ -170,3 +172,23 @@ def test_immutable_snapshots_stale_context_and_account_isolation(tmp_path):
         restored.cookies.set('syj_session', owner_cookie)
         assert restored.get('/api/runs/'+rid).json()['stale']
         assert restored.get(f'/api/runs/{rid}/evidence?group=numerator').json()['rows'][0]['cells'][1] == '有效'
+
+
+def test_percentage_original_sign_and_exact_recurring_fraction(tmp_path):
+    with TestClient(create_app(Settings(data_dir=tmp_path))) as client:
+        pid, table, _, _, _ = setup(client)
+        report_id = client.post(f'/api/projects/{pid}/reports', json={'name': '符号边界报告', 'text': '原文为-80%。\n原文为− 80%。\n原文为1,080%。\n原文为+80%。'}, headers=HEADERS).json()['id']
+        report = client.get('/api/assets/'+report_id).json()
+        paragraphs = client.get(f'/api/assets/{report_id}/preview').json()['paragraphs']
+        saved = run(client, pid, request(client, pid, table))
+        for paragraph in paragraphs[:3]:
+            assert check(client, saved['id'], report, paragraph, '80')['status'] == 'needs_confirmation'
+        assert check(client, saved['id'], report, paragraphs[3], '80')['status'] == 'consistent'
+    sheet = {'columns': [{'id': 'c1'}], 'rows': [{'id': f'r{i}', 'cells': [value]} for i, value in enumerate(['yes', 'no', 'no'])]}
+    body = RunRequest(asset_id='a', sheet_id='s1', operation='ratio', metric='自定义指标', scope_description='全表',
+                      scope=[], numerator=[{'column_id': 'c1', 'value': 'yes'}], null_policy='keep', precision=2,
+                      confirmed=True, context_hash='unused-in-pure-engine-test')
+    value, _ = calculate(sheet, body)
+    assert value['exact_fraction'] == {'numerator': 1, 'denominator': 3, 'percent_multiplier': 100}
+    assert value['display_value'] == '33.33'
+    assert len(value['unrounded_decimal']) > 70 and Decimal(value['unrounded_decimal']) > Decimal('33.33')
