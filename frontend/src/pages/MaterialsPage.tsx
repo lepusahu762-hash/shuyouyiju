@@ -24,7 +24,7 @@ function Materials({ projectId }: { projectId: string }) {
   const [previewAttempt, setPreviewAttempt] = useState(0)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [fieldDirty, setFieldDirty] = useState(false)
-  const [mobilePanel, setMobilePanel] = useState('files')
+  const [mobilePanel, setMobilePanel] = useState(() => new URLSearchParams(window.location.search).has('asset') ? 'preview' : 'files')
   const [reportName, setReportName] = useState('')
   const [reportText, setReportText] = useState('')
   const [reportError, setReportError] = useState('')
@@ -45,6 +45,15 @@ function Materials({ projectId }: { projectId: string }) {
   const preview = previewResult?.key === previewKey ? previewResult.data : null
   const previewLoading = assetStatus === 'ready' && previewResult?.key !== previewKey
   const requestPreviewError = previewResult?.key === previewKey ? previewResult.error : ''
+  useEffect(() => {
+    if (!preview || !new URLSearchParams(window.location.search).has('row')) return
+    const frame = requestAnimationFrame(() => {
+      const row = document.querySelector('.linked-source-row')
+      const scroll = row?.closest('.data-grid-scroll')
+      if (row && scroll) scroll.scrollBy({ top: row.getBoundingClientRect().top - scroll.getBoundingClientRect().top - 70, behavior: 'instant' })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [preview, linkedRow])
 
   const refreshAssets = useCallback(async () => {
     const values = await api<Asset[]>(`/projects/${projectId}/assets`)
