@@ -74,7 +74,7 @@ export function uploadFile(projectId: string, file: File, progress: (percentage:
 
 export function safeReturn(value: string | null): string {
   if (value === '/app') return value
-  return value && /^\/app\/projects\/[0-9a-f-]{36}\/materials$/.test(value) ? value : '/app'
+  return value && /^\/app\/projects\/[0-9a-f-]{36}\/(materials|calculations)$/.test(value) ? value : '/app'
 }
 export function authHref() { return '/auth?next=' + encodeURIComponent(safeReturn(window.location.pathname)) }
 export function displayDate(value: string) { return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) }
