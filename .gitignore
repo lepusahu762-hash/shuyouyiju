@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Private runtime data and local verification artifacts
+backend/data/
+artifacts/
+
