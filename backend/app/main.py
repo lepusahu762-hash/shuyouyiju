@@ -12,6 +12,7 @@ from .database import Database
 from .models import Base, Asset, now
 from .auth import setup_auth, UserRead, UserCreate
 from .projects import project_router
+from .materials import material_router
 
 
 def create_app(settings: Settings | None = None):
@@ -94,6 +95,7 @@ def create_app(settings: Settings | None = None):
                            "columns": settings.max_columns, "files": settings.max_project_files}}
 
     app.include_router(project_router(database, current_user))
+    app.include_router(material_router(database, settings, current_user))
     return app
 
 
