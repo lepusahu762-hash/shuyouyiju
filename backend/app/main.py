@@ -13,6 +13,7 @@ from .models import Base, Asset, now
 from .auth import setup_auth, UserRead, UserCreate
 from .projects import project_router
 from .materials import material_router
+from .calculations import calculations_router
 
 
 def create_app(settings: Settings | None = None):
@@ -31,7 +32,7 @@ def create_app(settings: Settings | None = None):
         yield
         await database.engine.dispose()
 
-    app = FastAPI(title="数有依据 API", version="0.3.0", lifespan=lifespan)
+    app = FastAPI(title="数有依据 API", version="0.4.0", lifespan=lifespan)
     app.state.database = database
     app.state.settings = settings
     origins = set(settings.allowed_origins.split(","))
@@ -90,12 +91,13 @@ def create_app(settings: Settings | None = None):
 
     @app.get("/api/health")
     async def health():
-        return {"status": "ok", "version": "0.3.0", "email_verification": False,
+        return {"status": "ok", "version": "0.4.0", "email_verification": False,
                 "limits": {"upload_bytes": settings.max_upload_bytes, "rows": settings.max_rows,
                            "columns": settings.max_columns, "files": settings.max_project_files}}
 
     app.include_router(project_router(database, current_user))
     app.include_router(material_router(database, settings, current_user))
+    app.include_router(calculations_router(database, current_user))
     return app
 
 

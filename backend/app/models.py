@@ -56,3 +56,35 @@ class Asset(Base):
     annotation_version: Mapped[int] = mapped_column(default=0)
     created_at: Mapped[str] = mapped_column(String, default=now)
     updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class CalculationRun(Base):
+    __tablename__ = "calculation_runs"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    spec: Mapped[dict] = mapped_column(JSON)
+    context: Mapped[dict] = mapped_column(JSON)
+    source: Mapped[dict] = mapped_column(JSON)
+    result: Mapped[dict] = mapped_column(JSON)
+    method_version: Mapped[str] = mapped_column(String(50))
+    created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class CalculationEvidence(Base):
+    __tablename__ = "calculation_evidence"
+    run_id: Mapped[str] = mapped_column(ForeignKey("calculation_runs.id"), primary_key=True)
+    ordinal: Mapped[int] = mapped_column(primary_key=True)
+    row: Mapped[dict] = mapped_column(JSON)
+    in_scope: Mapped[bool] = mapped_column(index=True)
+    in_numerator: Mapped[bool] = mapped_column(index=True)
+    reason: Mapped[str] = mapped_column(String(40))
+
+
+class NumericCheck(Base):
+    __tablename__ = "numeric_checks"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    run_id: Mapped[str] = mapped_column(ForeignKey("calculation_runs.id"), index=True)
+    report: Mapped[dict] = mapped_column(JSON)
+    spec: Mapped[dict] = mapped_column(JSON)
+    result: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[str] = mapped_column(String, default=now)
