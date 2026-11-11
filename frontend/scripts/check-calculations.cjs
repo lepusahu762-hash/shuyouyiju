@@ -14,9 +14,9 @@ function check(name, value) { assert.ok(value, name); results.push(name); consol
 async function until(fn, message) { for (let i=0;i<80;i++) { const value=await fn(); if(value) return value;await new Promise(resolve=>setTimeout(resolve,250)); }throw new Error('Timeout: '+message); }
 async function main() {
  fs.mkdirSync(out,{recursive:true});
- const state=phase==='restart'?JSON.parse(fs.readFileSync(path.join(out,'run.json'))):{email:`calc-${Date.now()}@example.com`,password:'Evidence2026!'};
+ const state=phase!=='seed'?JSON.parse(fs.readFileSync(path.join(out,'run.json'))):{email:`calc-${Date.now()}@example.com`,password:'Evidence2026!'};
  const browser=await chromium.launch({headless:true,...(process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{})});
- const context=await browser.newContext({viewport:{width:1440,height:1080},reducedMotion:'reduce',...(phase==='restart'?{storageState:path.join(out,'session.json')}:{})});
+ const context=await browser.newContext({viewport:{width:1440,height:1080},reducedMotion:'reduce',...(phase!=='seed'?{storageState:path.join(out,'session.json')}:{})});
  const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
  const get=async url=>{const response=await context.request.get(base+'/api'+url);assert.equal(response.status(),200,await response.text());return response.json();};
  const post=async(url,data)=>{const response=await context.request.post(base+'/api'+url,{headers,data});assert.equal(response.status(),201,await response.text());return response.json();};
@@ -32,7 +32,21 @@ async function main() {
   await until(()=>page.locator('.numeric-check-result').first().getAttribute('class').then(value=>value.includes('state-'+expected)),'check status '+expected);
  }
  try {
-  if(phase==='restart') {
+  if(phase==='source') {
+   for(const width of [390,1440]) {
+    await page.setViewportSize({width,height:1080});
+    await page.goto(base+`/app/projects/${state.pid}/materials?asset=${state.tableId}&sheet=s1&row=127`);
+    await page.locator('.linked-source-row').waitFor();
+    await page.waitForFunction(()=>{const row=document.querySelector('.linked-source-row');const scroll=row?.closest('.data-grid-scroll');if(!row||!scroll)return false;const r=row.getBoundingClientRect(),s=scroll.getBoundingClientRect();return r.top>=s.top+40&&r.bottom<=s.bottom;});
+    check(`${width}px资料来源链接打开正确分页并滚到源行127`,(await page.locator('.linked-source-row th').innerText())==='127'&&await page.locator('.preview-panel').isVisible());
+   }
+  } else if(phase==='production') {
+   check('生产预览API会话可用',(await get('/auth/me')).email===state.email);
+   for(const width of [390,1440]) {
+    await page.setViewportSize({width,height:900});await page.goto(base+state.route+'?run='+state.rid);await page.locator('.computed-value').waitFor();await page.reload();await page.locator('.calc-data-table tbody tr').first().waitFor();
+    check(`${width}px生产构建深层路由刷新、历史结果与证据正常`,(await page.locator('.computed-value strong').innerText()).includes('80')&&await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth));
+   }
+  } else if(phase==='restart') {
    const saved=await get('/runs/'+state.rid);check('实际后台进程重启后计算记录和80%结果保留',saved.result.display_value==='80'&&saved.status==='stale');
    const checks=await get('/runs/'+state.rid+'/checks');check('重启后72/80核验及报告原文保留',checks.total===2&&checks.items.some(check=>check.result.status==='different'&&check.result.difference_pp==='8')&&checks.items.some(check=>check.result.status==='consistent'));
    const evidence=await get(`/runs/${state.rid}/evidence?group=numerator&offset=125`);check('重启后证据分页与稳定来源保留',evidence.total===144&&evidence.rows.length===19&&evidence.rows[0].id===state.evidenceId);

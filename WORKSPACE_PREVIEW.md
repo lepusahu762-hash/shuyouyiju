@@ -1,3 +1,5 @@
+> 历史交付记录（v0.3）。当前 v0.4 已新增真实统计计算、分页证据和单条数字核验，见 [CALCULATION_PREVIEW.md](CALCULATION_PREVIEW.md)。以下“待接通”条目反映当时的状态。
+
 # 数有依据 v0.3：真实账户、工作空间与资料持久化
 
 交付日期：2026-11-11（Asia/Shanghai）。原仓库：`D:\Desktop\chuanzhibei\shuyouyiju`。本轮沿用原 `frontend/`，在根目录新增 `backend/`，没有新建第二套前端。已读取产品 MD、根 README、前端 README、HOMEPAGE_PREVIEW.md 以及实际代码后增量实现。

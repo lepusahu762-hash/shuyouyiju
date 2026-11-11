@@ -1,4 +1,4 @@
-# 数有依据后台 · v0.3
+# 数有依据后台 · v0.4
 
 运行方法、Python 环境和完整配置见[仓库 README](../README.md)。该目录使用项目 `.venv`，SQLite 和原件默认在 `data/`。启动创建所需数据表；本轮为初始数据库结构，后续改变结构应加入迁移脚本，不能把 `create_all` 当作迁移机制。
 
@@ -11,6 +11,7 @@
 - `materials.py`：受保护的上传、原件下载、状态、分页预览、重试、字段说明。
 - `parsers.py`：只读 CSV/XLSX/DOCX/粘贴文本解析；ZIP、XML、行列、字符和容量限制。
 - `main.py`：应用工厂、生命周期、错误清理、Origin/自定义头校验及注册登录限频。
+- `calculations.py`：完整工作表的等值／AND 条件统计，精确分数、规则快照、分页证据、单条百分比比较及历史失效检查。新增 `calculation_runs`、`calculation_evidence` 和 `numeric_checks` 三张表，既有表与用户数据保持保留。
 
 上传先持久保存原件及元数据，响应真实 `uploaded` 状态；后台任务依次进入 `parsing` → `ready` / `failed`，前端轮询。解析失败保留原件，单独重试使用相同资料标识。后台启动将遗留 `uploaded/parsing` 标记为中断失败并提供重试说明，避免永久假装正在解析。仅运行一个后台实例；该阶段尚无持久任务队列。
 
@@ -38,7 +39,27 @@
 | POST `/api/assets/{id}/retry` | 仅失败资料可重试，可传 CSV 编码与分隔符 |
 | PUT `/api/assets/{id}/fields` | 按版本保存字段，校验列 ID 属于当前资料 |
 
-未提供邮件验证、找回密码、第三方登录、AI 或计算接口。原件目录没有被挂载为公开静态目录。
+v0.4 计算接口（每一项均检查项目所有者，原件目录仍未公开挂载）：
+
+| 方法和路径 | 功能 |
+| --- | --- |
+| GET `/api/projects/{id}/calculation-context` | 当前项目口径／资料签名的 hash，运行时防止用过期确认 |
+| POST `/api/projects/{id}/runs` | 按确认的字段条件计算并保存快照，返回真实完成／证据不足／需要确认状态 |
+| GET `/api/projects/{id}/runs` | 分页历史，默认 20、最大 50；附当前过期状态 |
+| GET `/api/runs/{id}` | 运行、来源和当时口径快照 |
+| GET `/api/runs/{id}/evidence` | 分页证据；group 为 all / denominator / numerator / excluded / unmatched；默认 25、最大 100 |
+| POST `/api/runs/{id}/checks` | 关联同项目报告段落并保存一次百分比核验 |
+| GET `/api/runs/{id}/checks` | 分页核验，默认 10、最大 50；保留原始判定和当前过期状态 |
+
+运行不提供修改／覆盖接口。核验每次新增，人工勾选不是通过结果。`scope` 与 `numerator` 是等值条件数组，每组最多 10 个，组内 AND，分子继续从分母中筛选。`kind` 为 text / number / boolean；text 区分大小写和空格，number 明确转为有限十进制值，不执行公式；boolean 仅匹配真实布尔单元格。数值型 CSV 文本可用 number 方式比较；CSV 的字符串 true 不会冒充布尔值。
+
+空值定义为 null、空串或纯空白。`null_policy=exclude` 对范围和分子涉及的所有字段检查空值后排除整条记录；keep 保留空值记录但空值不匹配条件；block 遇空值时保留诊断分组，停止产出有效值。前端与结果说明披露其对分母的影响。诊断“有空值”与“非数值”计数可能重叠，四类最终分组互不重叠且合计等于全表记录数。
+
+精确值由整数分子／分母保存。十进制展开使用 80 位有效数字，展示用 0–6 位小数、ROUND_HALF_UP；核验重新从精确分数计算后严格比较，不采用容差。差异为“计算值 − 报告值”，单位百分点。报告值必须为 0–100，且原段落能找到相同的阿拉伯数字百分号表达；不自动识别中文数字、图中文字或复杂上下文。符号保留，负百分比不会误当作正值。
+
+失效检查比较当时的整个项目资料签名（原文件 SHA、解析结果指纹、字段说明与版本）和项目规则／版本。新增资料也会保守标记失效。证据接口读取运行时保存的行，不重新套用当前口径。未来替换解析结果后，旧证据仍不变；没有构建完整版本管理。
+
+未提供邮件验证、找回密码、第三方登录或 AI 接口。
 
 ## 测试与重启复核
 
@@ -64,3 +85,12 @@ node scripts/check-home-auth.cjs
 ```
 
 浏览器脚本新增合成测试账户和测试项目，不清理或修改其他账户。`QA_OUTPUT` 中的 `session.json` 含测试会话，属于本地忽略文件，不提交、不公开。`run.json`、截图和检查 JSON 支持重启复核。连续运行过快触发认证限频时，按错误提示等待一分钟。
+
+本轮优先使用 `frontend/scripts/check-calculations.cjs seed` 和 `restart` 两个阶段，生成材料用 `backend/scripts/make_calculation_demo.py`。默认输出 `artifacts/calculation-v04`，可用 `QA_OUTPUT` 覆盖；`QA_FIXTURES` 默认指向 `artifacts/calculation-demo`。seed 完成后手动 Ctrl+C 停止后台并按 README 启动同一目录，再运行 restart；restart 也会实测 390px 手机的证据定位与核验。不要上传或提交其 session/run 文件。
+
+本机遗留的 pytest 临时目录可能有其他执行账户的 ACL。遇到 WinError 5 时指定全新、位于仓库忽略目录的临时路径，不修改旧临时目录权限：
+
+```powershell
+$testRun = Join-Path (Resolve-Path '..\artifacts') ('pytest-' + [guid]::NewGuid().ToString())
+& '.\.venv\Scripts\python.exe' -m pytest tests -q --basetemp $testRun
+```

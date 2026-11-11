@@ -1,6 +1,6 @@
 # 数有依据 · shuyouyiju
 
-React + TypeScript + Vite 前端，Python + FastAPI 后台。当前 v0.3 已支持真实测试账户、个人项目、上传与预览资料、保存字段说明和统计口径。首页保留合成示例；计算引擎、AI、规则检索与报告核验尚未接入。
+React + TypeScript + Vite 前端，Python + FastAPI 后台。当前 v0.4 支持真实账户、个人项目、资料解析、记录数／比例计算、分页证据定位、单条报告百分比核验与历史快照。AI、规则检索和完整报告核验尚未接入。首页继续保留原有合成示例。
 
 ## 目录
 
@@ -17,6 +17,7 @@ backend/
   data/                    SQLite + originals 原文件（不提交）
 docs/shuyouyiju_product_spec_v1.md
 WORKSPACE_PREVIEW.md        本轮交付与验收报告
+CALCULATION_PREVIEW.md      v0.4 计算、证据、单条核验交付与演示步骤
 frontend/HOMEPAGE_PREVIEW.md 上轮历史记录
 artifacts/                 本地验收截图、结果、日志（不提交）
 ```
@@ -77,6 +78,23 @@ npm ci
 
 ## 本轮能力和限制
 
+v0.4 的“计算与证据”位于 `/app/projects/:projectId/calculations`，从已有项目资料页顶部进入。用户明确选择表格、工作表、字段和等值条件，后台对完整已解析数据计数；多个条件按“并且”组合。支持记录数及分子记录数／分母范围记录数，不执行求和、去重或任意表达式。统计单位是记录／行。
+
+必须确认空值策略与显示精度。结果保存精确分数和未作展示舍入的十进制值，循环小数展开最多 80 位有效数字；展示与核验用 `ROUND_HALF_UP` 十进制四舍五入后严格相等，不使用容差。核验报告需手动选段、输入原文百分比并确认范围、指标和精度。保留原报告内容；不判断整篇报告或因果关系。
+
+每次运行保存独立结果、规则版本、项目资料签名、方法版本、字段信息、原始行快照及报告段落快照。证据按页读取，默认 25 条、最多 100 条；报告选择每页 20 段。修改项目口径、字段说明、资料集合或解析内容后，旧运行及核验保留并显示待重新计算／复核。该阶段采用保守失效策略，补充其他资料也会触发重新确认；不会猜测新资料是否与某个指标无关。
+
+新数据表由启动时自动新增，已有用户、项目、文件不重置；没有修改旧表结构。运行数据仍在 `backend/data/`。升级前建议用 SQLite backup 或停止后台后完整备份该目录；本次已创建本地升级前 SQLite 备份，保留在忽略的 `artifacts/calculation-v04/` 中。
+
+独立合成演示文件生成：
+
+```powershell
+Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju'
+& '.\backend\.venv\Scripts\python.exe' backend/scripts/make_calculation_demo.py
+```
+
+生成到 `artifacts/calculation-demo/`，包含明确标注的 CSV、XLSX、DOCX 和说明：200 条总记录，180 条有效，其中 144 条满意。产品代码不会读取或硬编码这个案例。逐步演示与当前截图见 [CALCULATION_PREVIEW.md](CALCULATION_PREVIEW.md)。
+
 | 材料 | 实际支持 |
 | --- | --- |
 | CSV | UTF-8/BOM、GB18030、UTF-16 BOM，常见分隔符；失败时可指定编码与分隔符重试；首记录作为表头 |
@@ -100,8 +118,8 @@ Set-Location '..\backend'
 & '.\.venv\Scripts\python.exe' -m pytest tests -q
 ```
 
-本次后台 5 项测试通过；依赖 Starlette 对当前 TestClient 使用 httpx 发出一条弃用警告，未影响测试。前端构建和 lint 通过，lint 无警告。浏览器验收方法、截图与边界见 [WORKSPACE_PREVIEW.md](WORKSPACE_PREVIEW.md) 和 [backend/README.md](backend/README.md)。
+v0.4 新增 `tests/test_calculations.py`，覆盖完整数据、证据集合、空值、零分母、条件校验、舍入、原文符号、失效和隔离。后台当前共 10 项测试；依赖 Starlette 对 TestClient 使用 httpx 发出一条弃用警告。前端构建与 lint 通过。当前浏览器流程与检查结果见 [CALCULATION_PREVIEW.md](CALCULATION_PREVIEW.md)；上轮记录保留在 [WORKSPACE_PREVIEW.md](WORKSPACE_PREVIEW.md)。
 
 ## 下一阶段
 
-接入计算引擎、真实 AI、规则检索、结论核验、修订复核与交付。邮件验证、找回密码、PDF/OCR、完整版本历史尚未实现；页面明确显示状态。首页示例继续使用合成材料与本地演示逻辑，不会生成真实业务结果。
+下一阶段可扩展统计方法、真实 AI、规则检索和完整报告核验。修订复核、交付、邮件验证、找回密码、PDF/OCR 和完整版本历史尚未实现。当前工作区的真实计算完全由明确条件驱动，AI 尚未接入。
