@@ -1,6 +1,6 @@
 # 数有依据 · shuyouyiju
 
-React + TypeScript + Vite 前端，Python + FastAPI 后台。当前 v0.5 保留真实账户、项目、资料、统计计算、证据与历史，新增 AI 辅助单条百分比核验工作区、项目内真实规则检索、人工确认方案和受控模型工具调用。**当前本机缺少模型凭据，真实 AI 尚未接通**；模拟测试不能代表真实调用通过。首页保留原有合成示例。
+React + TypeScript + Vite 前端，Python + FastAPI 后台。当前 v0.5 保留真实账户、项目、资料、统计计算、证据与历史，新增 AI 辅助单条百分比核验工作区、项目内真实规则检索、人工确认方案和受控模型工具调用。**当前已用 `qwen3.7-plus`（北京）完成真实联调**：72%差异、80%一致及无基期证据三项通过；本轮9次真实请求，记录见 AI_PREVIEW.md。模拟验收单独保留。首页保留原有合成示例。
 
 ## 目录
 
@@ -119,11 +119,11 @@ Set-Location '..\backend'
 & '.\.venv\Scripts\python.exe' -m pytest tests -q
 ```
 
-v0.4 新增 `tests/test_calculations.py`，覆盖完整数据、证据集合、空值、零分母、条件校验、舍入、原文符号、失效和隔离。v0.5 后台当前共 15 项测试（含5项 AI 流程／协议模拟测试）；依赖 Starlette 对 TestClient 使用 httpx 发出一条弃用警告。前端构建与 lint 通过。本轮 AI 配置与浏览器检查见 [AI_PREVIEW.md](AI_PREVIEW.md)，原计算流程见 [CALCULATION_PREVIEW.md](CALCULATION_PREVIEW.md)；上轮记录保留在 [WORKSPACE_PREVIEW.md](WORKSPACE_PREVIEW.md)。
+v0.4 新增 `tests/test_calculations.py`，覆盖完整数据、证据集合、空值、零分母、条件校验、舍入、原文符号、失效和隔离。v0.5 初次交付的完整15项测试通过；本轮新增适配器与整轮预算测试后，相关11项回归通过（详见 AI_PREVIEW.md）；依赖 Starlette 对 TestClient 使用 httpx 发出一条弃用警告。前端构建与 lint 通过。本轮 AI 配置与浏览器检查见 [AI_PREVIEW.md](AI_PREVIEW.md)，原计算流程见 [CALCULATION_PREVIEW.md](CALCULATION_PREVIEW.md)；上轮记录保留在 [WORKSPACE_PREVIEW.md](WORKSPACE_PREVIEW.md)。
 
 ## 下一阶段
 
-下一阶段需在本地配置百炼账号并完成少量真实调用验收，再考虑扩展统计方法与完整报告核验。修订复核、交付、邮件验证、找回密码、PDF/OCR 和完整版本历史尚未实现。当前 AI 接入代码与模拟验收已完成，真实模型尚未接通；计算与比较仍由确定性后台执行。
+本轮已完成百炼真实联调，后续可在独立范围内评估更多统计方法与完整报告核验。修订复核、交付、邮件验证、找回密码、PDF/OCR 和完整版本历史尚未实现。当前 AI 已完成9次真实请求和三个合成场景验收，计算与比较仍由确定性后台执行；AI建议仍需人工核对。
 
 
 ## v0.5 AI 辅助单条核验

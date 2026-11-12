@@ -2,7 +2,76 @@
 
 交付日期：2026-11-12。原仓库 `D:\Desktop\chuanzhibei\shuyouyiju`，沿用 React / TypeScript / Vite、FastAPI、SQLite 和 `backend/.venv`（Python 3.13.11）。未重建项目、未修改首页、未删除或迁移原有账户和上传文件。本次检查未发现仓库及已检查父目录中的 AGENTS.md；已读 README、CALCULATION_PREVIEW、产品需求及实际代码。
 
-**当前真实 AI 尚未接通。** 本机没有 `backend/.env`，也未检测到该项目模型环境变量。缺少 API Key、Base URL、模型和地域。真实模型请求 **0 次**，没有付费模型验收。下面明确区分“接入代码／模拟验收完成”和“真实服务尚待验收”。
+**真实 AI 已于本轮联调接通。** 当前从本机 `backend/.env` 读取 `qwen3.7-plus` / `cn-beijing`，已完成9次真实模型请求及三项浏览器验收，详见下方“真实百炼联调验收”。文末原始 v0.5 模拟记录保留为历史，不能与本轮真实记录混用。
+
+## 真实百炼联调验收 · 2026-11-12
+
+本轮在原有 v0.5 上完成真实联调，没有新增业务页面、变更技术栈或替换用户资料。Git 开始时干净，保留原账户、资料、手动计算和历史。新增一个独立合成演示账户和项目，演示资料来自 `artifacts/ai-demo`。所有下述截图为**真实百炼模型 + 原有确定性统计引擎**，与文末 `artifacts/ai-v05` 的历史模拟截图分别保存。
+
+### 配置及 qwen3.7-plus 参数核对
+
+- 使用 `backend/.venv/Scripts/python.exe`（Python 3.13.11）。`pydantic-settings` 实际读取 `backend/.env`；模型/地址/Key/地域没有同名进程环境变量覆盖。仅检查Key是否存在，没有输出完整Key、整个.env或认证请求头，未修改用户填写的配置。
+- 实际模型 `qwen3.7-plus`，地域 `cn-beijing`，Base URL `https://dashscope.aliyuncs.com/compatible-mode/v1`，北京官方兼容端点。通过现有 `app.main:app` 启动的 `BailianProvider` 调用；前端5173复用原服务，`/api/ai/config` 返回 `test_mode=false`。独立模拟服务5174没有参与本轮真实流程。
+- 重新核对 [深度思考](https://help.aliyun.com/zh/model-studio/deep-thinking)：Qwen3.7 Plus 默认开启思考，但支持 `enable_thinking=false`。本流程显式关闭思考，采用 `stream=false`，不保存或显示 reasoning_content。
+- 核对 [结构化输出](https://help.aliyun.com/zh/model-studio/qwen-structured-output)：Qwen3.7 Plus 系列支持 JSON Object。本流程设置 `response_format={"type":"json_object"}`，提示词含 JSON 关键词，后台再进行 Pydantic/原文/字段校验，没有把 JSON Object 当成严格 Schema 保证。
+- 核对 [Function Calling](https://help.aliyun.com/zh/model-studio/qwen-function-calling)：Qwen3.7 Plus 系列支持工具调用。本轮实际成功使用指定函数 `tool_choice`、`tool_calls`、`tool_call_id`，查询规则后带真实工具响应继续生成方案；只开放规则查询和已确认方案指纹对应的计算能力，不执行代码。
+- 超时仍为45秒（httpx 客户端的网络阶段超时，非服务端生成时长承诺），显式非思考模式避免默认思考增加等待；本轮真实请求耗时约1.76–10.95秒，没有触发超时。没有新增重试、提高超时或切换模型。
+- 结构化输出文档建议不设 `max_tokens`，以免 JSON 截断。本应用为了保留已约定的输出成本上限，继续显式设置2500 tokens；这是有意保留的取舍，并非认定截断后仍然有效。`finish_reason=length` 时拒绝结果，绝不把半截 JSON 当作核验通过，也不自动无上限重试。本轮全部9次请求实际接受了这些参数，没有截断，结构化和工具输出均通过服务端校验。
+
+### 真实场景、请求次数与 token 用量
+
+| 场景 | 真实请求数 | 输入 tokens | 输出 tokens | 合计 tokens | 实际结果 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 72% 单条主流程 | 4 | 2,687 | 750 | 3,437 | 真实提取、规则工具、方案确认及计算工具完成；144÷180=80%，差8个百分点 |
+| 80% 一致流程 | 4 | 2,701 | 739 | 3,440 | 范围/精度确认一致后显示与数据一致，差0个百分点 |
+| 比去年提升8个百分点 | 1 | 286 | 84 | 370 | 提取为百分点变化，选择后显示证据不足；不虚构去年数据，不生成通过或计算记录 |
+| **本轮合计** | **9 / 最多12** | **5,674** | **1,573** | **7,247** | **9次均HTTP 200；无失败、无模型重试、无独立连通性探针** |
+
+用量来自每次真实接口返回的 `usage.prompt_tokens` / `completion_tokens` / `total_tokens`，全部9次均有这三项。没有把未返回的缓存、推理等详细用量填成0，这些细项本轮未采集。接口缺失基础用量时，代码以 `null` 表示未知；控制台账单与费用不由上述token汇总推算。
+
+本轮增加了可选的本地验收计数文件：在每次真实HTTP尝试前落盘预占次数，按任务之外的整轮总量限制为12；失败、重启和新建任务不能重置计数。文件为 `artifacts/ai-live/request-ledger.json`，只含模型、状态、时间、请求ID和基础用量，不含报告内容、Key或headers。每任务最多6次的原有约束继续保留。达到预算或计数文件异常时直接阻止出站请求，没有静默重试。
+
+验收过程中通过**临时进程环境变量**启用 `SYJ_AI_REQUEST_AUDIT_PATH`（指向上述绝对路径）和 `SYJ_AI_REQUEST_BUDGET=12`，没有写入或覆盖用户.env。验收完成后停止额外模型调用；交付时回到常规后台启动方式，不带专项验收覆盖。计数文件和本轮9次用量记录仍保留。后续用户主动开始的新任务依旧有每任务6次上限，属于新的实际模型用量；回看旧结果不调用模型。
+
+### 实际操作与人工修正
+
+通过浏览器注册独立合成账户、创建项目，上传200条CSV和报告/规则DOCX；指定规则后从72%和80%两个原段落分别提取候选。模型实际查到的规则是上传 DOCX 的 `body:2`，并正确建议了“记录状态=有效”的范围条件和“反馈选项=满意”的分子条件，精度0位。
+
+**发现并保留了一项模型建议偏差：两次方案都建议 `null_policy=exclude`，但真实规则明确要求保留空值。** 人工在已有“手动调整字段、条件与精度”区域将其改为 `keep`，写明采用保留空值、不去重、ROUND_HALF_UP四舍五入，确认所选规则和待确认事项后才执行。原 `payload.plan` 仍保留模型的排除建议，`payload.confirmed_plan` 保存最终保留策略，工具只能执行后者。本轮不是无需人工修正的自动通过；合成数据恰好无空值，因此不能据此推断模型空值语义已可靠。
+
+后台调用既有引擎读取完整200行，分母180、分子144、排除20；证据25行一页。通过浏览器实际检查了报告原句高亮、实际规则段落高亮、证据源行链接，确认没有示例内容替代真实来源。重启真实后台后又刷新三个任务，方案、结果、规则快照、请求计数和调用摘要均与保存时一致，原上传CSV与演示文件逐字节相同；没有增加第10次请求。
+
+### 回归与本轮改动
+
+- 离线预检：AI流程模拟测试和新增适配器/计数测试，共6项通过，未发真实模型请求。模拟客户端只在测试注入；新增适配器测试以 `httpx.MockTransport` 验证 qwen3.7-plus、非思考、JSON、指定工具、45秒超时及跨实例持久上限。
+- 相关后台回归：`tests/test_ai.py`、`tests/test_ai_live_adapter.py`、`tests/test_calculations.py` 共**11项通过**；包括账户隔离、历史恢复和原手动核验。仍有1条既有 TestClient/httpx 弃用提示。
+- 前端 `npm run build` 通过；`npm run lint` 通过，0警告。没有修改前端业务页面，只增加分阶段真实验收脚本。
+- 浏览器：`frontend/scripts/check-ai-live.cjs` 使用实际 Chrome/Playwright操作，真实流程及保存恢复检查共28条具名断言通过，无浏览器运行时异常。1440px桌面与390px手机已截图及检查，无页面级横向溢出。
+- 代码变更集中在可选整轮请求预算/无密钥审计、未知用量的明确表示、避免测试读取本机.env中的真实凭据，以及可恢复的分阶段真实验收脚本。没有改写统计答案、硬编码业务字段或扩大工具范围。验收脚本对独立合成资料的预期字段和值进行断言，并通过UI完成明确的人工修正，没有伪造工具输出。
+
+真实服务429、鉴权失败、超时和故意破坏的模型输出没有制造付费请求；这些仍是离线模拟覆盖。换列名的新资料本轮未再做真实调用，保留前轮模拟覆盖。没有重复付费评测或为了补截图重新提取。模型建议仍需人工复核，关键词检索覆盖和更广泛数据场景未在本轮宣称通过。
+
+### 回看与截图
+
+预览：[http://127.0.0.1:5173](http://127.0.0.1:5173)。可以用你已有账户上传合成资料重现，也可以查看本轮已保存的演示项目。独立演示账户的本地登录说明在 `artifacts/ai-live/演示账户.txt`（未提交Git，不含模型密钥）；登录后项目名为“真实AI验收 · 合成满意率200条”。从“恢复最近的AI方案”打开72%/80%/百分点任务，或者进入原计算历史，**仅回看不会追加模型调用**。
+
+本轮真实截图（与历史模拟文件分开）：
+
+- [72%真实候选](artifacts/ai-live/live-candidates-72.png)
+- [72%模型原建议与真实规则](artifacts/ai-live/live-plan-72.png)
+- [72%人工确认后的方案](artifacts/ai-live/live-confirmed-plan-72.png)
+- [72%差异结果（桌面）](artifacts/ai-live/live-result-72-desktop.png)
+- [72%差异结果（390px）](artifacts/ai-live/live-result-72-mobile.png)
+- [真实规则引用](artifacts/ai-live/live-rule-citations.png)
+- [报告原句定位](artifacts/ai-live/live-report-source.png)
+- [规则原文定位](artifacts/ai-live/live-rule-source.png)
+- [原始行证据](artifacts/ai-live/live-row-evidence.png)
+- [原始数据行定位](artifacts/ai-live/live-row-source.png)
+- [80%一致结果](artifacts/ai-live/live-result-80-desktop.png)
+- [无去年基期证据](artifacts/ai-live/live-insufficient-points-desktop.png)
+- [刷新恢复与调用摘要（390px）](artifacts/ai-live/live-restored-audit-mobile.png)
+
+基础用量汇总：`artifacts/ai-live/usage-summary.json`；每次出站记录：`request-ledger.json`；浏览器状态和逐项检查：`browser-run.json`。后两类均为本机运行资料，不提交Git。提交中只有代码、测试和不含真实密钥的说明。
 
 ## 预览与启动
 
@@ -96,9 +165,9 @@ Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju\backend'
 - 提取、检索、方案生成、等待确认和执行状态来自真实后台阶段。取消阻止后续工具步骤，保留已完成快照；已发出的请求无法保证服务商停止计费。请求失败可在剩余额度内重试。中断任务在重启后为失败，不显示虚假运行中。
 - 云端仅发送选定片段、来源标识、字段说明/少量示例值和检索规则；不发送整份原始文件或所有数据行。单次消息超过6万字符会明确停止并提示精简资料。未宣称全部本地处理。
 
-未实现：真实账号连通验收、完整报告自动核验、复杂统计/分组图表、AI 自动改写、导出、PDF/OCR、邮件功能、RAG向量服务、Agent自治执行或公网部署。没有独立的完整版本管理或持久任务队列。关键词检索可能漏召回；字段映射与语义解释仍须人工检查。
+未实现：完整报告自动核验、复杂统计/分组图表、AI 自动改写、导出、PDF/OCR、邮件功能、RAG向量服务、Agent自治执行或公网部署。没有独立的完整版本管理或持久任务队列。关键词检索可能漏召回；字段映射与语义解释仍须人工检查。
 
-## 验收结果（模拟与真实分开）
+## 首次 v0.5 交付时的验收记录（历史模拟，真实进展见文首新增章节）
 
 | 项目 | 结果 |
 | --- | --- |
@@ -109,7 +178,7 @@ Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju\backend'
 | 进程重启 | 实际重启隔离测试后台后，390px深层页面刷新恢复80%、8个百分点、规则原文快照、确认方案、4次模拟请求计数及过期状态，不增加模型请求 |
 | 真实模型验收 | **未执行，0次调用**。缺少本地Key及完整模型配置；72/80/基期不足/换字段这些语义流程尚未由真实模型验证。不能把模拟通过记为真实AI成功 |
 
-已知依赖提示：Starlette TestClient 对使用 httpx 发出1条弃用警告，不影响本次测试。本轮未升级认证或无关依赖。上传文档即使含有指令也不会增加工具权限；测试拒绝修改工具计划和虚构引用。真实模型的工具选择、中文提取效果、服务商取消行为和实际账单仍需配置后的小量验收。
+已知依赖提示：Starlette TestClient 对使用 httpx 发出1条弃用警告，不影响本次测试。本轮未升级认证或无关依赖。上传文档即使含有指令也不会增加工具权限；测试拒绝修改工具计划和虚构引用。本轮已补验真实模型的中文提取和工具选择；服务商取消行为、真实429/超时及更多字段/数据场景尚未真实制造测试，账单以控制台为准。
 
 相关检查命令：
 
@@ -126,7 +195,7 @@ npm run lint
 
 `frontend/scripts/check-ai.cjs` 是本轮21项浏览器脚本；`check-ai-restart.cjs` 在实际重启上述测试后台后复核保存内容。Playwright 可用路径通过 `PLAYWRIGHT_MODULE_PATH` 指定，Chrome 通过 `BROWSER_EXECUTABLE` 指定。这些脚本不自动调用付费模型。测试会创建明确标注的合成账户/项目，不删除用户资料。
 
-## 本机截图和记录
+## 首次 v0.5 模拟截图和记录（历史）
 
 全部在 `artifacts/ai-v05`，不提交运行资料、会话、日志或截图到 Git。以下含结果的截图均为**模拟模型 + 真实统计/检索/数据库**，画面顶部有相同标注：
 
