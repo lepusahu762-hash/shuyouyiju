@@ -1,5 +1,7 @@
 # AI 辅助单条百分比核验 · 已确认规则冲突检查
 
+> 2026-11-12 全站界面轮次：新增 `/verify` 与原 `/ai-verification` 共用现有组件，改为报告/事项/证据三栏；原任务链接、规则冲突和历史不变。本轮新增模型请求 **0次**，没有调整模型配置或后台计算。下方4次与9次是此前各轮验收记录。11页清单及本轮100项只读浏览器检查见 [SITE_PAGES_PREVIEW.md](SITE_PAGES_PREVIEW.md)。
+
 ## 本轮增量交付 · 2026-11-12
 
 本轮在原项目、原开发分支 `codex/ai-assisted-verification` 上增量实现规则约束检查，没有重做首页或建立重复工作区。沿用 React / TypeScript / Vite、FastAPI、SQLite、项目 `backend/.venv`（Python 3.13.11）和真实百炼 `qwen3.7-plus` / `cn-beijing`。**本轮真实新增请求为4次，不是下方历史联调的9次；错误建议阻断的模拟验收与真实验收分开记录。**
