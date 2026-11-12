@@ -1,6 +1,6 @@
-# 数有依据后台 · v0.4
+# 数有依据后台 · 单条修订与确定性复核
 
-运行方法、Python 环境和完整配置见[仓库 README](../README.md)。该目录使用项目 `.venv`，SQLite 和原件默认在 `data/`。本轮只新增独立 `rule_snapshots` 表，由启动时创建，既有表、账户和原件保留；没有修改既有表结构。后续改变已有表结构时应加入迁移脚本，不能把 `create_all` 当作迁移机制。
+运行方法、Python 环境和完整配置见[仓库 README](../README.md)。该目录使用项目 `.venv`，SQLite 和原件默认在 `data/`。本轮新增 `revision_threads`、`report_revisions`、`revision_confirmations`、`revision_rechecks` 四张独立表，由启动时创建，原 `rule_snapshots` 继续复用，既有表、账户和原件保留；没有修改既有表结构。后续改变已有表结构时应加入迁移脚本，不能把 `create_all` 当作迁移机制。
 
 ## 代码与持久化
 
@@ -13,6 +13,7 @@
 - `main.py`：应用工厂、生命周期、错误清理、Origin/自定义头校验及注册登录限频。
 - `calculations.py`：完整工作表的等值／AND 条件统计，精确分数、规则快照、分页证据、单条百分比比较及历史失效检查。新增 `calculation_runs`、`calculation_evidence` 和 `numeric_checks` 三张表，既有表与用户数据保持保留。
 - `rule_constraints.py`：9项必填规则约束、逐项原文来源及确认、不可覆盖快照、条件语义归一化和方案冲突检查。规则快照追加前核对预期版本和资料指纹，所有接口校验归属；没有覆盖／删除快照接口。
+- `revisions.py`：原稿与目标数字绑定、追加修订/恢复、版本冲突、显式规则确认、执行前再检查、原计算引擎重新计算和事务内复核保存。没有模型客户端；接口与限制见 [REVIEW_PREVIEW.md](../REVIEW_PREVIEW.md)。
 - `ai.py`：原AI建议、编辑草稿、最终方案、规则快照及修改事件分别保存；确认与执行前后都检查当前规则，不信任模型变更口径。旧任务显示未执行新版规则检查，不回填通过状态。API清单及真实／离线验收见 [AI_PREVIEW.md](../AI_PREVIEW.md)。
 
 上传先持久保存原件及元数据，响应真实 `uploaded` 状态；后台任务依次进入 `parsing` → `ready` / `failed`，前端轮询。解析失败保留原件，单独重试使用相同资料标识。后台启动将遗留 `uploaded/parsing` 标记为中断失败并提供重试说明，避免永久假装正在解析。仅运行一个后台实例；该阶段尚无持久任务队列。

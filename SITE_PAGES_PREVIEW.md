@@ -1,5 +1,7 @@
 # 全站页面与导航交付 · 2026-11-12
 
+> 后续更新：“修改与交付”已于修订轮次接通真实单条修订版本保存及确定性复核，导出仍未实现。本文是全站框架完成时的历史记录；该页当前能力以 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md) 为准。
+
 本轮在原目录 `D:\Desktop\chuanzhibei\shuyouyiju`、原分支 `codex/ai-assisted-verification`、基线 `dbb9ac1` 上继续开发。完整阅读 `docs/shuyouyiju_product_spec_v1.md`，沿用现有 React / TypeScript / Vite、FastAPI 接口与 SQLite 数据。仓库及 D 盘祖先目录没有找到 AGENTS.md；没有重新初始化前后端、修改模型配置或清理运行数据。
 
 **全站11个业务页面的界面框架已完成，不代表八项业务能力全部完成。** 本轮仅补页面、导航、布局与状态；新增真实模型请求 **0次**。截图回看上一轮已保存的真实合成任务，截图中的模型请求4/6为该历史任务原记录，不是本轮新调用。

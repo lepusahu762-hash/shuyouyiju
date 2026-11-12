@@ -1,10 +1,10 @@
 # 数有依据 · shuyouyiju
 
-React + TypeScript + Vite 前端，Python + FastAPI 后台。本轮补齐11个业务页面、统一工作区侧栏与项目四页签，继续复用真实账户、项目、资料、手动统计、AI单条核验、规则冲突阻断和历史。完整逐页路由、已接通/未接通能力、演示顺序及截图见 [SITE_PAGES_PREVIEW.md](SITE_PAGES_PREVIEW.md)。
+React + TypeScript + Vite 前端，Python + FastAPI 后台。现有全站11页框架与真实账户、项目、资料、计算、AI单条核验和规则约束继续保留。
 
-**本轮全站界面框架完成，新增真实模型请求0次。** 页面回看复用已保存记录，不改写计算结果；修订保存/重新核验/导出、对话分析和图像核验没有新增后台，相关操作禁用并说明原因。前端构建/lint、12项相关后台测试及100项浏览器检查通过，检查1440/768/390px。全站框架完成不等于八项业务能力全部完成。
+**本轮接通“单条修订 → 保存不可覆盖版本 → 确认当前规则 → 确定性重新核验”**。手动/AI实际结果提供“去修订”，准确关联报告、目标数字、计算与规则快照；接受建议和保存只进入待复核。复核重新运行完整工作表计算，不改写原稿或历史；规则变化和含义变化会阻止复用旧确认。导出仍未接通。演示、截图、接口、测试与限制见 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md)。
 
-真实百炼 `qwen3.7-plus`（北京）接通情况仍以此前 [AI_PREVIEW.md](AI_PREVIEW.md) 记录为准：上一轮12条空值案例使用4次真实请求，保留空值后4÷10=40%，与报告50%相差10个百分点。本轮仅回看，不把历史请求计作新增联调。
+本轮真实模型请求0次，未修改原百炼 `qwen3.7-plus` / `cn-beijing` 配置。AI真实接通及此前付费验收按 [AI_PREVIEW.md](AI_PREVIEW.md) 的历史轮次记录；本轮确定性业务验收不等于新增AI联调。全站清单历史见 [SITE_PAGES_PREVIEW.md](SITE_PAGES_PREVIEW.md)，其中“修改与交付”的后续状态以本轮交付为准。
 
 ## 目录
 
@@ -23,7 +23,8 @@ docs/shuyouyiju_product_spec_v1.md
 WORKSPACE_PREVIEW.md        v0.3 工作空间历史交付记录
 CALCULATION_PREVIEW.md      v0.4 计算、证据、单条核验历史交付
 AI_PREVIEW.md               v0.5 接入说明、配置步骤、模拟与真实验收边界
-SITE_PAGES_PREVIEW.md       本轮11页路由、界面与真实能力边界、验收及截图
+SITE_PAGES_PREVIEW.md       全站框架历史交付
+REVIEW_PREVIEW.md           本轮单条修订、版本与确定性复核、验收及截图
 frontend/HOMEPAGE_PREVIEW.md 上轮历史记录
 artifacts/                 本地验收截图、结果、日志（不提交）
 ```
