@@ -7,6 +7,7 @@ import type { ReportRevision, RevisionConfirmation, RevisionSource } from '../re
 import { revisionAction, revisionStatus } from '../revisionTypes'
 import { WorkShell, RequestError } from '../components/WorkShell'
 import { CalculationEvidence } from '../components/CalculationEvidence'
+import { PdfExportPanel } from '../components/PdfExportPanel'
 
 function RuleEvidence({ rule, projectId }: { rule: RuleSnapshot | null; projectId: string }) {
   if (!rule) return <p className="calc-warning">该依据没有绑定结构化规则快照，不会补写旧历史。复核前必须有与原方案相符的当前已确认规则。</p>
@@ -118,7 +119,7 @@ function ReviewWorkspace({ projectId }: { projectId: string }) {
     finally { setBusy('') }
   }
 
-  return <div className="revision-workspace"><div className="materials-heading"><div><p className="section-kicker">04 · 修改与交付</p><h1>修订有依据，保存后再复核。</h1><p>当前仅处理报告中选定的一个百分比。保留原稿与历史，整篇报告和导出尚不在此核验范围。</p></div></div>
+  return <div className="revision-workspace"><div className="materials-heading"><div><p className="section-kicker">04 · 修改与交付</p><h1>修订有依据，保存后再复核。</h1><p>当前仅处理报告中选定的一个百分比。保留原稿与历史，不代表整篇报告通过；支持所选单条结论PDF。</p></div></div>
     {error && <RequestError message={error} retry={() => {setError('');setAttempt(x => x+1)}} />}{notice && <p className="calc-save-notice" role="status">{notice}</p>}
     <details className="revision-source-list" open={!checkId}><summary>选择实际核验原句 {sources ? `· ${sources.total} 条` : ''}</summary><p className="calc-help">修改依据来自下列具体核验记录，不会自动套用项目最近的其他计算。</p>{sources?.items.map(c => <a key={c.id} className={c.id===checkId?'selected':''} href={`${url}?check=${c.id}`}><span>{c.report.name} · {c.report.paragraph.location}</span><b>{c.report.paragraph.text}</b><small>原核验：{calculationStatus[c.status]} · {displayDate(c.created_at)}</small></a>)}{sources && !sources.total && <div className="empty-panel"><h3>还没有可关联的单条数字核验。</h3><p>先完成手动或AI辅助核验，再从结果进入修订。</p><a href={`/app/projects/${projectId}/calculations`}>打开手动计算与核验 ↗</a><a href={`/app/projects/${projectId}/verify`}>打开结论核验 ↗</a></div>}<div className="calc-pagination"><span>核验原句每页10条</span><div><button disabled={!sourceOffset} onClick={() => setSourceOffset(x => x-10)}>上一组原句</button><button disabled={!sources || sourceOffset+10>=sources.total} onClick={() => setSourceOffset(x => x+10)}>下一组原句</button></div></div></details>
     {checkId && !source && !error && <p className="work-loading">正在定位原报告和核验依据…</p>}
@@ -141,7 +142,8 @@ function ReviewWorkspace({ projectId }: { projectId: string }) {
       </div></section></div>
       <aside className="revision-sidebar"><section><p className="calc-step">原稿与不可覆盖的版本</p><h2>修订历史</h2><p className="calc-help">只列当前原句和目标位置。查看历史不执行计算，不调用模型。</p><div className="revision-version-list"><button className={!revision?'selected':''} onClick={() => {setRevision(null);setDraft(original);setAction('edit');setSelectedId('');history.replaceState(null,'',`${url}?check=${checkId}&target=${targetIndex}`)}}><b>原稿</b><small>原核验：{calculationStatus[source.check.result.status]}</small></button>{source.versions.items.map(v => <button className={revision?.id===v.id?'selected':''} key={v.id} onClick={() => {setSelectedId(v.id);setUrlVersion(v.id);setNotice('');setError('')}}><b>v{v.version} {v.id===source.head_id?'· 最新':''}</b><small>{revisionAction[v.action]} · {displayDate(v.created_at)}</small><span>{v.text}</span></button>)}</div><div className="calc-pagination"><span>共 {source.versions.total} 版</span><div><button disabled={!versionOffset} onClick={() => setVersionOffset(x => x-10)}>上一页</button><button disabled={versionOffset+10>=source.versions.total} onClick={() => setVersionOffset(x => x+10)}>下一页</button></div></div>
       {revision && <details><summary>当前版本记录</summary><p>{revisionAction[revision.action]} · {displayDate(revision.created_at)}</p><p>修改说明：{revision.reason||'未填写'}</p><p>上版：{revision.parent_id??'原稿'}</p><p>恢复来源：{revision.restored_from??'无'}</p><code>{revision.id}</code></details>}{historical && <button className="button button-secondary" disabled={!!busy} onClick={() => {setDraft(revision!.text);setAction('restore');setRestoreId(revision!.id);setReason(`恢复为 v${revision!.version} 内容，追加新版本。`);setNotice('已选恢复内容；点击“恢复并保存为新版本”完成保存，旧历史仍保留。')}}>恢复此内容为新版本</button>}</section>
-      <section><h2>成果导出</h2><p>修订版本已可真实保存与复核。PDF／DOCX／XLSX导出尚未接通。</p><button className="button button-secondary" disabled title="本轮不实现文件导出">预览并导出</button></section><section><h2>其他计算历史</h2><p>其他运行仅供浏览，不会自动作为本句依据。</p><a href={`/app/projects/${projectId}/calculations#calculation-history`}>查看项目计算历史 ↗</a></section></aside></div></>}
+      <section><h2>成果导出</h2><p>已接通所选单条结论PDF，包含明确版本与复核快照。DOCX／XLSX仍未接通。</p><a className="text-link" href="#pdf-export">生成或查看 PDF ↓</a></section><section><h2>其他计算历史</h2><p>其他运行仅供浏览，不会自动作为本句依据。</p><a href={`/app/projects/${projectId}/calculations#calculation-history`}>查看项目计算历史 ↗</a></section></aside></div></>}
+    <PdfExportPanel key={revision?.id??'unselected'} projectId={projectId} revision={revision} dirty={dirty}/>
   </div>
 }
 
