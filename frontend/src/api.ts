@@ -28,6 +28,7 @@ function errorMessage(payload: unknown, status: number): string {
   }
   if (typeof detail === 'string' && messages[detail]) return messages[detail]
   if (status === 401) return '登录已过期或尚未登录，请重新登录后继续。'
+  if (status === 503 && typeof detail === 'string' && detail.startsWith('真实 AI')) return detail
   if (status >= 500 || status === 0) return '暂时无法连接后台服务。请确认后台已启动，再重试；本次操作未确认保存。'
   if (typeof detail === 'string' && detail !== 'Unauthorized') return detail
   if (detail && typeof detail === 'object' && 'reason' in detail) return String(detail.reason)
@@ -74,7 +75,7 @@ export function uploadFile(projectId: string, file: File, progress: (percentage:
 
 export function safeReturn(value: string | null): string {
   if (value === '/app') return value
-  return value && /^\/app\/projects\/[0-9a-f-]{36}\/(materials|calculations)$/.test(value) ? value : '/app'
+  return value && /^\/app\/projects\/[0-9a-f-]{36}\/(materials|calculations|ai-verification)$/.test(value) ? value : '/app'
 }
 export function authHref() { return '/auth?next=' + encodeURIComponent(safeReturn(window.location.pathname)) }
 export function displayDate(value: string) { return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) }

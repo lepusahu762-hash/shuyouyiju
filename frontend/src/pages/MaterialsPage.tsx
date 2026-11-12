@@ -16,7 +16,8 @@ function Materials({ projectId }: { projectId: string }) {
   const [sheetId, setSheetId] = useState(new URLSearchParams(window.location.search).get('sheet') ?? 's1')
   const [previewResult, setPreviewResult] = useState<{ key: string; data: Preview | null; error: string } | null>(null)
   const linkedRow = Math.max(2, Number(new URLSearchParams(window.location.search).get('row')) || 2)
-  const [offset, setOffset] = useState(() => Math.floor((linkedRow-2)/50)*50)
+  const linkedParagraph = useRef(new URLSearchParams(window.location.search).get('paragraph'))
+  const [offset, setOffset] = useState(() => Math.max(0, Number(new URLSearchParams(window.location.search).get('offset')) || Math.floor((linkedRow-2)/50)*50))
   const [loading, setLoading] = useState(true)
   const [limits, setLimits] = useState<{ upload_bytes: number; files: number } | null>(null)
   const [error, setError] = useState('')
@@ -54,6 +55,15 @@ function Materials({ projectId }: { projectId: string }) {
     })
     return () => cancelAnimationFrame(frame)
   }, [preview, linkedRow])
+  useEffect(() => {
+    if (!preview || !linkedParagraph.current) return
+    const frame = requestAnimationFrame(() => {
+      const element = document.getElementById(linkedParagraph.current!)
+      element?.classList.add('linked-source-paragraph')
+      element?.scrollIntoView({ behavior: 'instant', block: 'center' })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [preview])
 
   const refreshAssets = useCallback(async () => {
     const values = await api<Asset[]>(`/projects/${projectId}/assets`)
@@ -77,8 +87,9 @@ function Materials({ projectId }: { projectId: string }) {
     if (!selectedId) return
     const params = new URLSearchParams({ asset: selectedId, sheet: sheet?.id ?? 's1' })
     if (new URLSearchParams(window.location.search).has('row')) params.set('row', String(linkedRow))
+    if (linkedParagraph.current) { params.set('paragraph', linkedParagraph.current); params.set('offset', String(offset)) }
     window.history.replaceState(null, '', window.location.pathname + '?' + params.toString())
-  }, [selectedId, sheet?.id, linkedRow])
+  }, [selectedId, sheet?.id, linkedRow, offset])
   useEffect(() => {
     if (!assetId || assetStatus !== 'ready') return
     const controller = new AbortController()
@@ -96,7 +107,7 @@ function Materials({ projectId }: { projectId: string }) {
 
   function selectAsset(id: string) {
     if (id !== selectedId && fieldDirty && !window.confirm('字段说明尚未保存。切换资料会放弃这些字段修改，是否继续？')) return
-    if (id !== selectedId) { setFieldDirty(false); setSheetId('s1'); setOffset(0); setEncoding('auto'); setDelimiter('auto') }
+    if (id !== selectedId) { linkedParagraph.current = null; setFieldDirty(false); setSheetId('s1'); setOffset(0); setEncoding('auto'); setDelimiter('auto') }
     if (id !== selectedId) { const params = new URLSearchParams(window.location.search); params.delete('row'); window.history.replaceState(null, '', window.location.pathname + '?' + params.toString()) }
     setSelectedId(id); setMobilePanel('preview'); setPreviewError('')
   }
@@ -145,7 +156,7 @@ function Materials({ projectId }: { projectId: string }) {
   if (loading && !project) return <div className="work-loading" role="status">正在读取项目与资料…</div>
   if (!project) return <><RequestError message={error || '项目不存在或无权访问。'} retry={() => void load()} /><a className="text-link" href="/app"><Icon name="back" />返回工作空间</a></>
   return <><div className="materials-heading"><div><a href="/app" className="material-back"><Icon name="back" />全部项目</a><h1>{project.name}</h1><p>{project.goal === 'analysis' ? '分析数据' : '核验已有报告'}<span>·</span>{assets.length} 份资料<span>·</span>创建于 {displayDate(project.created_at)}</p></div><div className="material-top-actions"><button className="button button-secondary small" onClick={event => { pasteTrigger.current = event.currentTarget; setReportError(''); pasteDialog.current?.showModal() }}><Icon name="edit" />粘贴报告</button><button className="button button-primary small" onClick={() => input.current?.click()}><Icon name="plus" />上传资料</button></div></div>
-    <nav className="project-steps" aria-label="项目阶段"><span className="current"><b>01</b>资料与口径</span><a href={`/app/projects/${projectId}/calculations`}><b>02</b>计算与证据</a><span aria-disabled="true"><b>03</b>完整报告核验<small>开发中</small></span><span aria-disabled="true"><b>04</b>修改交付<small>开发中</small></span></nav>
+    <nav className="project-steps" aria-label="项目阶段"><span className="current"><b>01</b>资料与口径</span><a href={`/app/projects/${projectId}/calculations`}><b>02</b>计算与证据</a><a href={`/app/projects/${projectId}/ai-verification`}><b>03</b>AI 辅助单条核验</a><span aria-disabled="true"><b>04</b>修改交付<small>开发中</small></span></nav>
     {error && <RequestError message={error} retry={() => { setError(''); void refreshAssets().catch(cause => setError((cause as Error).message)) }} />}
     <div className="mobile-material-tabs" role="group" aria-label="资料页视图">{[['files', '资料列表'], ['preview', '内容预览'], ['rules', '字段与规则']].map(([id, name]) => <button key={id} aria-pressed={mobilePanel === id} onClick={() => setMobilePanel(id)}>{name}</button>)}</div>
     <input ref={input} className="sr-only" tabIndex={-1} type="file" multiple accept=".csv,.xlsx,.docx" aria-label="选择资料文件" onChange={event => addFiles(event.target.files)} />

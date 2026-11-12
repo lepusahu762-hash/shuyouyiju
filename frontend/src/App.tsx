@@ -7,6 +7,8 @@ import { WorkspacePage } from './pages/WorkspacePage'
 import { MaterialsPage } from './pages/MaterialsPage'
 import { CalculationsPage } from './pages/CalculationsPage'
 import './Calculations.css'
+import { AIVerificationPage } from './pages/AIVerificationPage'
+import './AI.css'
 
 // Native links support browser history and new tabs. Vite serves the SPA entry
 // on direct /auth refresh; production hosts need the same history fallback.
@@ -19,6 +21,8 @@ function App() {
   if (materialRoute) return <MaterialsPage projectId={materialRoute[1]} />
   const calculationRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/calculations$/)
   if (calculationRoute) return <CalculationsPage projectId={calculationRoute[1]} />
+  const aiRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/ai-verification$/)
+  if (aiRoute) return <AIVerificationPage projectId={aiRoute[1]} />
   return <main className="not-found"><a href="/"><Brand /></a><p className="section-kicker">404 · 页面不存在</p><h1>这个页面还没有到这里。</h1><p>回到首页，继续体验数据与证据的联动。</p><a className="button button-primary" href="/">返回首页<Icon name="arrow" /></a></main>
 }
 
