@@ -65,6 +65,7 @@ export function RuleSetup({ task, tables, onBound }: { task: AITask; tables: Ass
   const [head, setHead] = useState<{ items: RuleSnapshot[]; current_id: string | null; context_hash: string } | null>(null)
   const [draft, setDraft] = useState<AIPlan>({ ...(task.payload.rule_snapshot?.constraints ?? task.payload.plan ?? { asset_id: '', sheet_id: '', operation: 'ratio', metric: '', scope_description: '', scope: [], numerator: [], null_policy: 'block', precision: 0 }), confirmed: false, context_hash: task.context_hash })
   const [sources, setSources] = useState<Record<string, string>>({})
+  const [quotes,setQuotes]=useState<Record<string,string>>({})
   const [confirmed, setConfirmed] = useState<string[]>([])
   const [unresolved, setUnresolved] = useState('')
   const [reason, setReason] = useState('')
@@ -82,9 +83,10 @@ export function RuleSetup({ task, tables, onBound }: { task: AITask; tables: Ass
       if (!head) throw new Error('请先读取当前规则。')
       if (!save) { if (head.current_id) await bind(head.current_id); return }
       const constraints = Object.fromEntries(ruleFields.map(([key]) => [key, draft[key]]))
+      for(const [key] of ruleFields){const c=citations.find(c=>c.citation_id===sources[key]);if(c?.quote_options?.length&&!quotes[key])throw new Error('节选段落需逐项选择支持该约束的连续原文条款，不能将省略标记保存为引用。')}
       const snapshot = await api<RuleSnapshot>(`/projects/${task.project_id}/rule-snapshots`, { method: 'POST', body: JSON.stringify({
         previous_id: head.current_id, context_hash: head.context_hash, constraints,
-        sources: Object.fromEntries(ruleFields.map(([key]) => { const c = citations.find(c => c.citation_id === sources[key]); return [key, { asset_id: c?.asset_id, paragraph_id: c?.citation_id, quote: c?.text }] })),
+        sources: Object.fromEntries(ruleFields.map(([key]) => { const c = citations.find(c => c.citation_id === sources[key]); return [key, { asset_id: c?.asset_id, paragraph_id: c?.citation_id, quote: c?.quote_options?.length?quotes[key]:c?.text }] })),
         confirmed_fields: confirmed, unresolved: unresolved.trim() ? [unresolved.trim()] : [], change_reason: reason,
       }) })
       setHead(await api(`/projects/${task.project_id}/rule-snapshots`))
@@ -97,8 +99,9 @@ export function RuleSetup({ task, tables, onBound }: { task: AITask; tables: Ass
     <fieldset disabled={busy}><PlanFields plan={draft} tables={tables} disabled={busy} edit={patch => { setDraft(p => ({ ...p, ...patch })); setConfirmed([]) }} />
       <div className="rule-confirm-fields">{ruleFields.map(([key, label]) => <div className="rule-field-confirm" key={key}>
         <b>{label}：{ruleValue(key, draft[key], tables, draft)}</b>
-        <label className="work-field">{label}的原文来源<select aria-label={`${label}的原文来源`} value={sources[key] ?? ''} onChange={e => { setSources(s => ({ ...s, [key]: e.target.value })); setConfirmed(c => c.filter(k => k !== key)) }}><option value="">选择支持本项的真实规则段落</option>{citations.map(c => <option key={c.citation_id} value={c.citation_id}>{c.name} · {c.location} · {c.text}</option>)}</select></label>
+        <label className="work-field">{label}的原文来源<select aria-label={`${label}的原文来源`} value={sources[key] ?? ''} onChange={e => { setSources(s => ({ ...s, [key]: e.target.value })); setQuotes(s=>({...s,[key]:''})); setConfirmed(c => c.filter(k => k !== key)) }}><option value="">选择支持本项的真实规则段落</option>{citations.map(c => <option key={c.citation_id} value={c.citation_id}>{c.name} · {c.location} · {c.text}</option>)}</select></label>
         {sources[key] && <blockquote>{citations.find(c => c.citation_id === sources[key])?.text}</blockquote>}
+        {!!citations.find(c=>c.citation_id===sources[key])?.quote_options?.length&&<label className="work-field">{label}的连续原文条款<select value={quotes[key]??''} aria-label={`${label}的连续原文条款`} onChange={e=>{setQuotes(s=>({...s,[key]:e.target.value}));setConfirmed(c=>c.filter(k=>k!==key))}}><option value="">请选择实际支持本项的原文，不包含省略标记</option>{citations.find(c=>c.citation_id===sources[key])?.quote_options?.map((q,i)=><option value={q} key={i}>{q}</option>)}</select></label>}
         <label className="calc-confirm"><input type="checkbox" aria-label={`确认规则${label}`} checked={confirmed.includes(key)} disabled={!sources[key]} onChange={e => setConfirmed(c => e.target.checked ? [...c, key] : c.filter(k => k !== key))} /><span>我已明确本项含义，确认此设置及对应原文。</span></label>
       </div>)}</div>
       <label className="work-field">尚未明确的规则或歧义<textarea value={unresolved} onChange={e => setUnresolved(e.target.value)} placeholder="没有待确认内容时留空；有内容则不能保存为已确认规则。" /></label>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import type { Asset } from '../api'
-import type { RuleSnapshot } from '../aiTypes'
+import type { RuleSnapshot, Retrieval } from '../aiTypes'
+import { RuleRetrievalEvidence } from './RuleRetrievalEvidence'
 import { RequestError } from './WorkShell'
 
 // Uses the existing project-scoped rule roles and immutable snapshots.
@@ -11,6 +12,15 @@ export function RuleLibrary({ projectId, assets }: { projectId: string; assets: 
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
+  const [query,setQuery]=useState('')
+  const [retrieval,setRetrieval]=useState<Retrieval|null>(null)
+  const [searching,setSearching]=useState(false)
+  async function search(){
+    if(!query.trim()||searching)return
+    setSearching(true);setError('');setRetrieval(null)
+    try{setRetrieval(await api<Retrieval>(`/projects/${projectId}/rule-search?q=${encodeURIComponent(query.trim())}`))}
+    catch(cause){setError((cause as Error).message)}finally{setSearching(false)}
+  }
   useEffect(() => {
     let active = true
     Promise.all([api<string[]>(`/projects/${projectId}/rule-materials`), api<{ items: RuleSnapshot[]; current_id: string | null }>(`/projects/${projectId}/rule-snapshots`)]).then(([roles, head]) => {
@@ -35,6 +45,8 @@ export function RuleLibrary({ projectId, assets }: { projectId: string; assets: 
     {!reports.length && <p className="inspector-description">上传规则 DOCX，或使用“粘贴报告”保存规则文本，再将它指定为规则资料。</p>}
     {reports.map(asset => <label className="library-material" key={asset.id}><input type="checkbox" disabled={!data || busy} checked={data?.roles.includes(asset.id) ?? false} onChange={event => void toggle(asset.id, event.target.checked)} /><span>{asset.name}<small>设为统计规则资料</small></span></label>)}
     {saved && <p className="save-status" role="status">规则资料指定已保存。已有运行会按当前资料变化情况提示待复核。</p>}
+    <form className="rule-library-search" onSubmit={e=>{e.preventDefault();void search()}}><label>检索已指定规则<input aria-label="检索已指定规则" value={query} maxLength={200} placeholder="输入指标、期间或口径问题" onChange={e=>setQuery(e.target.value)}/></label><button className="button button-secondary small" disabled={searching||!query.trim()}>{searching?'检索中…':'查找规则原文'}</button></form>
+    {retrieval&&<RuleRetrievalEvidence projectId={projectId} citations={retrieval.items} retrieval={retrieval}/>}
     <details><summary>已保存的结构化约束</summary><p className="inspector-description">{snapshot ? `当前规则快照 v${snapshot.version}：${snapshot.change_reason}` : data ? '尚无当前规则快照。' : '正在读取规则快照…'}</p><p className="inspector-description">逐项规则确认和冲突对照复用结论核验中的现有流程；历史快照不会被覆盖。</p></details>
     <a className="text-link" href={`/app/projects/${projectId}/verify`}>前往规则确认与结论核验 ↗</a>
   </section>

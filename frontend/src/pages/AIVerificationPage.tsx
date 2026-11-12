@@ -7,6 +7,7 @@ import { calculationStatus, conditionText, nullPolicyLabel } from '../calculatio
 import { WorkShell, RequestError } from '../components/WorkShell'
 import { PlanFields, PlanRuleCheck, RuleComparison, RuleSetup, RuleStatus } from '../components/RuleConstraints'
 import { CalculationEvidence } from '../components/CalculationEvidence'
+import { RuleRetrievalEvidence } from '../components/RuleRetrievalEvidence'
 
 function PlanEditor({ task, tables, busy, submit, onBound }: { task: AITask; tables: Asset[]; busy: boolean; submit: (body: unknown) => Promise<void>; onBound: (task: AITask) => void }) {
   const candidate = task.payload.candidates?.[task.payload.selected ?? 0]
@@ -48,7 +49,7 @@ function TaskEvidence({ task }: { task: AITask }) {
       <p className="calc-help">{check.result.comparison_rule}</p><details className="calculation-details"><summary>查看已确认方案、公式及未舍入值</summary><div className="ai-plan-summary"><p>{conditionText(run.spec.scope, run.source.columns)}</p><p>分子：{conditionText(run.spec.numerator, run.source.columns)}</p><p>{nullPolicyLabel[run.spec.null_policy]}；{run.spec.precision} 位小数</p><p>未舍入值：<code>{run.result.unrounded_decimal ?? '无有效值'}</code></p><p>精确分数：{JSON.stringify(run.result.exact_fraction)}</p><p>来源：{run.source.name} / {run.source.sheet_name}</p><code>{run.source.source_id}</code><p>方法：{run.method_version}</p><p>人工确认依据：{task.payload.resolution || '无补充'}</p><p>原报告：{check.report.paragraph.text}</p></div></details>
       <a className="button button-primary small" href={`/app/projects/${task.project_id}/review?check=${check.id}`}>去修订这条原句 ↗</a><a className="text-link" href={`/app/projects/${task.project_id}/calculations?run=${run.id}`}>在原有计算历史中查看本次运行与核验 ↗</a></> : <div className="ai-empty-result"><h3>核验结果将在计算后出现</h3><p>{task.payload.message || '选择一条陈述，检查规则与方案后，后台才会计算并比较。人工确认本身不代表核验通过。'}</p></div>)}
     {tab === 'rows' && (run ? <CalculationEvidence run={run} key={run.id} /> : <p className="calc-empty-small">尚未运行计算，没有可展示的原始行证据。</p>)}
-    {tab === 'rules' && <><p className="calc-help">真实本地检索：中文双字词／关键词匹配，按命中词数排序。下面保留本次检索快照；不使用向量检索。引用规则不代表已自动消除冲突。</p>{!citations.length ? <p className="calc-empty-small">尚未找到相关规则；不会用示例规则替代。</p> : citations.map(c => <article className="ai-rule" key={c.citation_id}><b>{c.name}</b><span>{c.location} · {task.payload.citation_ids?.includes(c.citation_id) ? '方案引用' : '检索命中'}</span><p>{c.text}{c.truncated ? '（节选）' : ''}</p><code>{c.citation_id}</code><details><summary>版本指纹</summary><code>{c.version}</code><code>{c.sha256}</code></details><a href={`/app/projects/${task.project_id}/materials?asset=${c.asset_id}&paragraph=${encodeURIComponent(c.citation_id)}&offset=${Math.floor(c.paragraph_index/50)*50}`}>定位当前规则原文 ↗</a></article>)}</>}
+    {tab === 'rules' && <RuleRetrievalEvidence projectId={task.project_id} citations={citations} retrieval={task.payload.retrieval} selected={task.payload.citation_ids}/>}
     </div>
   </div>
 }

@@ -1,0 +1,7 @@
+.rule-retrieval-evidence { min-width:0; overflow-wrap:anywhere; }
+.rule-retrieval-evidence article { margin:12px 0; padding:14px; border:1px solid #e9edf4; border-radius:10px; background:#fff; }
+.rule-retrieval-evidence p { white-space:pre-wrap; line-height:1.75; }
+.rule-retrieval-evidence code { display:block; overflow-wrap:anywhere; font-size:11px; }
+.rule-retrieval-evidence details { margin:10px 0; }
+.rule-library-search { display:grid; gap:10px; margin:18px 0; min-width:0; }
+.rule-library-search input { min-width:0; width:100%; box-sizing:border-box; padding:10px; border:1px solid #dbe2ee; border-radius:7px; }

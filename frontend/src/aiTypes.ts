@@ -2,7 +2,9 @@ import type { CalculationRun, CalculationSpec, NumericCheck } from './calculatio
 
 export type AIConfig = { configured: boolean; test_mode: boolean; missing: string[]; configuration_error: string | null; provider: string; model: string; region: string; max_requests: number; max_tool_calls: number; timeout_seconds: number }
 export type Candidate = { quote: string; reported_value: string; metric: string; unit: 'percent' | 'decimal' | 'percentage_point'; scope: string; supported: boolean; reason: string }
-export type Citation = { citation_id: string; asset_id: string; name: string; sha256: string; version: string; location: string; paragraph_index: number; text: string; truncated: boolean; score: number }
+export type Citation = { citation_id: string; asset_id: string; name: string; sha256: string; version: string; location: string; paragraph_index: number; text: string; truncated: boolean; score: number;
+  context_role?: string; excerpt_ranges?: {start:number;end:number}[]; quote_options?:string[]; applicability?: {periods:string[];scope_quote:string;status:string;note:string} }
+export type Retrieval = { strategy_version:string; query:string; duration_ms:number; status:string; items:Citation[]; notice:string; model_query?:string; query_source?:string }
 export type AIPlan = CalculationSpec & { context_hash: string }
 export type RuleSpec = Omit<AIPlan, 'context_hash' | 'confirmed'>
 export type RuleSource = { asset_id: string; name: string; paragraph_id: string; paragraph_index: number; location: string; quote: string; text: string; version: string; sha256: string }
@@ -15,7 +17,7 @@ export type AITask = {
   payload: { candidates?: Candidate[]; selected?: number; citations?: Citation[]; citation_ids?: string[]; plan?: AIPlan | null;
     questions?: string[]; explanation?: string; message?: string; confirmed_plan?: AIPlan; resolution?: string; confirmed_at?: string;
     draft_plan?: AIPlan; rule_snapshot?: RuleSnapshot; confirmed_rule_id?: string; plan_revisions?: { event: string; at: string; plan?: AIPlan; previous_rule_id?: string; snapshot_id?: string }[];
-    model: { model: string; region: string; provider: string }; prompt_version: string };
+    retrieval?:Retrieval; retrieval_strategy?:string; model: { model: string; region: string; provider: string }; prompt_version: string };
   request_count: number; tool_count: number; trace: { event: string; name?: string; at: string; summary?: unknown; usage?: unknown; result?: unknown }[];
   run_id: string | null; run?: CalculationRun; check?: NumericCheck; error: string | null; created_at: string; updated_at: string;
 }
