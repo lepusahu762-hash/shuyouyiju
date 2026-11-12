@@ -96,6 +96,20 @@ class RuleMaterial(Base):
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
 
 
+class RuleSnapshot(Base):
+    __tablename__ = "rule_snapshots"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    version: Mapped[int]
+    previous_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    constraints: Mapped[dict] = mapped_column(JSON)
+    sources: Mapped[dict] = mapped_column(JSON)
+    context: Mapped[dict] = mapped_column(JSON)
+    fingerprint: Mapped[str] = mapped_column(String(64))
+    change_reason: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+
+
 class AITask(Base):
     __tablename__ = "ai_tasks"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)

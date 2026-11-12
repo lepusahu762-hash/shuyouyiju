@@ -72,13 +72,36 @@ def choose(client, task):
 
 
 def confirm(client, task, **changes):
+    task = bind_confirmed_rule(client, task)
     payload = task['payload']
     response = client.post(f"/api/ai-tasks/{task['id']}/confirm", headers=HEADERS,
-        json={'plan': {**payload['plan'], 'confirmed': True}, 'reported_value': payload['candidates'][payload['selected']]['reported_value'],
+        json={'plan': {**payload['draft_plan'], 'confirmed': True}, 'reported_value': payload['candidates'][payload['selected']]['reported_value'],
               'rules_confirmed': True, 'citation_ids': payload['citation_ids'],
+              'rule_snapshot_id': payload['rule_snapshot']['id'],
               'resolution': '已核对实际规则，以有效记录为分母，保留空值，不去重。', **changes})
     assert response.status_code == 200, response.text
     return client.get('/api/ai-tasks/'+task['id']).json()
+
+
+def bind_confirmed_rule(client, task, constraints=None):
+    if task['payload'].get('rule_snapshot'):
+        return task
+    fields = ['asset_id','sheet_id','operation','metric','scope_description','scope','numerator','null_policy','precision']
+    plan = constraints or {key:task['payload']['plan'][key] for key in fields}
+    head = client.get(f"/api/projects/{task['project_id']}/rule-snapshots").json()
+    if head['items'] and head['items'][0]['constraints'] == plan:
+        snapshot = head['items'][0]
+    else:
+        source = task['payload']['citations'][0]
+        response = client.post(f"/api/projects/{task['project_id']}/rule-snapshots", headers=HEADERS, json={
+            'previous_id':head['current_id'], 'context_hash':head['context_hash'], 'constraints':plan,
+            'sources':{key:{'asset_id':source['asset_id'],'paragraph_id':source['citation_id'],'quote':source['text']} for key in fields},
+            'confirmed_fields':fields,'unresolved':[],'change_reason':'合成测试逐项明确规则与原文对应关系。'})
+        assert response.status_code == 201, response.text
+        snapshot = response.json()
+    response = client.post(f"/api/ai-tasks/{task['id']}/bind-rule", headers=HEADERS, json={'snapshot_id':snapshot['id']})
+    assert response.status_code == 200, response.text
+    return response.json()
 
 
 def test_ai_workflow_persistence_stale_isolation_and_manual(tmp_path):

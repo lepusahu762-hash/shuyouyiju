@@ -12,7 +12,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import select, func, insert
-from .models import Asset, CalculationRun, CalculationEvidence, NumericCheck, RuleMaterial, new_id
+from .models import Asset, CalculationRun, CalculationEvidence, NumericCheck, RuleMaterial, RuleSnapshot, new_id
 from .projects import owned_project
 
 METHOD = "record-equality-v1"
@@ -164,12 +164,15 @@ async def project_context(session, project):
                "assets": {asset.id: {"name": asset.original_name, "sha256": asset.sha256, "status": asset.status,
                                      "parsed_fingerprint": digest(asset.result), "annotation_version": asset.annotation_version,
                                      "annotations": asset.annotations} for asset in assets}}
+    snapshot_id = await session.scalar(select(RuleSnapshot.id).where(RuleSnapshot.project_id == project.id).order_by(RuleSnapshot.version.desc()).limit(1))
+    if snapshot_id:
+        context["constraint_snapshot_id"] = snapshot_id
     return context, assets
 
 
 def stale_reasons(run, current):
     reasons = []
-    if run.context["rules_version"] != current["rules_version"] or run.context["rules"] != current["rules"] or run.context.get("rule_materials", []) != current.get("rule_materials", []):
+    if run.context["rules_version"] != current["rules_version"] or run.context["rules"] != current["rules"] or run.context.get("rule_materials", []) != current.get("rule_materials", []) or run.context.get("constraint_snapshot_id") != current.get("constraint_snapshot_id"):
         reasons.append("项目统计口径已变更")
     if run.context["assets"] != current["assets"]:
         reasons.append("项目资料集合、解析内容或字段说明已变更")

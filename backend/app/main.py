@@ -16,6 +16,7 @@ from .materials import material_router
 from .calculations import calculations_router
 from .ai import ai_router, BUSY
 from .ai_provider import BailianProvider
+from .rule_constraints import rules_router
 
 
 def create_app(settings: Settings | None = None, ai_provider=None):
@@ -101,6 +102,7 @@ def create_app(settings: Settings | None = None, ai_provider=None):
     app.include_router(project_router(database, current_user))
     app.include_router(material_router(database, settings, current_user))
     app.include_router(calculations_router(database, current_user))
+    app.include_router(rules_router(database, current_user))
     app.include_router(ai_router(database, settings, current_user, ai_provider or BailianProvider(settings)))
     return app
 
