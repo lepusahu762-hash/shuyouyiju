@@ -47,7 +47,7 @@ class ScriptedProvider:
 
 
 def configured(tmp_path, **kwargs):
-    return Settings(data_dir=tmp_path, ai_api_key='not-a-real-key', ai_base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
+    return Settings(_env_file=None, data_dir=tmp_path, ai_api_key='not-a-real-key', ai_base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
                     ai_model='test-model', ai_region='cn-beijing', **kwargs)
 
 
@@ -161,7 +161,7 @@ def test_missing_rules_unsupported_forgery_budget_cancel_and_renamed_fields(tmp_
 
 
 def test_unconfigured_and_provider_protocol(tmp_path, monkeypatch):
-    with TestClient(create_app(Settings(data_dir=tmp_path))) as client:
+    with TestClient(create_app(Settings(_env_file=None, data_dir=tmp_path))) as client:
         pid, table, report, paras, _ = setup(client)
         config = client.get('/api/ai/config').json()
         assert not config['configured'] and 'SYJ_AI_API_KEY' in config['missing']

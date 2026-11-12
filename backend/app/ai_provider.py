@@ -2,6 +2,7 @@
 import json
 from urllib.parse import urlparse
 import httpx
+from .ai_audit import RequestAudit, token_usage
 
 
 class AIError(Exception):
@@ -39,6 +40,7 @@ def configuration(settings):
 class BailianProvider:
     def __init__(self, settings):
         self.settings = settings
+        self.audit = RequestAudit(settings.ai_request_audit_path, settings.ai_request_budget) if settings.ai_request_audit_path else None
 
     async def complete(self, messages, tools=None, tool_choice=None, json_mode=False):
         settings = self.settings
@@ -52,24 +54,48 @@ class BailianProvider:
             body.update(tools=tools, tool_choice=tool_choice)
         if json_mode:
             body["response_format"] = {"type": "json_object"}
+        # Qwen3.7 Plus defaults to thinking: explicitly disable it for short,
+        # non-streaming JSON/tool calls. Keep a hard output budget; truncated JSON
+        # is rejected rather than silently retried without a cost bound.
+        ordinal = None
+        if self.audit:
+            try:
+                ordinal = self.audit.reserve(settings.ai_model)
+            except (ValueError, OSError):
+                raise AIError("本轮真实请求预算已用完或计数文件不可用，已阻止继续调用。请查看本轮验收记录。") from None
         try:
             async with httpx.AsyncClient(timeout=settings.ai_timeout_seconds, follow_redirects=False) as client:
                 response = await client.post(settings.ai_base_url.rstrip("/") + "/chat/completions",
                     headers={"Authorization": "Bearer " + settings.ai_api_key.get_secret_value()}, json=body)
+            try:
+                data = response.json()
+            except ValueError:
+                data = {}
+            if not isinstance(data, dict):
+                data = {}
+            if self.audit:
+                self.audit.finish(ordinal, status="returned", http_status=response.status_code,
+                    usage=token_usage(data.get("usage")),
+                    returned_model=data.get("model") if isinstance(data.get("model"), str) else None,
+                    request_id=response.headers.get("x-request-id"),
+                    error_code=str((data.get("error") or {}).get("code", ""))[:100] if isinstance(data.get("error"), dict) else None)
             if response.status_code == 429:
                 raise AIError("模型服务限流或额度不足（429）。请检查控制台额度，稍后重试；已完成结果保留。")
             if response.status_code in {401, 403}:
                 raise AIError("模型鉴权失败：请在本地检查 API Key、地域及工作空间权限，勿将密钥发到聊天中。")
             if response.status_code >= 400:
                 raise AIError(f"模型 API 请求失败（HTTP {response.status_code}），请检查模型、地域和工具调用支持。")
-            data = response.json()
             message = data["choices"][0]["message"]
             if not isinstance(message, dict) or data["choices"][0].get("finish_reason") == "length":
                 raise AIError("模型输出不完整，请检查输出长度配置后重试。")
             return message, data.get("usage", {})
         except httpx.TimeoutException:
+            if self.audit:
+                self.audit.finish(ordinal, status="timeout")
             raise AIError("模型请求超时。未确认完成的请求仍计入调用上限，可在剩余额度内重试。") from None
         except httpx.HTTPError:
+            if self.audit:
+                self.audit.finish(ordinal, status="connection_error")
             raise AIError("模型服务连接失败，请检查后台网络和服务地址。") from None
         except (ValueError, KeyError, IndexError, TypeError):
             raise AIError("模型响应格式错误，没有生成核验通过结果。") from None

@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     ai_max_tokens: int = Field(default=2500, ge=256, le=8000)
     ai_max_requests: int = Field(default=6, ge=1, le=6)
     ai_max_tool_calls: int = Field(default=4, ge=1, le=6)
+    # Optional local acceptance guard; unset during normal operation. Never stores credentials.
+    ai_request_audit_path: Path | None = None
+    ai_request_budget: int = Field(default=12, ge=1, le=12)
 
     @property
     def storage_dir(self) -> Path:
