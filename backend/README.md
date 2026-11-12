@@ -126,3 +126,12 @@ ReportLab生成PDF，PyMuPDF按需将已保存PDF的一页渲染为PNG，pypdf�
 `app/rule_retrieval.py` 保留 `keyword-bigram-v1`，新增 `bm25-context-v2`，使用Python标准库，无新增依赖。新任务payload保存策略与本次实际查询、真实段落、适用信息及耗时；工具trace记录来源ID。原任务不补写，旧方案及快照仍可读取。GET规则检索仍先校验账户/项目，限定指定规则资料。长段引用保存时必须为原段落中的连续原文；界面为节选提供条款选择，不能提交省略标记。
 
 离线复现与逐题评测在 [RETRIEVAL_PREVIEW.md](../RETRIEVAL_PREVIEW.md)。本轮相关后台27项通过；前端构建/lint通过，真实请求9次，已保存完整用量。独立合成结果可提交，artifacts中的账号/会话/原件不能提交。验收用共享账本通过临时进程环境配置，用户的backend/.env保持原样；正常任务仍有最多6次请求和既有工具上限。
+
+
+## 对话与单字段分组增量（v0.12）
+
+`/api/projects/{pid}/analysis-sessions` 保存/列出会话，`/api/analysis-sessions/{sid}` 分页消息，`.../{sid}/questions` 提交带request_id与expected_head的问题；`/api/analysis-turns/{tid}` 读取，`confirm/cancel/retry` 为受保护POST。`retry`默认重新校验已有响应，不增加请求；明确传 `request_model:true` 才重新调用。每问题最多6次。
+
+原RunRequest的count/ratio与历史兼容；新增可选group_by/group_null_policy，以及后台为范围计数派生的null_fields。`/api/runs/{rid}/groups` 按20组分页，可精确值排序；原evidence接受category并仍按25行分页。所有接口校验所属项目，不提供任意代码/SQL工具。分组方法record-single-group-v1，原不分组方法record-equality-v1不变；总体不平均比例。
+
+不覆盖已确认基础规则；范围只能与探索等值AND取交集，保存不可变运行和稳定行来源。详细方案、独立合成生成器、测试与真实4次调用的审计见仓库根目录ANALYSIS_PREVIEW.md。

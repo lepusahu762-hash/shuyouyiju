@@ -1,0 +1,2073 @@
+{
+  "synthetic_only": true,
+  "model": "qwen3.7-plus",
+  "region": "cn-beijing",
+  "request_budget": 12,
+  "actual_requests": 4,
+  "usage": {
+    "prompt_tokens": 8627,
+    "completion_tokens": 1065,
+    "total_tokens": 9692
+  },
+  "request_audit": [
+    {
+      "ordinal": 1,
+      "model": "qwen3.7-plus",
+      "started_at": "2026-11-12T15:45:53.796614+00:00",
+      "status": "returned",
+      "usage": {
+        "prompt_tokens": 2045,
+        "completion_tokens": 280,
+        "total_tokens": 2325
+      },
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "request_id": "d1e5fcaa-057f-9f29-b18d-a6764697a58f",
+      "error_code": null,
+      "finished_at": "2026-11-12T15:46:00.728103+00:00"
+    },
+    {
+      "ordinal": 2,
+      "model": "qwen3.7-plus",
+      "started_at": "2026-11-12T15:53:23.650677+00:00",
+      "status": "returned",
+      "usage": {
+        "prompt_tokens": 2056,
+        "completion_tokens": 330,
+        "total_tokens": 2386
+      },
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "request_id": "b70cf935-45d1-98b3-84e7-6f7ff1e743a6",
+      "error_code": null,
+      "finished_at": "2026-11-12T15:53:32.346512+00:00"
+    },
+    {
+      "ordinal": 3,
+      "model": "qwen3.7-plus",
+      "started_at": "2026-11-12T15:54:01.708703+00:00",
+      "status": "returned",
+      "usage": {
+        "prompt_tokens": 2051,
+        "completion_tokens": 133,
+        "total_tokens": 2184
+      },
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "request_id": "47f7e06d-8843-9476-8aef-3cad509c66e6",
+      "error_code": null,
+      "finished_at": "2026-11-12T15:54:07.162408+00:00"
+    },
+    {
+      "ordinal": 4,
+      "model": "qwen3.7-plus",
+      "started_at": "2026-11-12T16:04:11.703868+00:00",
+      "status": "returned",
+      "usage": {
+        "prompt_tokens": 2475,
+        "completion_tokens": 322,
+        "total_tokens": 2797
+      },
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "request_id": "33e8d17f-a362-9756-8baa-1a12a5da1285",
+      "error_code": null,
+      "finished_at": "2026-11-12T16:04:19.555627+00:00"
+    }
+  ],
+  "notice": "实际百炼返回与后台计算；初次响应plan为JSON字符串，离线增加有界结构校验后复用该响应，无新请求。追加A的第2次问题未绑定parent，作为独立明确筛选验收；第4次明确绑定该已确认方案验证连续继承。没有把人工修改算作模型原始正确。",
+  "cases": [
+    {
+      "case": "single_group_ratio",
+      "question": "各学院满意率是多少？按所属学院分组，分组字段为空时保留为空值组。",
+      "turn_id": "dd405d18-43d7-47d9-8184-e4427d51a6c1",
+      "parent_id": null,
+      "status": "completed",
+      "model_requests": 1,
+      "original_tool_message": {
+        "content": "",
+        "tool_calls": [
+          {
+            "index": 0,
+            "id": "call_f73855286aa0457d84cd68b4",
+            "type": "function",
+            "function": {
+              "name": "propose_analysis",
+              "arguments": "{\"action\": \"calculate\", \"plan\": \"{\\\"operation\\\": \\\"ratio\\\", \\\"metric\\\": \\\"有效记录满意率\\\", \\\"group_by\\\": \\\"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1\\\", \\\"group_null_policy\\\": \\\"keep\\\", \\\"exploration\\\": [{\\\"column_id\\\": \\\"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2\\\", \\\"kind\\\": \\\"text\\\", \\\"value\\\": \\\"有效\\\"}]}\", \"message\": \"已按“所属学院”分组，筛选“纳入状态”为“有效”的记录，计算各组的“有效记录满意率”。空值组将保留。\", \"questions\": \n[]\n\n, \"citation_ids\": \n[\"7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1\"]\n\n, \"group_key\": null}"
+            }
+          }
+        ],
+        "role": "assistant"
+      },
+      "parsed_original_proposal": {
+        "action": "calculate",
+        "plan": {
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "exploration": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            }
+          ]
+        },
+        "message": "已按“所属学院”分组，筛选“纳入状态”为“有效”的记录，计算各组的“有效记录满意率”。空值组将保留。",
+        "questions": [],
+        "citation_ids": [
+          "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1"
+        ],
+        "group_key": null
+      },
+      "confirmed_plan": {
+        "operation": "ratio",
+        "metric": "有效记录满意率",
+        "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+        "group_null_policy": "keep",
+        "exploration": [
+          {
+            "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+            "kind": "text",
+            "value": "有效"
+          }
+        ]
+      },
+      "human_confirmation": {
+        "at": "2026-11-12T15:52:13.681150+00:00",
+        "plan": {
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "exploration": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            }
+          ]
+        },
+        "rule_snapshot_id": "f9b15049-3279-4b1c-a457-9c8f6b60bb10",
+        "reason": ""
+      },
+      "answer": {
+        "message": "按已确认规则完成完整工作表计算：纳入10条记录，排除2条；总体占比40%。"
+      },
+      "rule_snapshot": {
+        "id": "f9b15049-3279-4b1c-a457-9c8f6b60bb10",
+        "project_id": "b354047a-028a-419b-ba9f-c9bec3f81c27",
+        "version": 1,
+        "previous_id": null,
+        "constraints": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "scope_description": "纳入状态为有效；不限定期间",
+          "scope": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0
+        },
+        "sources": {
+          "asset_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "sheet_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "operation": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "metric": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope_description": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "numerator": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "null_policy": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "precision": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          }
+        },
+        "context": {
+          "rules": {},
+          "rules_version": 1,
+          "rule_materials": [
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c"
+          ],
+          "assets": {
+            "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6": {
+              "name": "独立合成_学院12条.csv",
+              "sha256": "f4618adfc9aea342c986d82a403e7ff5611edf340f2851190d6543bbae792110",
+              "status": "ready",
+              "parsed_fingerprint": "2f531e7604fe4f52dbae58f9bc53c74a8ea42a5581c49a846ef26fcff5ee3404",
+              "annotation_version": 0,
+              "annotations": {}
+            },
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c": {
+              "name": "独立合成_统计规则",
+              "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+              "status": "ready",
+              "parsed_fingerprint": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a",
+              "annotation_version": 0,
+              "annotations": {}
+            }
+          }
+        },
+        "fingerprint": "c11530318b9007d1ca8fc54e159f048c4070346ef5de21efcd672a427937c0a3",
+        "change_reason": "独立合成验收准备：逐项明确基础范围、分子、空值、精度和原文。通过原有受保护接口保存，不由模型推断。",
+        "created_at": "2026-11-12T15:45:35.830581+00:00"
+      },
+      "trace": [
+        {
+          "event": "model_response",
+          "at": "2026-11-12T15:46:00.736643+00:00",
+          "usage": {
+            "prompt_tokens": 2045,
+            "completion_tokens": 280,
+            "total_tokens": 2325
+          },
+          "duration_ms": 6941
+        },
+        {
+          "event": "revalidate_saved_response",
+          "at": "2026-11-12T15:51:00.909338+00:00",
+          "notice": "重新校验已保存真实响应，没有新模型请求。"
+        },
+        {
+          "event": "tool_call",
+          "name": "group_records",
+          "at": "2026-11-12T15:52:13.681207+00:00",
+          "run_id": "5fcf3936-8673-43a2-8e0e-47ac27056b80",
+          "arguments": {
+            "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+            "sheet_id": "s1",
+            "operation": "ratio",
+            "metric": "有效记录满意率",
+            "scope_description": "纳入状态为有效；不限定期间",
+            "scope": [
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+                "kind": "text",
+                "value": "有效"
+              },
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+                "kind": "text",
+                "value": "有效"
+              }
+            ],
+            "numerator": [
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+                "kind": "text",
+                "value": "满意"
+              }
+            ],
+            "null_policy": "keep",
+            "precision": 0,
+            "confirmed": true,
+            "context_hash": "0d10a123dafc7026bafcff2ed9e4ba69a7151fe09174e1b1fb8902b5ecc02176",
+            "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+            "group_null_policy": "keep"
+          },
+          "summary": {
+            "status": "completed",
+            "groups": 3
+          }
+        }
+      ],
+      "run": {
+        "id": "5fcf3936-8673-43a2-8e0e-47ac27056b80",
+        "spec": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "scope_description": "纳入状态为有效；不限定期间",
+          "scope": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0,
+          "confirmed": true,
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep"
+        },
+        "source": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "name": "独立合成_学院12条.csv",
+          "sheet_id": "s1",
+          "sheet_name": "CSV 数据",
+          "source_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1",
+          "source_version": 1,
+          "sha256": "f4618adfc9aea342c986d82a403e7ff5611edf340f2851190d6543bbae792110",
+          "parsed_fingerprint": "9094f9ef2abfd30df43bbccc6bb26c7b9b5d74d189273b113931789274daae28",
+          "columns": [
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "name": "所属学院",
+              "label": "所属学院",
+              "index": 1,
+              "letter": "A"
+            },
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "name": "纳入状态",
+              "label": "纳入状态",
+              "index": 2,
+              "letter": "B"
+            },
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "name": "反馈等级",
+              "label": "反馈等级",
+              "index": 3,
+              "letter": "C"
+            }
+          ],
+          "annotations": {}
+        },
+        "result": {
+          "status": "completed",
+          "message": "按已确认条件完成全工作表计算。",
+          "unit": "记录/行",
+          "total": 12,
+          "included": 10,
+          "excluded": 2,
+          "numerator": 4,
+          "denominator": 10,
+          "numerator_unmatched": 6,
+          "null_rows": 3,
+          "numeric_unmatched_rows": 0,
+          "reasons": {
+            "null_excluded": {
+              "count": 0,
+              "label": "所选条件字段有空值，按确认策略排除"
+            },
+            "group_null_excluded": {
+              "count": 0,
+              "label": "分组字段为空，按明确的分组策略排除"
+            },
+            "scope_unmatched": {
+              "count": 2,
+              "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+            },
+            "numerator_unmatched": {
+              "count": 6,
+              "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+            },
+            "matched": {
+              "count": 4,
+              "label": "同时满足范围和计数／分子条件"
+            }
+          },
+          "exact_fraction": {
+            "numerator": 4,
+            "denominator": 10,
+            "percent_multiplier": 100
+          },
+          "unrounded_decimal": "40",
+          "display_value": "40",
+          "rounding": "ROUND_HALF_UP",
+          "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。",
+          "group_null_rows": 1,
+          "group_null_excluded": 0,
+          "groups": [
+            {
+              "key": "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b",
+              "type": "text",
+              "value": "A",
+              "label": "A",
+              "result": {
+                "status": "completed",
+                "message": "按已确认条件完成全工作表计算。",
+                "unit": "记录/行",
+                "total": 7,
+                "included": 6,
+                "excluded": 1,
+                "numerator": 3,
+                "denominator": 6,
+                "numerator_unmatched": 3,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 1,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 3,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 3,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": {
+                  "numerator": 3,
+                  "denominator": 6,
+                  "percent_multiplier": 100
+                },
+                "unrounded_decimal": "50",
+                "display_value": "50",
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            },
+            {
+              "key": "9522746b2e6b25086b5b6fc7a20940fa4b81856d4850d4d86e835ebc8b6e3ada",
+              "type": "text",
+              "value": "B",
+              "label": "B",
+              "result": {
+                "status": "completed",
+                "message": "按已确认条件完成全工作表计算。",
+                "unit": "记录/行",
+                "total": 4,
+                "included": 4,
+                "excluded": 0,
+                "numerator": 1,
+                "denominator": 4,
+                "numerator_unmatched": 3,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 0,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 3,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 1,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": {
+                  "numerator": 1,
+                  "denominator": 4,
+                  "percent_multiplier": 100
+                },
+                "unrounded_decimal": "25",
+                "display_value": "25",
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            },
+            {
+              "key": "415f6399633611eef48590fbd8943d9e46a6f970a7a8b0a6bcf36e4c5f64b6ff",
+              "type": "null",
+              "value": null,
+              "label": "（分组空值）",
+              "result": {
+                "status": "insufficient",
+                "message": "分母为零，没有满足当前范围的可用记录，无法计算百分比。",
+                "unit": "记录/行",
+                "total": 1,
+                "included": 0,
+                "excluded": 1,
+                "numerator": 0,
+                "denominator": 0,
+                "numerator_unmatched": 0,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 1,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 0,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 0,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": null,
+                "unrounded_decimal": null,
+                "display_value": null,
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            }
+          ],
+          "group_count": 3,
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "chart_limit": 20,
+          "extrema": {
+            "lowest": [
+              "9522746b2e6b25086b5b6fc7a20940fa4b81856d4850d4d86e835ebc8b6e3ada"
+            ],
+            "highest": [
+              "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b"
+            ],
+            "rule": "以各组精确分数比较；并列全部列出；不是显著性检验或因果解释。"
+          },
+          "aggregation_note": "总体由总体分子÷总体分母计算，不平均各组百分比。各组数值单位为记录/行；不同类型的同名值分开。"
+        },
+        "created_at": "2026-11-12T15:52:13.670119+00:00",
+        "method_version": "record-single-group-v1"
+      }
+    },
+    {
+      "case": "explicit_append_independent_question",
+      "question": "在刚才已确认基础上，追加所属学院等于A的筛选，仍按所属学院计算满意率。分组空值保留。",
+      "turn_id": "9ce78c45-8fb8-4f34-8b8b-dc235531fcf6",
+      "parent_id": null,
+      "status": "completed",
+      "model_requests": 1,
+      "original_tool_message": {
+        "content": "",
+        "tool_calls": [
+          {
+            "index": 0,
+            "id": "call_2276c8e31a20459b81a0fd12",
+            "type": "function",
+            "function": {
+              "name": "propose_analysis",
+              "arguments": "{\"action\": \"calculate\", \"message\": \"基于基础规则“有效记录满意率”，追加筛选“所属学院”等于“A”，并按“所属学院”分组计算组内满意率。分组空值策略设定为保留（keep）。\", \"questions\": \n[]\n\n, \"citation_ids\": \n[\"7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1\"]\n\n, \"plan\": {\"operation\": \"ratio\", \"metric\": \"有效记录满意率\", \"group_by\": \"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1\", \"group_null_policy\": \"keep\", \"exploration\": [{\"column_id\": \"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2\", \"kind\": \"text\", \"value\": \"有效\"}, {\"column_id\": \"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1\", \"kind\": \"text\", \"value\": \"A\"}]}}"
+            }
+          }
+        ],
+        "role": "assistant"
+      },
+      "parsed_original_proposal": {
+        "action": "calculate",
+        "plan": {
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "exploration": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "kind": "text",
+              "value": "A"
+            }
+          ]
+        },
+        "message": "基于基础规则“有效记录满意率”，追加筛选“所属学院”等于“A”，并按“所属学院”分组计算组内满意率。分组空值策略设定为保留（keep）。",
+        "questions": [],
+        "citation_ids": [
+          "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1"
+        ],
+        "group_key": null
+      },
+      "confirmed_plan": {
+        "operation": "ratio",
+        "metric": "有效记录满意率",
+        "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+        "group_null_policy": "keep",
+        "exploration": [
+          {
+            "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+            "kind": "text",
+            "value": "有效"
+          },
+          {
+            "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+            "kind": "text",
+            "value": "A"
+          }
+        ]
+      },
+      "human_confirmation": {
+        "at": "2026-11-12T15:53:58.092449+00:00",
+        "plan": {
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "exploration": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "kind": "text",
+              "value": "A"
+            }
+          ]
+        },
+        "rule_snapshot_id": "f9b15049-3279-4b1c-a457-9c8f6b60bb10",
+        "reason": ""
+      },
+      "answer": {
+        "message": "按已确认规则完成完整工作表计算：纳入6条记录，排除6条；总体占比50%。"
+      },
+      "rule_snapshot": {
+        "id": "f9b15049-3279-4b1c-a457-9c8f6b60bb10",
+        "project_id": "b354047a-028a-419b-ba9f-c9bec3f81c27",
+        "version": 1,
+        "previous_id": null,
+        "constraints": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "scope_description": "纳入状态为有效；不限定期间",
+          "scope": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0
+        },
+        "sources": {
+          "asset_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "sheet_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "operation": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "metric": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope_description": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "numerator": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "null_policy": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "precision": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          }
+        },
+        "context": {
+          "rules": {},
+          "rules_version": 1,
+          "rule_materials": [
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c"
+          ],
+          "assets": {
+            "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6": {
+              "name": "独立合成_学院12条.csv",
+              "sha256": "f4618adfc9aea342c986d82a403e7ff5611edf340f2851190d6543bbae792110",
+              "status": "ready",
+              "parsed_fingerprint": "2f531e7604fe4f52dbae58f9bc53c74a8ea42a5581c49a846ef26fcff5ee3404",
+              "annotation_version": 0,
+              "annotations": {}
+            },
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c": {
+              "name": "独立合成_统计规则",
+              "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+              "status": "ready",
+              "parsed_fingerprint": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a",
+              "annotation_version": 0,
+              "annotations": {}
+            }
+          }
+        },
+        "fingerprint": "c11530318b9007d1ca8fc54e159f048c4070346ef5de21efcd672a427937c0a3",
+        "change_reason": "独立合成验收准备：逐项明确基础范围、分子、空值、精度和原文。通过原有受保护接口保存，不由模型推断。",
+        "created_at": "2026-11-12T15:45:35.830581+00:00"
+      },
+      "trace": [
+        {
+          "event": "model_response",
+          "at": "2026-11-12T15:53:32.355485+00:00",
+          "usage": {
+            "prompt_tokens": 2056,
+            "completion_tokens": 330,
+            "total_tokens": 2386
+          },
+          "duration_ms": 8706
+        },
+        {
+          "event": "tool_call",
+          "name": "group_records",
+          "at": "2026-11-12T15:53:58.092502+00:00",
+          "run_id": "c06683d5-b83c-4c73-898c-2934ebdb4e72",
+          "arguments": {
+            "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+            "sheet_id": "s1",
+            "operation": "ratio",
+            "metric": "有效记录满意率",
+            "scope_description": "纳入状态为有效；不限定期间",
+            "scope": [
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+                "kind": "text",
+                "value": "有效"
+              },
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+                "kind": "text",
+                "value": "有效"
+              },
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+                "kind": "text",
+                "value": "A"
+              }
+            ],
+            "numerator": [
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+                "kind": "text",
+                "value": "满意"
+              }
+            ],
+            "null_policy": "keep",
+            "precision": 0,
+            "confirmed": true,
+            "context_hash": "0d10a123dafc7026bafcff2ed9e4ba69a7151fe09174e1b1fb8902b5ecc02176",
+            "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+            "group_null_policy": "keep"
+          },
+          "summary": {
+            "status": "completed",
+            "groups": 3
+          }
+        }
+      ],
+      "run": {
+        "id": "c06683d5-b83c-4c73-898c-2934ebdb4e72",
+        "spec": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "scope_description": "纳入状态为有效；不限定期间",
+          "scope": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "kind": "text",
+              "value": "A"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0,
+          "confirmed": true,
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep"
+        },
+        "source": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "name": "独立合成_学院12条.csv",
+          "sheet_id": "s1",
+          "sheet_name": "CSV 数据",
+          "source_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1",
+          "source_version": 1,
+          "sha256": "f4618adfc9aea342c986d82a403e7ff5611edf340f2851190d6543bbae792110",
+          "parsed_fingerprint": "9094f9ef2abfd30df43bbccc6bb26c7b9b5d74d189273b113931789274daae28",
+          "columns": [
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "name": "所属学院",
+              "label": "所属学院",
+              "index": 1,
+              "letter": "A"
+            },
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "name": "纳入状态",
+              "label": "纳入状态",
+              "index": 2,
+              "letter": "B"
+            },
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "name": "反馈等级",
+              "label": "反馈等级",
+              "index": 3,
+              "letter": "C"
+            }
+          ],
+          "annotations": {}
+        },
+        "result": {
+          "status": "completed",
+          "message": "按已确认条件完成全工作表计算。",
+          "unit": "记录/行",
+          "total": 12,
+          "included": 6,
+          "excluded": 6,
+          "numerator": 3,
+          "denominator": 6,
+          "numerator_unmatched": 3,
+          "null_rows": 3,
+          "numeric_unmatched_rows": 0,
+          "reasons": {
+            "null_excluded": {
+              "count": 0,
+              "label": "所选条件字段有空值，按确认策略排除"
+            },
+            "group_null_excluded": {
+              "count": 0,
+              "label": "分组字段为空，按明确的分组策略排除"
+            },
+            "scope_unmatched": {
+              "count": 6,
+              "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+            },
+            "numerator_unmatched": {
+              "count": 3,
+              "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+            },
+            "matched": {
+              "count": 3,
+              "label": "同时满足范围和计数／分子条件"
+            }
+          },
+          "exact_fraction": {
+            "numerator": 3,
+            "denominator": 6,
+            "percent_multiplier": 100
+          },
+          "unrounded_decimal": "50",
+          "display_value": "50",
+          "rounding": "ROUND_HALF_UP",
+          "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。",
+          "group_null_rows": 1,
+          "group_null_excluded": 0,
+          "groups": [
+            {
+              "key": "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b",
+              "type": "text",
+              "value": "A",
+              "label": "A",
+              "result": {
+                "status": "completed",
+                "message": "按已确认条件完成全工作表计算。",
+                "unit": "记录/行",
+                "total": 7,
+                "included": 6,
+                "excluded": 1,
+                "numerator": 3,
+                "denominator": 6,
+                "numerator_unmatched": 3,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 1,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 3,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 3,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": {
+                  "numerator": 3,
+                  "denominator": 6,
+                  "percent_multiplier": 100
+                },
+                "unrounded_decimal": "50",
+                "display_value": "50",
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            },
+            {
+              "key": "9522746b2e6b25086b5b6fc7a20940fa4b81856d4850d4d86e835ebc8b6e3ada",
+              "type": "text",
+              "value": "B",
+              "label": "B",
+              "result": {
+                "status": "insufficient",
+                "message": "分母为零，没有满足当前范围的可用记录，无法计算百分比。",
+                "unit": "记录/行",
+                "total": 4,
+                "included": 0,
+                "excluded": 4,
+                "numerator": 0,
+                "denominator": 0,
+                "numerator_unmatched": 0,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 4,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 0,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 0,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": null,
+                "unrounded_decimal": null,
+                "display_value": null,
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            },
+            {
+              "key": "415f6399633611eef48590fbd8943d9e46a6f970a7a8b0a6bcf36e4c5f64b6ff",
+              "type": "null",
+              "value": null,
+              "label": "（分组空值）",
+              "result": {
+                "status": "insufficient",
+                "message": "分母为零，没有满足当前范围的可用记录，无法计算百分比。",
+                "unit": "记录/行",
+                "total": 1,
+                "included": 0,
+                "excluded": 1,
+                "numerator": 0,
+                "denominator": 0,
+                "numerator_unmatched": 0,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 1,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 0,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 0,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": null,
+                "unrounded_decimal": null,
+                "display_value": null,
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            }
+          ],
+          "group_count": 3,
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "chart_limit": 20,
+          "extrema": {
+            "lowest": [
+              "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b"
+            ],
+            "highest": [
+              "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b"
+            ],
+            "rule": "以各组精确分数比较；并列全部列出；不是显著性检验或因果解释。"
+          },
+          "aggregation_note": "总体由总体分子÷总体分母计算，不平均各组百分比。各组数值单位为记录/行；不同类型的同名值分开。"
+        },
+        "created_at": "2026-11-12T15:53:58.086964+00:00",
+        "method_version": "record-single-group-v1"
+      }
+    },
+    {
+      "case": "missing_metric",
+      "question": "请统计各学院的收入增长率。表中没有收入或去年字段时请说明缺少什么，不能用满意率代替。",
+      "turn_id": "6a1197ed-867f-4808-ad8e-54fd9604921b",
+      "parent_id": null,
+      "status": "unsupported",
+      "model_requests": 1,
+      "original_tool_message": {
+        "content": "",
+        "tool_calls": [
+          {
+            "index": 0,
+            "id": "call_595fa5c42efb4b23ab008c04",
+            "type": "function",
+            "function": {
+              "name": "propose_analysis",
+              "arguments": "{\"action\": \"unsupported\", \"message\": \"无法统计各学院的收入增长率。当前数据表中缺少“收入”及“去年收入”相关字段，且基础规则定义的指标为“有效记录满意率”，不能用于代替收入增长率计算。\", \"questions\": \n[]\n\n, \"citation_ids\": \n[\"7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1\"]\n\n}"
+            }
+          }
+        ],
+        "role": "assistant"
+      },
+      "parsed_original_proposal": {
+        "action": "unsupported",
+        "plan": null,
+        "message": "无法统计各学院的收入增长率。当前数据表中缺少“收入”及“去年收入”相关字段，且基础规则定义的指标为“有效记录满意率”，不能用于代替收入增长率计算。",
+        "questions": [],
+        "citation_ids": [
+          "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1"
+        ],
+        "group_key": null
+      },
+      "confirmed_plan": null,
+      "human_confirmation": null,
+      "answer": {
+        "message": "无法统计各学院的收入增长率。当前数据表中缺少“收入”及“去年收入”相关字段，且基础规则定义的指标为“有效记录满意率”，不能用于代替收入增长率计算。",
+        "questions": []
+      },
+      "rule_snapshot": {
+        "id": "f9b15049-3279-4b1c-a457-9c8f6b60bb10",
+        "project_id": "b354047a-028a-419b-ba9f-c9bec3f81c27",
+        "version": 1,
+        "previous_id": null,
+        "constraints": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "scope_description": "纳入状态为有效；不限定期间",
+          "scope": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0
+        },
+        "sources": {
+          "asset_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "sheet_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "operation": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "metric": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope_description": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "numerator": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "null_policy": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "precision": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          }
+        },
+        "context": {
+          "rules": {},
+          "rules_version": 1,
+          "rule_materials": [
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c"
+          ],
+          "assets": {
+            "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6": {
+              "name": "独立合成_学院12条.csv",
+              "sha256": "f4618adfc9aea342c986d82a403e7ff5611edf340f2851190d6543bbae792110",
+              "status": "ready",
+              "parsed_fingerprint": "2f531e7604fe4f52dbae58f9bc53c74a8ea42a5581c49a846ef26fcff5ee3404",
+              "annotation_version": 0,
+              "annotations": {}
+            },
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c": {
+              "name": "独立合成_统计规则",
+              "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+              "status": "ready",
+              "parsed_fingerprint": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a",
+              "annotation_version": 0,
+              "annotations": {}
+            }
+          }
+        },
+        "fingerprint": "c11530318b9007d1ca8fc54e159f048c4070346ef5de21efcd672a427937c0a3",
+        "change_reason": "独立合成验收准备：逐项明确基础范围、分子、空值、精度和原文。通过原有受保护接口保存，不由模型推断。",
+        "created_at": "2026-11-12T15:45:35.830581+00:00"
+      },
+      "trace": [
+        {
+          "event": "model_response",
+          "at": "2026-11-12T15:54:07.170583+00:00",
+          "usage": {
+            "prompt_tokens": 2051,
+            "completion_tokens": 133,
+            "total_tokens": 2184
+          },
+          "duration_ms": 5463
+        }
+      ],
+      "run": null
+    },
+    {
+      "case": "inherit_confirmed_filter",
+      "question": "在上一步已确认的A学院筛选基础上继续按所属学院计算满意率。保留已确认筛选与分组空值策略。",
+      "turn_id": "b7834e55-fe0e-4b68-adfd-4f5a76fe61d2",
+      "parent_id": "9ce78c45-8fb8-4f34-8b8b-dc235531fcf6",
+      "status": "completed",
+      "model_requests": 1,
+      "original_tool_message": {
+        "content": "",
+        "tool_calls": [
+          {
+            "index": 0,
+            "id": "call_65c4dc827d9249eca3e4c92f",
+            "type": "function",
+            "function": {
+              "name": "propose_analysis",
+              "arguments": "{\"action\": \"calculate\", \"message\": \"基于已确认的A学院筛选，按所属学院分组计算有效记录满意率。保留纳入状态为有效的筛选条件及分组空值策略keep。\", \"questions\": \n[]\n\n, \"citation_ids\": \n[\"7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1\"]\n\n, \"plan\": {\"operation\": \"ratio\", \"metric\": \"有效记录满意率\", \"group_by\": \"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1\", \"group_null_policy\": \"keep\", \"exploration\": [{\"column_id\": \"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2\", \"kind\": \"text\", \"value\": \"有效\"}, {\"column_id\": \"2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1\", \"kind\": \"text\", \"value\": \"A\"}]}}"
+            }
+          }
+        ],
+        "role": "assistant"
+      },
+      "parsed_original_proposal": {
+        "action": "calculate",
+        "plan": {
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "exploration": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "kind": "text",
+              "value": "A"
+            }
+          ]
+        },
+        "message": "基于已确认的A学院筛选，按所属学院分组计算有效记录满意率。保留纳入状态为有效的筛选条件及分组空值策略keep。",
+        "questions": [],
+        "citation_ids": [
+          "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1"
+        ],
+        "group_key": null
+      },
+      "confirmed_plan": {
+        "operation": "ratio",
+        "metric": "有效记录满意率",
+        "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+        "group_null_policy": "keep",
+        "exploration": [
+          {
+            "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+            "kind": "text",
+            "value": "有效"
+          },
+          {
+            "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+            "kind": "text",
+            "value": "A"
+          }
+        ]
+      },
+      "human_confirmation": {
+        "at": "2026-11-12T16:04:20.119839+00:00",
+        "plan": {
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "exploration": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "kind": "text",
+              "value": "A"
+            }
+          ]
+        },
+        "rule_snapshot_id": "f9b15049-3279-4b1c-a457-9c8f6b60bb10",
+        "reason": ""
+      },
+      "answer": {
+        "message": "按已确认规则完成完整工作表计算：纳入6条记录，排除6条；总体占比50%。"
+      },
+      "rule_snapshot": {
+        "id": "f9b15049-3279-4b1c-a457-9c8f6b60bb10",
+        "project_id": "b354047a-028a-419b-ba9f-c9bec3f81c27",
+        "version": 1,
+        "previous_id": null,
+        "constraints": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "scope_description": "纳入状态为有效；不限定期间",
+          "scope": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0
+        },
+        "sources": {
+          "asset_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "sheet_id": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "operation": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "metric": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope_description": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "scope": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "numerator": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "null_policy": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          },
+          "precision": {
+            "asset_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c",
+            "name": "独立合成_统计规则",
+            "paragraph_id": "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c:v1:line:1",
+            "location": "line:1",
+            "paragraph_index": 0,
+            "quote": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "text": "有效记录满意率：以纳入状态为有效的全部记录为分母，反馈等级为满意的记录为分子。保留反馈空值，不去重，按记录/行统计，显示0位小数。不限定期间；可按所属学院探索分组，分组字段空值处理由用户另行明确。",
+            "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+            "version": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a"
+          }
+        },
+        "context": {
+          "rules": {},
+          "rules_version": 1,
+          "rule_materials": [
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c"
+          ],
+          "assets": {
+            "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6": {
+              "name": "独立合成_学院12条.csv",
+              "sha256": "f4618adfc9aea342c986d82a403e7ff5611edf340f2851190d6543bbae792110",
+              "status": "ready",
+              "parsed_fingerprint": "2f531e7604fe4f52dbae58f9bc53c74a8ea42a5581c49a846ef26fcff5ee3404",
+              "annotation_version": 0,
+              "annotations": {}
+            },
+            "7dc97c09-abd8-4bb1-9705-f5b2e0545a0c": {
+              "name": "独立合成_统计规则",
+              "sha256": "c57c1fb07efb8e7ef09223109bd72bef311c7b773284458eabaf1d733a9d7a14",
+              "status": "ready",
+              "parsed_fingerprint": "4874f4b7f1e41520863bc16284b417dc3e31cf0bf750c6e059caa9e5bd9bf65a",
+              "annotation_version": 0,
+              "annotations": {}
+            }
+          }
+        },
+        "fingerprint": "c11530318b9007d1ca8fc54e159f048c4070346ef5de21efcd672a427937c0a3",
+        "change_reason": "独立合成验收准备：逐项明确基础范围、分子、空值、精度和原文。通过原有受保护接口保存，不由模型推断。",
+        "created_at": "2026-11-12T15:45:35.830581+00:00"
+      },
+      "trace": [
+        {
+          "event": "model_response",
+          "at": "2026-11-12T16:04:19.566139+00:00",
+          "usage": {
+            "prompt_tokens": 2475,
+            "completion_tokens": 322,
+            "total_tokens": 2797
+          },
+          "duration_ms": 7863
+        },
+        {
+          "event": "tool_call",
+          "name": "group_records",
+          "at": "2026-11-12T16:04:20.119873+00:00",
+          "run_id": "33c5ed24-82f1-4ac4-ace3-08ab333efe82",
+          "arguments": {
+            "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+            "sheet_id": "s1",
+            "operation": "ratio",
+            "metric": "有效记录满意率",
+            "scope_description": "纳入状态为有效；不限定期间",
+            "scope": [
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+                "kind": "text",
+                "value": "有效"
+              },
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+                "kind": "text",
+                "value": "有效"
+              },
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+                "kind": "text",
+                "value": "A"
+              }
+            ],
+            "numerator": [
+              {
+                "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+                "kind": "text",
+                "value": "满意"
+              }
+            ],
+            "null_policy": "keep",
+            "precision": 0,
+            "confirmed": true,
+            "context_hash": "0d10a123dafc7026bafcff2ed9e4ba69a7151fe09174e1b1fb8902b5ecc02176",
+            "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+            "group_null_policy": "keep"
+          },
+          "summary": {
+            "status": "completed",
+            "groups": 3
+          }
+        }
+      ],
+      "run": {
+        "id": "33c5ed24-82f1-4ac4-ace3-08ab333efe82",
+        "spec": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "有效记录满意率",
+          "scope_description": "纳入状态为有效；不限定期间",
+          "scope": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "kind": "text",
+              "value": "有效"
+            },
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "kind": "text",
+              "value": "A"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0,
+          "confirmed": true,
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep"
+        },
+        "source": {
+          "asset_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6",
+          "name": "独立合成_学院12条.csv",
+          "sheet_id": "s1",
+          "sheet_name": "CSV 数据",
+          "source_id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1",
+          "source_version": 1,
+          "sha256": "f4618adfc9aea342c986d82a403e7ff5611edf340f2851190d6543bbae792110",
+          "parsed_fingerprint": "9094f9ef2abfd30df43bbccc6bb26c7b9b5d74d189273b113931789274daae28",
+          "columns": [
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+              "name": "所属学院",
+              "label": "所属学院",
+              "index": 1,
+              "letter": "A"
+            },
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c2",
+              "name": "纳入状态",
+              "label": "纳入状态",
+              "index": 2,
+              "letter": "B"
+            },
+            {
+              "id": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c3",
+              "name": "反馈等级",
+              "label": "反馈等级",
+              "index": 3,
+              "letter": "C"
+            }
+          ],
+          "annotations": {}
+        },
+        "result": {
+          "status": "completed",
+          "message": "按已确认条件完成全工作表计算。",
+          "unit": "记录/行",
+          "total": 12,
+          "included": 6,
+          "excluded": 6,
+          "numerator": 3,
+          "denominator": 6,
+          "numerator_unmatched": 3,
+          "null_rows": 3,
+          "numeric_unmatched_rows": 0,
+          "reasons": {
+            "null_excluded": {
+              "count": 0,
+              "label": "所选条件字段有空值，按确认策略排除"
+            },
+            "group_null_excluded": {
+              "count": 0,
+              "label": "分组字段为空，按明确的分组策略排除"
+            },
+            "scope_unmatched": {
+              "count": 6,
+              "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+            },
+            "numerator_unmatched": {
+              "count": 3,
+              "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+            },
+            "matched": {
+              "count": 3,
+              "label": "同时满足范围和计数／分子条件"
+            }
+          },
+          "exact_fraction": {
+            "numerator": 3,
+            "denominator": 6,
+            "percent_multiplier": 100
+          },
+          "unrounded_decimal": "50",
+          "display_value": "50",
+          "rounding": "ROUND_HALF_UP",
+          "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。",
+          "group_null_rows": 1,
+          "group_null_excluded": 0,
+          "groups": [
+            {
+              "key": "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b",
+              "type": "text",
+              "value": "A",
+              "label": "A",
+              "result": {
+                "status": "completed",
+                "message": "按已确认条件完成全工作表计算。",
+                "unit": "记录/行",
+                "total": 7,
+                "included": 6,
+                "excluded": 1,
+                "numerator": 3,
+                "denominator": 6,
+                "numerator_unmatched": 3,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 1,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 3,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 3,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": {
+                  "numerator": 3,
+                  "denominator": 6,
+                  "percent_multiplier": 100
+                },
+                "unrounded_decimal": "50",
+                "display_value": "50",
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            },
+            {
+              "key": "9522746b2e6b25086b5b6fc7a20940fa4b81856d4850d4d86e835ebc8b6e3ada",
+              "type": "text",
+              "value": "B",
+              "label": "B",
+              "result": {
+                "status": "insufficient",
+                "message": "分母为零，没有满足当前范围的可用记录，无法计算百分比。",
+                "unit": "记录/行",
+                "total": 4,
+                "included": 0,
+                "excluded": 4,
+                "numerator": 0,
+                "denominator": 0,
+                "numerator_unmatched": 0,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 4,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 0,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 0,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": null,
+                "unrounded_decimal": null,
+                "display_value": null,
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            },
+            {
+              "key": "415f6399633611eef48590fbd8943d9e46a6f970a7a8b0a6bcf36e4c5f64b6ff",
+              "type": "null",
+              "value": null,
+              "label": "（分组空值）",
+              "result": {
+                "status": "insufficient",
+                "message": "分母为零，没有满足当前范围的可用记录，无法计算百分比。",
+                "unit": "记录/行",
+                "total": 1,
+                "included": 0,
+                "excluded": 1,
+                "numerator": 0,
+                "denominator": 0,
+                "numerator_unmatched": 0,
+                "null_rows": 1,
+                "numeric_unmatched_rows": 0,
+                "reasons": {
+                  "null_excluded": {
+                    "count": 0,
+                    "label": "所选条件字段有空值，按确认策略排除"
+                  },
+                  "group_null_excluded": {
+                    "count": 0,
+                    "label": "分组字段为空，按明确的分组策略排除"
+                  },
+                  "scope_unmatched": {
+                    "count": 1,
+                    "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+                  },
+                  "numerator_unmatched": {
+                    "count": 0,
+                    "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+                  },
+                  "matched": {
+                    "count": 0,
+                    "label": "同时满足范围和计数／分子条件"
+                  }
+                },
+                "exact_fraction": null,
+                "unrounded_decimal": null,
+                "display_value": null,
+                "rounding": "ROUND_HALF_UP",
+                "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+              }
+            }
+          ],
+          "group_count": 3,
+          "group_by": "2a4ba6f1-3c05-4bb3-9f4d-19eeb04652b6:v1:s1:c1",
+          "group_null_policy": "keep",
+          "chart_limit": 20,
+          "extrema": {
+            "lowest": [
+              "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b"
+            ],
+            "highest": [
+              "f230b197aa041f0f2b1b7e377c3d1b68f40e55f4924ace941f26cd7a72696d7b"
+            ],
+            "rule": "以各组精确分数比较；并列全部列出；不是显著性检验或因果解释。"
+          },
+          "aggregation_note": "总体由总体分子÷总体分母计算，不平均各组百分比。各组数值单位为记录/行；不同类型的同名值分开。"
+        },
+        "created_at": "2026-11-12T16:04:20.113596+00:00",
+        "method_version": "record-single-group-v1"
+      }
+    }
+  ],
+  "local_read_followups": [
+    {
+      "question": "哪个最低？",
+      "request_count": 0,
+      "answer": {
+        "kind": "lowest",
+        "message": "最低：B（text）：25%，分子1，分母4。共1组；按精确值排名，仅描述已计算记录，不表示统计显著性或因果。",
+        "groups": [
+          "9522746b2e6b25086b5b6fc7a20940fa4b81856d4850d4d86e835ebc8b6e3ada"
+        ],
+        "tie_count": 1,
+        "truncated": false
+      },
+      "answer_run_id": "5fcf3936-8673-43a2-8e0e-47ac27056b80"
+    },
+    {
+      "question": "查看选中组的记录。",
+      "request_count": 0,
+      "answer": {
+        "kind": "view_group",
+        "groups": [
+          "9522746b2e6b25086b5b6fc7a20940fa4b81856d4850d4d86e835ebc8b6e3ada"
+        ],
+        "message": "已定位B（text）的保存记录：分子1，分母4；可在证据区分页查看。"
+      },
+      "answer_run_id": "5fcf3936-8673-43a2-8e0e-47ac27056b80"
+    }
+  ]
+}
