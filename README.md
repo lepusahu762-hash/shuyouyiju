@@ -2,9 +2,9 @@
 
 React + TypeScript + Vite 前端，Python + FastAPI 后台。现有全站11页框架与真实账户、项目、资料、计算、AI单条核验和规则约束继续保留。
 
-**本轮接通“单条修订 → 保存不可覆盖版本 → 确认当前规则 → 确定性重新核验”**。手动/AI实际结果提供“去修订”，准确关联报告、目标数字、计算与规则快照；接受建议和保存只进入待复核。复核重新运行完整工作表计算，不改写原稿或历史；规则变化和含义变化会阻止复用旧确认。导出仍未接通。演示、截图、接口、测试与限制见 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md)。
+**本轮接通单条结论 PDF 核验报告**：在现有“修改与交付”页明确选择原句、已保存修订版本和一次复核（也可明确不选，按待复核导出）。后台读取保存结果，生成含中文、公式、规则快照和证据摘录的真实PDF，支持受权限保护的分页预览、下载和项目导出历史。预览后依据变化会拒绝生成；旧PDF不会随资料、规则或修订变化而重写。演示、样例、截图及验收见 [PDF_EXPORT_PREVIEW.md](PDF_EXPORT_PREVIEW.md)。
 
-本轮真实模型请求0次，未修改原百炼 `qwen3.7-plus` / `cn-beijing` 配置。AI真实接通及此前付费验收按 [AI_PREVIEW.md](AI_PREVIEW.md) 的历史轮次记录；本轮确定性业务验收不等于新增AI联调。全站清单历史见 [SITE_PAGES_PREVIEW.md](SITE_PAGES_PREVIEW.md)，其中“修改与交付”的后续状态以本轮交付为准。
+修订保存、确定性重新核验继续保留，历史交付见 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md)。本轮真实模型请求 **0次**，没有修改模型配置；导出不重新计算或核验。此前AI接通与付费验收见 [AI_PREVIEW.md](AI_PREVIEW.md)，全站框架历史见 [SITE_PAGES_PREVIEW.md](SITE_PAGES_PREVIEW.md)。
 
 ## 目录
 
@@ -24,7 +24,8 @@ WORKSPACE_PREVIEW.md        v0.3 工作空间历史交付记录
 CALCULATION_PREVIEW.md      v0.4 计算、证据、单条核验历史交付
 AI_PREVIEW.md               v0.5 接入说明、配置步骤、模拟与真实验收边界
 SITE_PAGES_PREVIEW.md       全站框架历史交付
-REVIEW_PREVIEW.md           本轮单条修订、版本与确定性复核、验收及截图
+REVIEW_PREVIEW.md           单条修订、版本与确定性复核历史交付
+PDF_EXPORT_PREVIEW.md       本轮单条PDF、演示、样例、权限与验收
 frontend/HOMEPAGE_PREVIEW.md 上轮历史记录
 artifacts/                 本地验收截图、结果、日志（不提交）
 ```
@@ -76,6 +77,7 @@ npm ci
 ## 数据与认证
 
 - SQLite：`backend/data/shuyouyiju.sqlite3`，存账户、服务器会话、项目、文件元数据、解析结果、字段与统计口径。
+- PDF：`backend/data/exports/<导出 UUID>.pdf`，独立文件及快照；每次读取校验账户归属与SHA256，不通过公开静态目录暴露。备份必须包含此目录。
 - 原件：`backend/data/originals/<资料 UUID>.<扩展名>`，上传后单独保存，SHA-256 记录完整性；预览、检查、字段说明和规则编辑不改写原件。同名上传新增资料。
 - FastAPI Users 15.0.5 管理注册、密码校验和会话；密码使用库默认的 Argon2id 安全哈希。会话使用数据库策略和 HttpOnly / SameSite=Lax Cookie，默认 7 天；退出会在服务器撤销令牌。
 - 每个项目、文件、预览、下载、重试和保存接口均检查当前用户归属。私有资源越权访问返回 404，未登录返回 401。写接口要求 `X-Requested-With: shuyouyiju`，校验浏览器 Origin；认证入口有本进程限频。
@@ -131,7 +133,7 @@ v0.4 新增 `tests/test_calculations.py`，覆盖完整数据、证据集合、�
 
 ## 下一阶段
 
-本轮先完成全站页面与导航，后续再接报告修订保存、修改复核和交付导出；对话分析、交互分组图表、图像核验、邮件验证、找回密码、PDF/OCR与完整版本比较仍未接通。现有AI单条核验继续由确定性后台计算和比较，关键口径需要用户确认。请按独立开发范围推进，勿将禁用预览入口视为已实现业务。
+单条修订、确定性复核及单条PDF已接通。整篇或批量导出、DOCX/XLSX导出、对话分析、交互分组图表、图像核验、邮件验证、找回密码、PDF导入/OCR与完整文件版本比较仍未接通。现有AI单条核验继续由确定性后台计算和比较，关键口径需要用户确认。请按独立开发范围推进，勿将禁用预览入口视为已实现业务。
 
 
 ## v0.5 AI 辅助单条核验

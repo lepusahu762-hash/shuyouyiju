@@ -1,4 +1,4 @@
-# 数有依据后台 · 单条修订与确定性复核
+# 数有依据后台 · 单条修订、确定性复核与PDF导出
 
 运行方法、Python 环境和完整配置见[仓库 README](../README.md)。该目录使用项目 `.venv`，SQLite 和原件默认在 `data/`。本轮新增 `revision_threads`、`report_revisions`、`revision_confirmations`、`revision_rechecks` 四张独立表，由启动时创建，原 `rule_snapshots` 继续复用，既有表、账户和原件保留；没有修改既有表结构。后续改变已有表结构时应加入迁移脚本，不能把 `create_all` 当作迁移机制。
 
@@ -62,7 +62,7 @@ v0.4 计算接口（每一项均检查项目所有者，原件目录仍未公开
 
 失效检查比较当时的整个项目资料签名（原文件 SHA、解析结果指纹、字段说明与版本）和项目规则／版本。新增资料也会保守标记失效。证据接口读取运行时保存的行，不重新套用当前口径。未来替换解析结果后，旧证据仍不变；没有构建完整版本管理。
 
-未提供邮件验证、找回密码、第三方登录或 AI 接口。
+未提供邮件验证、找回密码或第三方登录。已有受控AI单条核验接口；本轮导出不会调用模型。
 
 ## 测试与重启复核
 
@@ -97,3 +97,25 @@ node scripts/check-home-auth.cjs
 $testRun = Join-Path (Resolve-Path '..\artifacts') ('pytest-' + [guid]::NewGuid().ToString())
 & '.\.venv\Scripts\python.exe' -m pytest tests -q --basetemp $testRun
 ```
+
+
+## 单条结论 PDF（本轮）
+
+新增 `pdf_exports` 独立表（仅创建缺失表）和 `data/exports/<UUID>.pdf`；没有重置数据或改变既有修订表。`exports.py`负责明确选择、归属检查、快照确认、生成及读取，`pdf_report.py`负责ReportLab中文排版。预览哈希绑定当前资料、规则、修订head和复核事件；生成时获取SQLite写锁再校验，变化返回409。原始资料按普通文本转义，不解释其中的HTML或指令。
+
+安装本轮依赖仍用项目虚拟环境：
+
+```powershell
+Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju\backend'
+& '.\.venv\Scripts\python.exe' -m pip install -r requirements.txt
+```
+
+ReportLab生成PDF，PyMuPDF按需将已保存PDF的一页渲染为PNG，pypdf用于验收。Windows默认使用本机宋体 `C:/Windows/Fonts/simsun.ttc`；未把字体文件提交到仓库。其他系统请提供合法可嵌入的中文TrueType字体，必要时在已有 `backend/.env` 添加 `SYJ_PDF_FONT_PATH=字体完整路径` 后重启；Linux默认也检查WenQuanYi。缺字体时保留失败记录并给出重试说明，不伪造成功。商用分发需自行确认所选字体及依赖许可证。
+
+接口与完整验收记录见 [PDF_EXPORT_PREVIEW.md](../PDF_EXPORT_PREVIEW.md)。相关检查：
+
+```powershell
+& '.\.venv\Scripts\python.exe' -m pytest tests/test_exports.py tests/test_revisions.py -q --basetemp '..\artifacts\pytest-pdf-new'
+```
+
+临时目录应使用尚不存在的新路径。独立浏览器验收通过 `scripts/seed_pdf_demo.py` 建立明确标注的合成项目，不写入既有用户项目；账户、会话、PDF和截图均保存在Git忽略的artifacts中。不要提交或公开这些本地文件。已有导出记录下载遇到文件丢失或校验失败会报错，恢复备份后再试，不根据当前资料重建旧PDF。
