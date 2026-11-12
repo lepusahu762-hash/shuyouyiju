@@ -4,11 +4,17 @@ export type AIConfig = { configured: boolean; test_mode: boolean; missing: strin
 export type Candidate = { quote: string; reported_value: string; metric: string; unit: 'percent' | 'decimal' | 'percentage_point'; scope: string; supported: boolean; reason: string }
 export type Citation = { citation_id: string; asset_id: string; name: string; sha256: string; version: string; location: string; paragraph_index: number; text: string; truncated: boolean; score: number }
 export type AIPlan = CalculationSpec & { context_hash: string }
+export type RuleSpec = Omit<AIPlan, 'context_hash' | 'confirmed'>
+export type RuleSource = { asset_id: string; name: string; paragraph_id: string; paragraph_index: number; location: string; quote: string; text: string; version: string; sha256: string }
+export type RuleSnapshot = { id: string; project_id: string; version: number; previous_id: string | null; constraints: RuleSpec; sources: Record<keyof RuleSpec, RuleSource>; fingerprint: string; change_reason: string; created_at: string }
+export type RuleCheck = { status: 'legacy' | 'needs_confirmation' | 'stale' | 'conflict' | 'confirmed'; message: string; snapshot_id?: string; version: string; conflicts: { field: keyof RuleSpec; label: string; required: unknown; suggested: unknown; actual: unknown; source: RuleSource }[] }
 export type AITask = {
+  rule_check: RuleCheck;
   id: string; project_id: string; status: string; saved_status: string; stale: boolean; context_hash: string;
   source: { asset_id: string; name: string; excerpt: string; paragraph_index: number; paragraph: { id: string; location: string; text: string } };
   payload: { candidates?: Candidate[]; selected?: number; citations?: Citation[]; citation_ids?: string[]; plan?: AIPlan | null;
     questions?: string[]; explanation?: string; message?: string; confirmed_plan?: AIPlan; resolution?: string; confirmed_at?: string;
+    draft_plan?: AIPlan; rule_snapshot?: RuleSnapshot; confirmed_rule_id?: string; plan_revisions?: { event: string; at: string; plan?: AIPlan; previous_rule_id?: string; snapshot_id?: string }[];
     model: { model: string; region: string; provider: string }; prompt_version: string };
   request_count: number; tool_count: number; trace: { event: string; name?: string; at: string; summary?: unknown; usage?: unknown; result?: unknown }[];
   run_id: string | null; run?: CalculationRun; check?: NumericCheck; error: string | null; created_at: string; updated_at: string;

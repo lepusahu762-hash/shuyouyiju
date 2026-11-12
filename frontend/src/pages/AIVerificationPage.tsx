@@ -5,40 +5,33 @@ import type { AIConfig, AIPlan, AITask } from '../aiTypes'
 import { aiBusy, aiStatus } from '../aiTypes'
 import { calculationStatus, conditionText, nullPolicyLabel } from '../calculationTypes'
 import { WorkShell, RequestError } from '../components/WorkShell'
-import { CalculationConditions } from '../components/CalculationConditions'
+import { PlanFields, PlanRuleCheck, RuleComparison, RuleSetup, RuleStatus } from '../components/RuleConstraints'
 import { CalculationEvidence } from '../components/CalculationEvidence'
 
-function PlanEditor({ task, tables, busy, submit }: { task: AITask; tables: Asset[]; busy: boolean; submit: (body: unknown) => Promise<void> }) {
+function PlanEditor({ task, tables, busy, submit, onBound }: { task: AITask; tables: Asset[]; busy: boolean; submit: (body: unknown) => Promise<void>; onBound: (task: AITask) => void }) {
   const candidate = task.payload.candidates?.[task.payload.selected ?? 0]
-  const [plan, setPlan] = useState<AIPlan>(task.payload.plan ?? { asset_id: '', sheet_id: '', operation: 'ratio', metric: candidate?.metric ?? '',
+  const [plan, setPlan] = useState<AIPlan>(task.payload.draft_plan ?? task.payload.plan ?? { asset_id: '', sheet_id: '', operation: 'ratio', metric: candidate?.metric ?? '',
     scope_description: candidate?.scope ?? '', scope: [], numerator: [], null_policy: 'block', precision: 0, confirmed: false, context_hash: task.context_hash })
   const [resolution, setResolution] = useState('')
   const [ruleIds, setRuleIds] = useState<string[]>(task.payload.citation_ids ?? [])
   const [rulesConfirmed, setRulesConfirmed] = useState(false)
+  const [checkedPlan, setCheckedPlan] = useState('')
   const table = tables.find(item => item.id === plan.asset_id)
   const sheet = table?.summary.sheets?.find(item => item.id === plan.sheet_id)
-  function edit(patch: Partial<AIPlan>) { setPlan(value => ({ ...value, ...patch, confirmed: false })) }
-  return <form onSubmit={event => { event.preventDefault(); void submit({ plan, resolution, citation_ids: ruleIds, rules_confirmed: rulesConfirmed, reported_value: candidate?.reported_value }) }} className="ai-plan-editor">
+  function edit(patch: Partial<AIPlan>) { setCheckedPlan(''); setPlan(value => ({ ...value, ...patch, confirmed: false })) }
+  return <><RuleSetup task={task} tables={tables} onBound={onBound} /><form onSubmit={event => { event.preventDefault(); void submit({ plan, resolution, citation_ids: ruleIds, rules_confirmed: rulesConfirmed, rule_snapshot_id: task.payload.rule_snapshot?.id, reported_value: candidate?.reported_value }) }} className="ai-plan-editor">
     <p className="calc-step">03 · 检查方案并确认</p><h2>先确认这条结论的依据。</h2>
     <p className="ai-plan-explanation">AI 方案建议（尚未核验）：{task.payload.explanation || 'AI 未能确定全部字段，请手动补全；仍需引用实际统计规则。'}</p>
     <div className="ai-plan-summary"><p><b>指标</b>{plan.metric || '待确定'}</p><p><b>统计范围</b>{plan.scope_description || '待确定'}</p><p><b>分母</b>{conditionText(plan.scope, sheet?.columns ?? [])}</p><p><b>分子</b>{conditionText(plan.numerator, sheet?.columns ?? [])}</p><p><b>空值与精度</b>{nullPolicyLabel[plan.null_policy]} · {plan.precision} 位小数</p><p><b>数据来源</b>{table?.name ?? '待选择'} / {sheet?.name ?? '待选择工作表'} · {sheet?.row_count ?? '—'} 条记录</p></div>
     {!!task.payload.questions?.length && <div className="calc-warning"><b>以下事项需要具体确认</b><ul>{task.payload.questions.map((q, i) => <li key={i}>{q}</li>)}</ul></div>}
     <fieldset className="ai-rule-choice"><legend>本次采用的真实规则</legend>{task.payload.citations?.map(c => <label key={c.citation_id}><input type="checkbox" checked={ruleIds.includes(c.citation_id)} onChange={event => { setRuleIds(ids => event.target.checked ? [...ids, c.citation_id] : ids.filter(id => id !== c.citation_id)); setRulesConfirmed(false); edit({}) }} /><span><b>{c.name} · {c.location}</b>{c.text}</span></label>)}</fieldset>
-    <label className="calc-confirm"><input type="checkbox" checked={rulesConfirmed} onChange={event => { setRulesConfirmed(event.target.checked); edit({}) }} /><span>我已核对所选规则；若有冲突，已在确认说明中写明解决依据。仍有未解决问题时，请暂缓执行。</span></label>
-    <details className="ai-adjustments" open={!task.payload.plan}><summary>手动调整字段、条件与精度</summary><fieldset disabled={busy}>
-      <label className="work-field">表格资料<select value={plan.asset_id} onChange={event => edit({ asset_id: event.target.value, sheet_id: '', scope: [], numerator: [] })}><option value="">请选择</option>{tables.map(t => <option value={t.id} key={t.id}>{t.name}</option>)}</select></label>
-      <label className="work-field">工作表<select value={plan.sheet_id} onChange={event => edit({ sheet_id: event.target.value, scope: [], numerator: [] })}><option value="">请选择</option>{table?.summary.sheets?.map(s => <option value={s.id} key={s.id}>{s.name} · {s.row_count} 条</option>)}</select></label>
-      <label className="work-field">指标<input required value={plan.metric} maxLength={120} onChange={event => edit({ metric: event.target.value })} /></label>
-      <label className="work-field">范围说明<textarea required maxLength={1000} value={plan.scope_description} onChange={event => edit({ scope_description: event.target.value })} /></label>
-      <CalculationConditions title="范围" help="所有条件以“并且”组合；无条件为全表。" columns={sheet?.columns ?? []} items={plan.scope} onChange={scope => edit({ scope })} disabled={busy || !sheet} />
-      <CalculationConditions title="分子" help="只从分母范围筛选，不自动去重。" columns={sheet?.columns ?? []} items={plan.numerator} onChange={numerator => edit({ numerator })} disabled={busy || !sheet} />
-      <label className="work-field">空值处理<select value={plan.null_policy} onChange={event => edit({ null_policy: event.target.value as AIPlan['null_policy'] })}>{Object.entries(nullPolicyLabel).map(([value, text]) => <option value={value} key={value}>{text}</option>)}</select></label>
-      <label className="work-field">显示与比较精度<select value={plan.precision} onChange={event => edit({ precision: Number(event.target.value) })}>{Array.from({ length: 7 }, (_, i) => <option value={i} key={i}>{i} 位小数</option>)}</select></label>
-    </fieldset></details>
+    <label className="calc-confirm"><input type="checkbox" checked={rulesConfirmed} onChange={event => { setRulesConfirmed(event.target.checked); edit({}) }} /><span>我已核对所选规则。存在冲突时必须修正方案，或明确保存新规则快照；确认说明不能绕过规则检查。</span></label>
+    <PlanRuleCheck task={task} tables={tables} plan={plan} onChecked={check => { setCheckedPlan(!check.conflicts.length && check.status !== 'stale' && !!task.payload.rule_snapshot ? JSON.stringify({ ...plan, confirmed: false }) : ''); setPlan(p => ({ ...p, confirmed: false })) }} />
+    <details className="ai-adjustments"><summary>手动调整最终方案的字段、条件与精度</summary><PlanFields plan={plan} tables={tables} edit={edit} disabled={busy} /></details>
     <label className="work-field">确认说明{task.payload.questions?.length ? '（必填）' : '（选填）'}<textarea aria-label="确认说明" value={resolution} required={!!task.payload.questions?.length} maxLength={1500} placeholder="例如：已核对规则第1段，以有效记录为分母；采用保留空值，按记录统计。请写实际处理依据。" onChange={event => { setResolution(event.target.value); setPlan(p => ({ ...p, confirmed: false })) }} /></label>
     <label className="calc-confirm"><input type="checkbox" checked={plan.confirmed} onChange={event => setPlan(value => ({ ...value, confirmed: event.target.checked }))} /><span>我已核对原文 {candidate?.reported_value}%、规则、字段、范围、空值和精度。仅核验这一条记录占比，不表示整篇报告通过。</span></label>
-    <button className="button button-primary calc-run-button" disabled={busy || !plan.confirmed || !rulesConfirmed || !ruleIds.length || !sheet || !plan.numerator.length}>确认方案，执行真实计算</button><p className="calc-help">修改设置后需要重新确认。已保存且未变化的方案在失败重试时直接复用，不重复要求确认。</p>
-  </form>
+    <button className="button button-primary calc-run-button" disabled={busy || checkedPlan !== JSON.stringify({ ...plan, confirmed: false }) || !plan.confirmed || !rulesConfirmed || !ruleIds.length || !sheet || !plan.numerator.length}>确认方案，执行真实计算</button><p className="calc-help">修改设置后需要重新确认。已保存且未变化的方案在失败重试时直接复用，不重复要求确认。</p>
+  </form></>
 }
 
 function TaskEvidence({ task }: { task: AITask }) {
@@ -156,7 +149,8 @@ function AIVerification({ projectId }: { projectId: string }) {
         {['extracting', 'searching', 'planning', 'calculating', 'candidates', 'awaiting_confirmation', 'failed'].includes(task.status) && <div className="ai-task-actions">{task.status === 'failed' && <button className="button button-secondary small" disabled={busy || task.request_count >= bundle.config.max_requests} onClick={() => void perform(`/ai-tasks/${task.id}/retry`)}>重试本阶段</button>}<button disabled={busy} onClick={() => void perform(`/ai-tasks/${task.id}/cancel`)}>取消任务</button></div>}
         {task.status === 'cancelled' && <p className="calc-help">取消后不再继续工具步骤；已发出的模型请求可能仍计费。可以重新选择片段开始新任务。</p>}
       </section>
-      {task.status === 'awaiting_confirmation' && <section className="calc-card"><PlanEditor task={task} tables={tables} busy={busy} submit={body => perform(`/ai-tasks/${task.id}/confirm`, body)} key={task.id+task.updated_at} /></section>}
+      {task.status === 'awaiting_confirmation' && <section className="calc-card"><PlanEditor task={task} tables={tables} busy={busy} submit={body => perform(`/ai-tasks/${task.id}/confirm`, body)} onBound={selectTask} key={task.id+(task.payload.rule_snapshot?.id ?? "unbound")} /></section>}
+      {task.status !== 'awaiting_confirmation' && <section className="calc-card">{task.payload.rule_snapshot && (task.payload.confirmed_plan || task.payload.draft_plan || task.payload.plan) ? <RuleComparison task={task} tables={tables} plan={(task.payload.confirmed_plan ?? task.payload.draft_plan ?? task.payload.plan)!} check={task.rule_check} /> : <RuleStatus check={task.rule_check} />}{task.status === 'stale' && task.payload.plan && !task.run_id && task.rule_check.status !== 'legacy' && <RuleSetup task={task} tables={tables} onBound={selectTask} />}</section>}
       <section className="calc-card ai-evidence-card"><p className="calc-step">04 · 可追溯的结论</p><TaskEvidence task={task} key={task.id} /></section>
       <details className="calc-card ai-audit"><summary>本次真实调用摘要与保存信息</summary><p className="calc-help">{task.payload.model.model} · {task.payload.model.region} · 提示词 {task.payload.prompt_version}<br />开始 {displayDate(task.created_at)}；最近更新 {displayDate(task.updated_at)}<br />工具调用 {task.tool_count}/{bundle.config.max_tool_calls}。仅显示实际返回和执行的事件，不展示模型内部推理。</p>{task.trace.map((t, i) => <div key={i}><b>{t.event === 'model_response' ? '模型响应' : t.event === 'tool_result' ? '工具计算结果' : `调用 ${t.name}`}</b><small>{displayDate(t.at)}</small><pre>{JSON.stringify(t.summary ?? t.usage ?? t.result, null, 2)}</pre></div>)}<code>{task.id}</code></details>
     </>}</div></div>

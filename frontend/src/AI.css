@@ -5,6 +5,29 @@
 .ai-service-banner.unconfigured b { color: #85602a; }
 .ai-workspace { display: grid; grid-template-columns: minmax(270px, .8fr) minmax(0, 1.3fr); gap: 20px; align-items: start; }
 .ai-right { min-width: 0; display: grid; gap: 18px; }
+.rule-setup { margin-bottom: 24px; border-bottom: 1px solid #e8edf4; padding-bottom: 20px; }
+.rule-setup > summary, .rule-comparison summary { cursor: pointer; font-size: 13px; line-height: 1.8; color: #355888; }
+.rule-setup fieldset, .rule-plan-fields { min-width: 0; border: 0; padding: 0; margin: 16px 0; }
+.rule-plan-fields .work-field { margin-block: 12px; }
+.rule-status { border-radius: 8px; padding: 14px 16px; background: #f2f6fd; color: #31517e; font-size: 13px; line-height: 1.8; }
+.rule-status p { margin: 5px 0 0; }
+.rule-conflict { background: #fff4ed; color: #8b3d1d; border-left: 3px solid #d67542; }
+.rule-confirmed { background: #eff8f4; color: #286448; }
+.rule-stale, .rule-legacy { background: #f6f3e9; color: #76602d; }
+.rule-comparison { margin-block: 20px; overflow-wrap: anywhere; min-width: 0; }
+.rule-comparison > details { margin-top: 14px; }
+.rule-compare-row { margin-top: 12px; padding: 14px; background: #f8fafc; border-radius: 8px; font-size: 12px; line-height: 1.8; }
+.rule-compare-row.has-conflict { background: #fff8f3; }
+.rule-compare-row > b { font-size: 13px; }
+.rule-compare-row > b > span { margin-left: 8px; color: #a84b21; font-size: 11px; }
+.rule-three-values { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-block: 12px; }
+.rule-three-values small { display: block; color: #75829a; font-size: 11px; }
+.rule-three-values p { margin: 5px 0; }
+.rule-compare-row blockquote, .rule-field-confirm blockquote { margin: 10px 0; padding-left: 12px; border-left: 2px solid #d8e3f4; white-space: pre-wrap; font-size: 12px; line-height: 1.9; color: #54647d; }
+.rule-field-confirm { margin: 14px 0; padding: 12px; background: #f8fafc; border-radius: 6px; font-size: 12px; overflow-wrap: anywhere; }
+.rule-field-confirm select { width: 100%; min-width: 0; text-overflow: ellipsis; }
+.rule-check-button { margin-block: 8px 18px; }
+@media (max-width: 760px) { .rule-three-values { grid-template-columns: minmax(0,1fr); gap: 8px; } .rule-three-values > div { border-bottom: 1px solid #e9e8e4; padding-bottom: 6px; } .rule-field-confirm { padding: 10px; } }
 .ai-source .work-field select { width: 100%; }
 .ai-paragraphs { display: grid; gap: 8px; margin-top: 16px; max-height: 390px; overflow: auto; padding: 2px; }
 .ai-paragraphs button { display: flex; flex-direction: column; gap: 7px; background: #fafbfd; text-align: left; color: #35465f; border: 1px solid transparent; padding: 13px; border-radius: 7px; line-height: 1.9; font-size: 13px; overflow-wrap: anywhere; white-space: pre-wrap; }
