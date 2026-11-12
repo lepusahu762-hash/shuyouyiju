@@ -102,6 +102,7 @@ export function safeReturn(value: string | null): string {
     if (sheet && /^[A-Za-z0-9_-]{1,64}$/.test(sheet)) safeQuery.set('sheet', sheet)
     if (offset && /^\d{1,6}$/.test(offset)) safeQuery.set('offset', offset)
   } else if (page === 'analysis' || page === 'calculations') {
+    for(const key of ['session','turn']){const id=query.get(key);if(id&&uuid.test(id))safeQuery.set(key,id)}
     const run = query.get('run')
     if (run && uuid.test(run)) safeQuery.set('run', run)
   } else if (page === 'review') {

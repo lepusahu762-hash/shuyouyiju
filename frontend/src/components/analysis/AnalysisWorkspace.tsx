@@ -1,0 +1,46 @@
+import {useCallback,useEffect,useState} from 'react'
+import {api,displayDate,type Asset} from '../../api'
+import type {AIConfig} from '../../aiTypes'
+import type {AnalysisSession,AnalysisTurn,AnalysisPlan as Plan} from '../../analysisTypes'
+import {analysisStatus} from '../../analysisTypes'
+import {AnalysisConversation} from './AnalysisConversation'
+import {AnalysisPlan} from './AnalysisPlan'
+import {AnalysisChart} from './AnalysisChart'
+import {AnalysisEvidence} from './AnalysisEvidence'
+import {RequestError} from '../WorkShell'
+import './Analysis.css'
+
+export function AnalysisWorkspace({projectId}:{projectId:string}){
+ const [sessions,setSessions]=useState<{items:AnalysisSession[];total:number}>({items:[],total:0}),[sessionOffset,setSessionOffset]=useState(0)
+ const [session,setSession]=useState<AnalysisSession|null>(null),[turn,setTurn]=useState<AnalysisTurn|null>(null),[offset,setOffset]=useState(0)
+ const [assets,setAssets]=useState<Asset[]>([]),[config,setConfig]=useState<AIConfig|null>(null),[parent,setParent]=useState(''),[selected,setSelected]=useState('')
+ const [loading,setLoading]=useState(true)
+ const [busy,setBusy]=useState(false),[error,setError]=useState(''),[consent,setConsent]=useState(false)
+ const choose=useCallback((t:AnalysisTurn)=>{setTurn(t);setSelected(t.payload.answer?.groups?.[0]??'');if(t.saved_status==='completed'&&!t.stale&&t.run)setParent(t.id);const url=new URL(location.href);url.searchParams.set('session',t.session_id);url.searchParams.set('turn',t.id);history.replaceState(null,'',url)},[])
+ const load=useCallback(async()=>{const [a,c,s]=await Promise.all([api<Asset[]>(`/projects/${projectId}/assets`),api<AIConfig>('/ai/config'),api<typeof sessions>(`/projects/${projectId}/analysis-sessions?offset=${sessionOffset}`)]);setAssets(a);setConfig(c);setSessions(s)},[projectId,sessionOffset])
+ const refresh=useCallback(async(sid:string)=>{const s=await api<AnalysisSession>(`/analysis-sessions/${sid}?offset=${offset}`);if(s.project_id!==projectId)throw Error('会话不属于当前项目。');setSession(s);return s},[offset,projectId])
+ useEffect(()=>{let active=true;Promise.resolve().then(()=>{if(active)setLoading(true)}).then(load).then(async()=>{const q=new URLSearchParams(location.search),sid=q.get('session'),tid=q.get('turn');if(sid){await refresh(sid);if(tid){const t=await api<AnalysisTurn>('/analysis-turns/'+tid);if(t.session_id!==sid)throw Error('消息与会话不匹配。');if(active)choose(t)}}}).then(()=>{if(active)setLoading(false)}).catch(e=>{if(active){setError(e.message);setLoading(false)}});return()=>{active=false}},[load,refresh,choose])
+ const tid=turn?.id,status=turn?.status,sid=session?.id
+ const running=!!status&&['understanding','searching','planning','calculating'].includes(status)
+ useEffect(()=>{if(!running||!tid||!sid)return;let active=true;const timer=setInterval(()=>{api<AnalysisTurn>('/analysis-turns/'+tid).then(async t=>{if(active){setTurn(t);if(!['understanding','searching','planning','calculating'].includes(t.status)){await refresh(sid);choose(t)}}}).catch(e=>{if(active)setError(e.message)})},800);return()=>{active=false;clearInterval(timer)}},[running,tid,sid,refresh,choose])
+ async function action(fn:()=>Promise<void>){if(busy)return;setBusy(true);setError('');try{await fn()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
+ async function newSession(){await action(async()=>{const s=await api<AnalysisSession>(`/projects/${projectId}/analysis-sessions`,{method:'POST',body:JSON.stringify({name:'分析 · '+new Intl.DateTimeFormat('zh-CN',{dateStyle:'short',timeStyle:'short'}).format(new Date())})});setSession({...s,items:[],total:0});setTurn(null);setParent('');setSelected('');const u=new URL(location.href);u.searchParams.set('session',s.id);u.searchParams.delete('turn');history.replaceState(null,'',u);await load()})}
+ async function ask(question:string){await action(async()=>{if(!session)throw Error('请先新建或选择分析会话。');const t=await api<AnalysisTurn>(`/analysis-sessions/${session.id}/questions`,{method:'POST',body:JSON.stringify({question,request_id:crypto.randomUUID(),expected_head:session.head_id,parent_id:parent||null,selected_group:selected||null,consent})});choose(t);await refresh(session.id)})}
+ async function confirm(plan:Plan,reason:string){await action(async()=>{if(!turn||!session)return;const t=await api<AnalysisTurn>(`/analysis-turns/${turn.id}/confirm`,{method:'POST',body:JSON.stringify({plan,reason,confirmed:true,proposal_hash:turn.payload.proposal_hash,rule_snapshot_id:turn.payload.rule_snapshot?.id})});choose(t);await refresh(session.id)})}
+ async function control(which:string,requestModel=false){await action(async()=>{if(!turn||!session)return;const t=await api<AnalysisTurn>(`/analysis-turns/${turn.id}/${which}`,{method:'POST',...(which==='retry'?{body:JSON.stringify({request_model:requestModel})}:{})});choose(t);await refresh(session.id)})}
+ return <><div className="materials-heading"><div><h1>对话式数据分析</h1><p>一个规则基础，一次明确统计，一组可定位的原始证据。</p></div><button className="button button-primary" disabled={busy||running||loading} onClick={()=>void newSession()}>新建分析会话</button></div>
+ <p className="calc-help">{config?.model} · {config?.region}。模型理解问题并提出受限方案；后台负责完整表格计算。最高最低、排序、图表选择和翻页读取保存结果。</p>
+ {config&&!config.configured&&<p className="calc-warning">真实AI尚未接通，请检查后台本地配置。原手动计算仍可用。</p>}{config?.test_mode&&<p className="calc-warning">离线模拟验收，不代表真实模型接入。</p>}
+ {loading&&<p role="status">正在恢复会话与已确认分析，完成后可提问…</p>}{error&&<RequestError message={error} retry={()=>void action(async()=>{await load();if(session)await refresh(session.id);if(turn)choose(await api<AnalysisTurn>('/analysis-turns/'+turn.id))})}/>}
+ <div className="analysis-session-picker"><label>项目内保存的会话<select aria-label="分析会话" value={session?.id??''} onChange={e=>void action(async()=>{if(!e.target.value)return;const s=await refresh(e.target.value);setTurn(null);setParent('');setSelected('');const u=new URL(location.href);u.searchParams.set('session',s.id);u.searchParams.delete('turn');history.replaceState(null,'',u);if(s.items.length)choose(s.items[s.items.length-1])})}><option value="">请选择或新建</option>{sessions.items.map(s=><option value={s.id} key={s.id}>{s.name} · {s.created_at&&displayDate(s.created_at)}</option>)}</select></label><button disabled={!sessionOffset} onClick={()=>setSessionOffset(v=>v-20)}>前20个会话</button><button disabled={sessionOffset+20>=sessions.total} onClick={()=>setSessionOffset(v=>v+20)}>后20个会话</button></div>
+ <div className="analysis-workspace"><AnalysisConversation session={session} turn={turn} parentId={parent} onParent={setParent} onSelect={choose} onAsk={q=>void ask(q)} onPage={setOffset} offset={offset} busy={busy||running||loading} consent={consent} onConsent={setConsent}/>
+ <div className="analysis-result-column">{!turn?<section className="calc-card empty-panel"><h2>从一个清楚的问题开始</h2><p>先准备表格与已确认统计规则。选择或新建会话后提问，查看方案，再确认计算。</p><a href={`/app/projects/${projectId}/materials`}>上传资料与指定规则 ↗</a> · <a href={`/app/projects/${projectId}/verify`}>确认统计规则 ↗</a></section>:<>
+ <section className="calc-card analysis-answer" role="status"><p className="calc-step">{analysisStatus[turn.status]} · 本问题模型请求 {turn.request_count}/6</p><h2>{turn.question}</h2>{turn.stale&&<p className="calc-warning">依据已变化。下方是历史快照，未重新计算；需要按当前资料与规则重新提问确认。</p>}{turn.error&&<p role="alert">{turn.error}</p>}{turn.payload.answer&&<><p>{turn.payload.answer.message}</p>{turn.payload.answer.questions?.map((q,i)=><p key={i}>{q}</p>)}</>}{running&&<p>正在进行上述实际后台阶段，已完成内容会保存；不展示虚构百分比进度。</p>}
+ {(running||turn.status==='awaiting_confirmation')&&<button className="button button-secondary small" disabled={busy} onClick={()=>void control('cancel')}>取消当前问题</button>}{turn.status==='failed'&&<><button className="button button-secondary small" disabled={busy||(!turn.payload.raw_model_message&&turn.request_count>=6)} onClick={()=>void control('retry')}>{turn.payload.raw_model_message?'重新校验已保存建议（不调用模型）':'重试当前问题（计入请求上限）'}</button>{!!turn.payload.raw_model_message&&<button className="button button-secondary small" disabled={busy||turn.request_count>=6} onClick={()=>void control('retry',true)}>重新请求模型（计入上限）</button>}</>}
+ {turn.payload.answer?.kind&&<p className="calc-help">回答依据明确绑定保存的计算记录；没有再次调用模型或重新计算。</p>}</section>
+ {turn.status==='awaiting_confirmation'&&turn.payload.original_proposal?.plan&&<AnalysisPlan key={`plan-${turn.id}`} turn={turn} assets={assets} busy={busy} onConfirm={(p,r)=>void confirm(p,r)}/>}
+ {turn.run?.result.groups&&<AnalysisChart key={turn.run.id} run={turn.run} selected={selected} onSelect={setSelected}/>}
+ {turn.run&&!turn.run.result.groups&&<section className="calc-card"><h2>{turn.run.spec.operation==='count'?'范围内记录数':'当前范围总体占比'}</h2><p className="analysis-big-value">{turn.run.result.display_value??'无有效值'}{turn.run.result.display_value!==null?(turn.run.spec.operation==='ratio'?'%':'条'):''}</p><p>分子{turn.run.result.numerator}／分母{turn.run.result.denominator}；排除{turn.run.result.excluded}条。{turn.run.result.message}</p></section>}
+ <AnalysisEvidence key={`evidence-${turn.id}`} turn={turn} projectId={projectId} selected={selected}/>
+ </>}</div></div></>
+}

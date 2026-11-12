@@ -3,7 +3,7 @@ import type { Column, Rules, FieldMeaning } from './api'
 export type Condition = { column_id: string; kind: 'text' | 'number' | 'boolean'; value: string }
 export type CalculationSpec = {
   asset_id: string; sheet_id: string; operation: 'count' | 'ratio'; metric: string; scope_description: string;
-  scope: Condition[]; numerator: Condition[]; null_policy: 'exclude' | 'keep' | 'block'; precision: number; confirmed: boolean;
+  scope: Condition[]; numerator: Condition[]; null_policy: 'exclude' | 'keep' | 'block'; precision: number; confirmed: boolean; null_fields?:string[];
 }
 export type RunStatus = 'completed' | 'needs_confirmation' | 'insufficient' | 'stale'
 export type NumericResult = {
