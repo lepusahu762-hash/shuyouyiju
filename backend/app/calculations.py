@@ -189,7 +189,7 @@ def run_view(run, context, detail=True):
     return value
 
 
-async def create_run_service(session, project_id, body, user):
+async def create_run_service(session, project_id, body, user, *, commit=True):
     project = await owned_project(session, project_id, user)
     current, assets = await project_context(session, project)
     if digest(current) != body.context_hash:
@@ -213,7 +213,8 @@ async def create_run_service(session, project_id, body, user):
     # Bounded batches; never send a whole-sheet evidence object to the browser.
     for start in range(0, len(evidence), 500):
         await session.execute(insert(CalculationEvidence), [{"run_id": run.id, **row} for row in evidence[start:start+500]])
-    await session.commit()
+    if commit:
+        await session.commit()
     return run_view(run, current)
 
 def check_view(check, run, context):
@@ -224,6 +225,45 @@ def check_view(check, run, context):
     return {"id": check.id, "run_id": check.run_id, "created_at": check.created_at, "report": check.report,
             "spec": check.spec, "result": check.result, "status": "stale" if reasons else check.result["status"],
             "stale": bool(reasons), "stale_reasons": reasons}
+
+def compare_percentage(run, text, reported_value, precision, confirmed, *, is_stale=False):
+    value = Decimal(reported_value)
+    if value > 100:
+        raise HTTPException(422, "本轮核验记录占比，报告百分比必须在 0 到 100 之间。")
+    status, message = "needs_confirmation", "请确认这条原文中的数值、指标、范围和精度与计算一致。"
+    result = {"status": status, "message": message, "reported_value": reported_value,
+              "calculated_value": run.result["display_value"], "difference_pp": None, "exact_difference_pp": None,
+              "comparison_rule": COMPARE_RULE}
+    tokens = re.findall(r"(?<![0-9A-Za-z_.,])([+\-−]?\s*[0-9]+(?:\.[0-9]+)?)\s*[%％]", text)
+    found = [Decimal(re.sub(r"\s", "", item).replace("−", "-")) for item in tokens]
+    if is_stale:
+        status, message = "stale", "资料或口径已变化，请重新计算后再核验；旧结果和证据仍保留。"
+    elif run.spec["operation"] != "ratio" or run.result["status"] == "insufficient":
+        status, message = "insufficient", "没有可用的百分比计算证据。请先完成非零分母的比例计算。"
+    elif run.result["status"] != "completed":
+        status, message = "needs_confirmation", "计算口径尚待确认，请先处理空值并重新计算。"
+    elif precision != run.spec["precision"]:
+        message = "报告精度与计算精度不一致，请确认相同小数位后再核验。"
+    elif max(0, -value.as_tuple().exponent) > precision:
+        message = "输入值的小数位多于确认的报告精度，请按原文重新确认。"
+    elif value not in found:
+        message = "输入的百分比未在所选原文中找到。本轮仅识别阿拉伯数字加 %／％，请选对应段落，不会改写原文。"
+    elif confirmed:
+        with localcontext() as ctx:
+            ctx.prec = 80
+            fraction = run.result["exact_fraction"]
+            raw = Decimal(fraction["numerator"]) * 100 / Decimal(fraction["denominator"])
+            quantum = Decimal(1).scaleb(-precision)
+            computed = raw.quantize(quantum, rounding=ROUND_HALF_UP)
+            reported = value.quantize(quantum, rounding=ROUND_HALF_UP)
+            difference = computed - reported
+            status = "consistent" if difference == 0 else "different"
+            message = "在已确认的指标、范围与精度下，数字与数据一致。" if status == "consistent" else "在已确认的指标、范围与精度下，报告值与计算值存在差异。"
+            result.update(calculated_value=format(computed, "f"), difference_pp=format(difference, "f"),
+                          exact_difference_pp={"numerator": str(Decimal(fraction["numerator"]) * 100 - value * fraction["denominator"]), "denominator": fraction["denominator"]})
+    result.update(status=status, message=message)
+    return result
+
 
 async def create_check_service(session, run_id, body, user):
     run = await session.get(CalculationRun, run_id)
@@ -239,41 +279,7 @@ async def create_check_service(session, run_id, body, user):
     paragraph = next((p for p in report.result["paragraphs"] if p["id"] == body.paragraph_id), None)
     if paragraph is None:
         raise HTTPException(422, "报告段落来源标识不存在，请重新选择。")
-    value = Decimal(body.reported_value)
-    if value > 100:
-        raise HTTPException(422, "本轮核验记录占比，报告百分比必须在 0 到 100 之间。")
-    status, message = "needs_confirmation", "请确认这条原文中的数值、指标、范围和精度与计算一致。"
-    result = {"status": status, "message": message, "reported_value": body.reported_value,
-              "calculated_value": run.result["display_value"], "difference_pp": None, "exact_difference_pp": None,
-              "comparison_rule": COMPARE_RULE}
-    tokens = re.findall(r"(?<![0-9A-Za-z_.,])([+\-−]?\s*[0-9]+(?:\.[0-9]+)?)\s*[%％]", paragraph["text"])
-    found = [Decimal(re.sub(r"\s", "", item).replace("−", "-")) for item in tokens]
-    if stale_reasons(run, context):
-        status, message = "stale", "资料或口径已变化，请重新计算后再核验；旧结果和证据仍保留。"
-    elif run.spec["operation"] != "ratio" or run.result["status"] == "insufficient":
-        status, message = "insufficient", "没有可用的百分比计算证据。请先完成非零分母的比例计算。"
-    elif run.result["status"] != "completed":
-        status, message = "needs_confirmation", "计算口径尚待确认，请先处理空值并重新计算。"
-    elif body.precision != run.spec["precision"]:
-        message = "报告精度与计算精度不一致，请确认相同小数位后再核验。"
-    elif max(0, -value.as_tuple().exponent) > body.precision:
-        message = "输入值的小数位多于确认的报告精度，请按原文重新确认。"
-    elif value not in found:
-        message = "输入的百分比未在所选原文中找到。本轮仅识别阿拉伯数字加 %／％，请选对应段落，不会改写原文。"
-    elif body.confirmed:
-        with localcontext() as ctx:
-            ctx.prec = 80
-            fraction = run.result["exact_fraction"]
-            raw = Decimal(fraction["numerator"]) * 100 / Decimal(fraction["denominator"])
-            quantum = Decimal(1).scaleb(-body.precision)
-            computed = raw.quantize(quantum, rounding=ROUND_HALF_UP)
-            reported = value.quantize(quantum, rounding=ROUND_HALF_UP)
-            difference = computed - reported
-            status = "consistent" if difference == 0 else "different"
-            message = "在已确认的指标、范围与精度下，数字与数据一致。" if status == "consistent" else "在已确认的指标、范围与精度下，报告值与计算值存在差异。"
-            result.update(calculated_value=format(computed, "f"), difference_pp=format(difference, "f"),
-                          exact_difference_pp={"numerator": str(Decimal(fraction["numerator"]) * 100 - value * fraction["denominator"]), "denominator": fraction["denominator"]})
-    result.update(status=status, message=message)
+    result = compare_percentage(run, paragraph["text"], body.reported_value, body.precision, body.confirmed, is_stale=bool(stale_reasons(run, context)))
     snapshot = {"asset_id": report.id, "name": report.original_name, "sha256": report.sha256,
                 "paragraph": paragraph, "signature": context["assets"][report.id]}
     check = NumericCheck(run_id=run.id, report=snapshot, spec=body.model_dump(), result=result)

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import ForeignKey, JSON, String, Text
+from sqlalchemy import ForeignKey, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from fastapi_users_db_sqlalchemy.access_token import SQLAlchemyBaseAccessTokenTableUUID
@@ -126,3 +126,47 @@ class AITask(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[str] = mapped_column(String, default=now)
     updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class RevisionThread(Base):
+    __tablename__ = "revision_threads"
+    __table_args__ = (UniqueConstraint("source_check_id", "target_index"),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    source_check_id: Mapped[str] = mapped_column(ForeignKey("numeric_checks.id"), index=True)
+    target_index: Mapped[int]
+    head_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class ReportRevision(Base):
+    __tablename__ = "report_revisions"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    thread_id: Mapped[str] = mapped_column(ForeignKey("revision_threads.id"), index=True)
+    version: Mapped[int]
+    parent_id: Mapped[str | None] = mapped_column(ForeignKey("report_revisions.id"), nullable=True)
+    restored_from: Mapped[str | None] = mapped_column(ForeignKey("report_revisions.id"), nullable=True)
+    text: Mapped[str] = mapped_column(Text)
+    action: Mapped[str] = mapped_column(String(20))
+    reason: Mapped[str] = mapped_column(Text)
+    basis: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    __table_args__ = (UniqueConstraint("thread_id", "version"),)
+
+
+class RevisionConfirmation(Base):
+    __tablename__ = "revision_confirmations"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("report_revisions.id"), index=True)
+    snapshot: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class RevisionRecheck(Base):
+    __tablename__ = "revision_rechecks"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("report_revisions.id"), index=True)
+    confirmation_id: Mapped[str] = mapped_column(ForeignKey("revision_confirmations.id"), unique=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("calculation_runs.id"), index=True)
+    result: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[str] = mapped_column(String, default=now)
