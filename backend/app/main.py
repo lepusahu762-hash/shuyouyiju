@@ -21,6 +21,8 @@ from .revisions import revisions_router
 from .exports import exports_router
 from .image_verification import image_router
 from .models import ImageTask
+from .models import AnalysisTurn
+from .analysis import analysis_router
 
 
 def create_app(settings: Settings | None = None, ai_provider=None):
@@ -38,6 +40,7 @@ def create_app(settings: Settings | None = None, ai_provider=None):
             await session.execute(update(AITask).where(AITask.status.in_(BUSY)).values(status="failed", error="后台已重启，本阶段中断。已完成快照保留，可在剩余调用额度内重试。", updated_at=now()))
             await session.commit()
             await session.execute(update(ImageTask).where(ImageTask.status.in_(["extracting","calculating"])).values(status="failed",error="后台重启中断，已完成内容保留，可在预算内重试。"))
+            await session.execute(update(AnalysisTurn).where(AnalysisTurn.status.in_(['understanding','searching','planning','calculating'])).values(status='failed',error='后台重启中断，已保存消息保留；可在剩余预算内重试。'))
             await session.commit()
         yield
         await database.engine.dispose()
@@ -112,6 +115,7 @@ def create_app(settings: Settings | None = None, ai_provider=None):
     app.include_router(revisions_router(database, current_user))
     app.include_router(exports_router(database, settings, current_user))
     app.include_router(image_router(database,settings,current_user,ai_provider or BailianProvider(settings)))
+    app.include_router(analysis_router(database,settings,current_user,ai_provider or BailianProvider(settings)))
     app.include_router(ai_router(database, settings, current_user, ai_provider or BailianProvider(settings)))
     return app
 

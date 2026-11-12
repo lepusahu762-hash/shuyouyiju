@@ -202,3 +202,30 @@ class ImageTask(Base):
     error: Mapped[str | None] = mapped_column(Text,nullable=True)
     created_at: Mapped[str] = mapped_column(String,default=now)
     updated_at: Mapped[str] = mapped_column(String,default=now)
+
+
+class AnalysisSession(Base):
+    __tablename__='analysis_sessions'
+    id: Mapped[str]=mapped_column(String,primary_key=True,default=new_id)
+    project_id: Mapped[str]=mapped_column(ForeignKey('projects.id'),index=True)
+    name: Mapped[str]=mapped_column(String(120))
+    head_id: Mapped[str|None]=mapped_column(String,nullable=True)
+    created_at: Mapped[str]=mapped_column(String,default=now)
+
+
+class AnalysisTurn(Base):
+    __tablename__='analysis_turns'
+    __table_args__=(UniqueConstraint('session_id','request_id'),)
+    id: Mapped[str]=mapped_column(String,primary_key=True,default=new_id)
+    session_id: Mapped[str]=mapped_column(ForeignKey('analysis_sessions.id'),index=True)
+    request_id: Mapped[str]=mapped_column(String(64))
+    question: Mapped[str]=mapped_column(Text)
+    parent_id: Mapped[str|None]=mapped_column(ForeignKey('analysis_turns.id'),nullable=True)
+    context: Mapped[dict]=mapped_column(JSON)
+    payload: Mapped[dict]=mapped_column(JSON,default=dict)
+    status: Mapped[str]=mapped_column(String(40),default='understanding')
+    request_count: Mapped[int]=mapped_column(default=0)
+    trace: Mapped[list]=mapped_column(JSON,default=list)
+    run_id: Mapped[str|None]=mapped_column(ForeignKey('calculation_runs.id'),nullable=True)
+    error: Mapped[str|None]=mapped_column(Text,nullable=True)
+    created_at: Mapped[str]=mapped_column(String,default=now)

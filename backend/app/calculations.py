@@ -18,6 +18,7 @@ from .projects import owned_project
 METHOD = "record-equality-v1"
 COMPARE_RULE = "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
 REASONS = {"null_excluded": "所选条件字段有空值，按确认策略排除",
+           'group_null_excluded':'分组字段为空，按明确的分组策略排除',
            "scope_unmatched": "未同时满足统计范围条件（含保留的空值或非数值未匹配）",
            "numerator_unmatched": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）",
            "matched": "同时满足范围和计数／分子条件"}
@@ -68,6 +69,9 @@ class RunRequest(BaseModel):
     precision: int = Field(ge=0, le=6)
     confirmed: bool = False
     context_hash: str
+    group_by: str | None = None
+    group_null_policy: Literal['keep', 'exclude', 'block'] | None = None
+    null_fields: list[str] | None = Field(default=None,max_length=20)
 
 
 class CheckRequest(BaseModel):
@@ -118,6 +122,10 @@ def calculate(sheet, body):
     scope = compiled(body.scope, sheet["columns"])
     numerator = compiled(body.numerator, sheet["columns"])
     relevant = {item[0] for item in scope + numerator}
+    if body.null_fields is not None:
+        indexes={c['id']:i for i,c in enumerate(sheet['columns'])}
+        if not set(body.null_fields)<=indexes.keys():raise HTTPException(422,'空值检查字段不存在于所选工作表。')
+        relevant.update(indexes[k] for k in body.null_fields)
     counts = Counter()
     evidence = []
     null_rows, numeric_unmatched = 0, 0
@@ -184,6 +192,10 @@ def run_view(run, context, detail=True):
     value = {"id": run.id, "project_id": run.project_id, "created_at": run.created_at, "method_version": run.method_version,
              "spec": run.spec, "source": run.source, "result": run.result, "stale": bool(reasons), "stale_reasons": reasons,
              "status": "stale" if reasons else run.result["status"]}
+    if 'groups' in run.result:
+        value['result']={**run.result,'groups':run.result['groups'][:20],'groups_truncated':len(run.result['groups'])>20,
+                         'extrema':{**run.result['extrema'],**{k:run.result['extrema'][k][:20] for k in ['lowest','highest']},
+                                    'tie_counts':{k:len(run.result['extrema'][k]) for k in ['lowest','highest']}}}
     if detail:
         value["context"] = run.context
     return value
@@ -202,12 +214,17 @@ async def create_run_service(session, project_id, body, user, *, commit=True):
     sheet = next((sheet for sheet in asset.result["sheets"] if sheet["id"] == body.sheet_id), None)
     if sheet is None:
         raise HTTPException(422, "工作表不存在，请重新选择。")
-    result, evidence = calculate(sheet, body)
+    if body.group_by:
+        from .group_calculations import calculate_groups
+        result, evidence = calculate_groups(sheet, body)
+    else:
+        if body.group_null_policy is not None:raise HTTPException(422,'未选择分组字段，不能设置分组空值策略。')
+        result, evidence = calculate(sheet, body)
     source = {"asset_id": asset.id, "name": asset.original_name, "sheet_id": sheet["id"], "sheet_name": sheet["name"],
               "source_id": f"{asset.id}:v1:{sheet['id']}", "source_version": 1, "sha256": asset.sha256,
               "parsed_fingerprint": digest(sheet), "columns": sheet["columns"], "annotations": asset.annotations}
-    run = CalculationRun(id=new_id(), project_id=project_id, spec=body.model_dump(exclude={"context_hash"}),
-                         context=current, source=source, result=result, method_version=METHOD)
+    run = CalculationRun(id=new_id(), project_id=project_id, spec=body.model_dump(exclude={"context_hash"},exclude_none=True),
+                         context=current, source=source, result=result, method_version='record-single-group-v1' if body.group_by else METHOD)
     session.add(run)
     await session.flush()
     # Bounded batches; never send a whole-sheet evidence object to the browser.
@@ -325,9 +342,12 @@ def calculations_router(database, current_user):
 
     @router.get("/runs/{run_id}/evidence")
     async def evidence(run_id: str, group: Literal["all", "denominator", "numerator", "excluded", "unmatched"] = "denominator",
-                       offset: int = Query(0, ge=0), limit: int = Query(25, ge=1, le=100), user=Depends(current_user), session=Depends(database.session)):
+                       offset: int = Query(0, ge=0), limit: int = Query(25, ge=1, le=100), category: str | None = Query(None,max_length=64), user=Depends(current_user), session=Depends(database.session)):
         run, project = await owned_run(session, run_id, user)
         query = select(CalculationEvidence).where(CalculationEvidence.run_id == run.id)
+        if category is not None:
+            if not any(g['key']==category for g in run.result.get('groups',[])):raise HTTPException(422,'分组不存在于此保存结果。')
+            query=query.where(CalculationEvidence.row['group_key'].as_string()==category)
         if group == "denominator":
             query = query.where(CalculationEvidence.in_scope.is_(True))
         elif group == "numerator":
@@ -341,6 +361,20 @@ def calculations_router(database, current_user):
         return {"run_id": run.id, "group": group, "total": total, "offset": offset, "limit": limit, "columns": run.source["columns"],
                 "rows": [{**row.row, "in_scope": row.in_scope, "in_numerator": row.in_numerator,
                           "reason": row.reason, "reason_label": REASONS[row.reason]} for row in rows]}
+
+    @router.get('/runs/{run_id}/groups')
+    async def groups(run_id:str,offset:int=Query(0,ge=0),limit:int=Query(20,ge=1,le=100),
+                     order:Literal['source','ascending','descending']='source',category:str|None=Query(None,max_length=64),user=Depends(current_user),session=Depends(database.session)):
+        from fractions import Fraction
+        run,_=await owned_run(session,run_id,user)
+        rows=run.result.get('groups',[])
+        if category is not None:rows=[g for g in rows if g['key']==category]
+        if order!='source':
+            usable=[g for g in rows if g['result']['exact_fraction'] is not None]
+            unavailable=[g for g in rows if g['result']['exact_fraction'] is None]
+            usable.sort(key=lambda g:Fraction(g['result']['exact_fraction']['numerator'],g['result']['exact_fraction']['denominator']),reverse=order=='descending')
+            rows=usable+unavailable
+        return {'items':rows[offset:offset+limit],'total':len(rows),'offset':offset,'limit':limit,'order':order}
 
 
     @router.get("/runs/{run_id}/checks")
