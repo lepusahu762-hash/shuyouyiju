@@ -104,7 +104,7 @@ def test_failure_retry_and_file_authorization(tmp_path):
         assert client.get(f"/api/assets/{aid}/preview").status_code == 409
         assert client.post(f"/api/assets/{aid}/retry", json={}, headers=HEADERS).status_code == 202
         assert client.get(f"/api/assets/{aid}").json()["status"] == "failed"
-        assert client.post(f"/api/projects/{pid}/assets", files={"file": ("image.png", b"image")}, headers=HEADERS).status_code == 415
+        assert client.post(f"/api/projects/{pid}/assets", files={"file": ("document.pdf", b"pdf")}, headers=HEADERS).status_code == 415
         assert client.post(f"/api/projects/{pid}/assets", files={"file": ("empty.csv", b"")}, headers=HEADERS).status_code == 422
         good = upload(client, pid, "normal.csv", b"x,y\n1,2\n")
         assert good["status"] == "ready"

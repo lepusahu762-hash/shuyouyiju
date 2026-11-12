@@ -1,5 +1,9 @@
 """Server-only Bailian Chat Completions adapter. No document instructions are trusted."""
 import json
+import base64
+import copy
+from io import BytesIO
+from PIL import Image
 from urllib.parse import urlparse
 import httpx
 from .ai_audit import RequestAudit, token_usage
@@ -46,7 +50,28 @@ class BailianProvider:
         settings = self.settings
         if not configuration(settings)["configured"]:
             raise AIError("真实 AI 尚未接通：请在后台本地 .env 中补全模型配置并重启。")
-        if len(json.dumps(messages, ensure_ascii=False)) > 60000:
+        text_messages=copy.deepcopy(messages)
+        image_count=0
+        for message in text_messages:
+            content=message.get('content')
+            if not isinstance(content,list):continue
+            for part in content:
+                if part.get('type')=='image_url':
+                    image_count+=1
+                    url=part.get('image_url',{}).get('url','')
+                    prefix=next((p for p in ['data:image/png;base64,','data:image/jpeg;base64,'] if url.startswith(p)),None)
+                    if not prefix or len(url)>12*1024*1024:raise AIError('图片输入仅接受有大小限制的PNG/JPEG Base64数据，不读取外部URL。')
+                    try:
+                        raw=base64.b64decode(url[len(prefix):],validate=True)
+                        if len(raw)>settings.image_max_bytes:raise ValueError()
+                        with Image.open(BytesIO(raw)) as im:
+                            if im.format not in {'PNG','JPEG'} or im.width*im.height>settings.image_max_pixels or max(im.size)>8000:raise ValueError()
+                            im.verify()
+                    except Exception:raise AIError('模型图片输入无效或超出8 MiB/1200万像素限制。') from None
+                    part['image_url']={'url':'[bounded image bytes]'}
+                elif part.get('type')!='text':raise AIError('不支持此多模态输入类型。')
+        if image_count>1:raise AIError('一次仅识别一张图片选区。')
+        if len(json.dumps(text_messages, ensure_ascii=False)) > 60000:
             raise AIError("必要字段与规则超过首版单次6万字符限制，请精简项目资料后重试；本次未向模型发送内容。")
         body = {"model": settings.ai_model, "messages": messages, "max_tokens": settings.ai_max_tokens,
                 "temperature": 0, "stream": False, "enable_thinking": False}
@@ -54,6 +79,8 @@ class BailianProvider:
             body.update(tools=tools, tool_choice=tool_choice)
         if json_mode:
             body["response_format"] = {"type": "json_object"}
+        if len(json.dumps(body,ensure_ascii=False).encode('utf-8'))>settings.ai_max_request_bytes:
+            raise AIError('模型请求总量超过12 MiB，未发出请求。请缩小选区或减少文字。')
         # Qwen3.7 Plus defaults to thinking: explicitly disable it for short,
         # non-streaming JSON/tool calls. Keep a hard output budget; truncated JSON
         # is rejected rather than silently retried without a cost bound.

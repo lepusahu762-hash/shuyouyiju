@@ -19,6 +19,8 @@ from .ai_provider import BailianProvider
 from .rule_constraints import rules_router
 from .revisions import revisions_router
 from .exports import exports_router
+from .image_verification import image_router
+from .models import ImageTask
 
 
 def create_app(settings: Settings | None = None, ai_provider=None):
@@ -34,6 +36,8 @@ def create_app(settings: Settings | None = None, ai_provider=None):
             # An interrupted parser cannot retain a fictitious running state after restart.
             await session.execute(update(Asset).where(Asset.status.in_(["uploaded", "parsing"])).values(status="failed", error="后台已重启，解析中断。原文件已保留，请重试解析。", updated_at=now()))
             await session.execute(update(AITask).where(AITask.status.in_(BUSY)).values(status="failed", error="后台已重启，本阶段中断。已完成快照保留，可在剩余调用额度内重试。", updated_at=now()))
+            await session.commit()
+            await session.execute(update(ImageTask).where(ImageTask.status.in_(["extracting","calculating"])).values(status="failed",error="后台重启中断，已完成内容保留，可在预算内重试。"))
             await session.commit()
         yield
         await database.engine.dispose()
@@ -107,6 +111,7 @@ def create_app(settings: Settings | None = None, ai_provider=None):
     app.include_router(rules_router(database, current_user))
     app.include_router(revisions_router(database, current_user))
     app.include_router(exports_router(database, settings, current_user))
+    app.include_router(image_router(database,settings,current_user,ai_provider or BailianProvider(settings)))
     app.include_router(ai_router(database, settings, current_user, ai_provider or BailianProvider(settings)))
     return app
 

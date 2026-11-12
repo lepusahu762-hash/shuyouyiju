@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # Embedded CJK TrueType font. Empty uses the local Windows SimSun or Linux
     # WenQuanYi font, otherwise export fails explicitly instead of broken glyphs.
     pdf_font_path: Path | None = None
+    image_max_bytes: int = Field(default=8*1024*1024,ge=1024,le=8*1024*1024)
+    image_max_pixels: int = Field(default=12000000,ge=10000,le=12000000)
+    ai_max_request_bytes: int = Field(default=12*1024*1024,ge=65536,le=12*1024*1024)
     ai_api_key: SecretStr = SecretStr("")
     ai_base_url: str = ""
     ai_model: str = ""

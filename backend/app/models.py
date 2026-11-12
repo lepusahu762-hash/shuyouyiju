@@ -185,3 +185,20 @@ class PdfExport(Base):
     sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     size_bytes: Mapped[int] = mapped_column(default=0)
     created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class ImageTask(Base):
+    __tablename__ = 'image_tasks'
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(ForeignKey('projects.id'), index=True)
+    source: Mapped[dict] = mapped_column(JSON)
+    context: Mapped[dict] = mapped_column(JSON)
+    payload: Mapped[dict] = mapped_column(JSON,default=dict)
+    status: Mapped[str] = mapped_column(String(40),default='extracting')
+    request_count: Mapped[int] = mapped_column(default=0)
+    trace: Mapped[list] = mapped_column(JSON,default=list)
+    run_id: Mapped[str | None] = mapped_column(ForeignKey('calculation_runs.id'),nullable=True)
+    result: Mapped[dict | None] = mapped_column(JSON,nullable=True)
+    error: Mapped[str | None] = mapped_column(Text,nullable=True)
+    created_at: Mapped[str] = mapped_column(String,default=now)
+    updated_at: Mapped[str] = mapped_column(String,default=now)

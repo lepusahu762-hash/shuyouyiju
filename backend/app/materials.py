@@ -9,6 +9,7 @@ from sqlalchemy import select, update, func
 from .models import Asset, Project, new_id, now
 from .projects import owned_project
 from .parsers import parse_file, ParseError
+from .image_files import parse_image
 
 
 class ParseOptions(BaseModel):
@@ -69,7 +70,7 @@ def material_router(database, settings, current_user):
             asset.updated_at = now()
             await session.commit()
             try:
-                result = await asyncio.to_thread(parse_file, settings.storage_dir / asset.stored_name,
+                result = await asyncio.to_thread(parse_image, settings.storage_dir / asset.stored_name,asset.id,settings) if asset.kind=="image" else await asyncio.to_thread(parse_file, settings.storage_dir / asset.stored_name,
                                                  asset.extension, asset.id, asset.parse_options, settings)
                 asset.result = result
                 asset.status = "ready"
@@ -93,8 +94,8 @@ def material_router(database, settings, current_user):
         project = await owned_project(session, project_id, user)
         name = (file.filename or "").replace("\\", "/").split("/")[-1].replace("\r", "").replace("\n", "")
         extension = Path(name).suffix.lower()
-        if extension not in {".csv", ".xlsx", ".docx"}:
-            raise HTTPException(415, "当前仅支持 CSV、XLSX、DOCX 文件。PDF、图片、XLS、宏文件及其他格式尚未接通。")
+        if extension not in {".csv", ".xlsx", ".docx", ".png", ".jpg", ".jpeg"}:
+            raise HTTPException(415, "当前支持 CSV、XLSX、DOCX、PNG、JPEG。PDF导入、XLS及宏文件尚未接通。")
         if not name or len(name) > 255:
             raise HTTPException(422, "文件名为空或超过 255 个字符。")
         await reserve_slot(session, project)
@@ -106,14 +107,15 @@ def material_router(database, settings, current_user):
             with target.open("xb") as original:
                 while chunk := await file.read(1024 * 1024):
                     size += len(chunk)
-                    if size > settings.max_upload_bytes:
-                        raise HTTPException(413, f"单个文件最多 {settings.max_upload_bytes // 1024 // 1024} MiB。请拆分后上传。")
+                    if size > (min(settings.max_upload_bytes,settings.image_max_bytes) if extension in {".png",".jpg",".jpeg"} else settings.max_upload_bytes):
+                        limit = min(settings.max_upload_bytes, settings.image_max_bytes) if extension in {'.png','.jpg','.jpeg'} else settings.max_upload_bytes
+                        raise HTTPException(413, f"单个文件最多 {limit // 1024 // 1024} MiB。请拆分后上传。")
                     digest.update(chunk)
                     original.write(chunk)
             if size == 0:
                 raise HTTPException(422, "文件为空，请选择有内容的文件。")
             asset = Asset(id=aid, project_id=project.id, original_name=name, extension=extension,
-                          kind="table" if extension in {".csv", ".xlsx"} else "report", stored_name=stored_name,
+                          kind="table" if extension in {".csv", ".xlsx"} else "image" if extension in {".png",".jpg",".jpeg"} else "report", stored_name=stored_name,
                           size_bytes=size, sha256=digest.hexdigest(), status="uploaded", parse_options={"encoding": "auto", "delimiter": "auto"})
             session.add(asset)
             await session.commit()
@@ -160,6 +162,7 @@ def material_router(database, settings, current_user):
         if asset.status != "ready" or not asset.result:
             raise HTTPException(409, asset.error or "资料仍在解析，请稍后再查看。")
         result = asset.result
+        if result["kind"]=="image":return result
         if result["kind"] == "table":
             selected = next((item for item in result["sheets"] if item["id"] == sheet), None)
             if selected is None:
@@ -167,6 +170,15 @@ def material_router(database, settings, current_user):
             return {"kind": "table", "sheet_id": sheet, "columns": selected["columns"], "total": selected["row_count"],
                     "rows": selected["rows"][offset:offset+limit], "offset": offset, "limit": limit}
         return {"kind": "report", "total": result["paragraph_count"], "paragraphs": result["paragraphs"][offset:offset+limit], "offset": offset, "limit": limit}
+
+    @router.get("/assets/{asset_id}/image")
+    async def preview_image(asset_id:str,user=Depends(current_user),session=Depends(database.session)):
+        asset=await owned_asset(session,asset_id,user)
+        if asset.kind!='image' or asset.status!='ready':raise HTTPException(409,'图片尚未成功解析。')
+        target=settings.data_dir.resolve()/'image_previews'/(asset.id+'.png')
+        if not target.is_file():raise HTTPException(410,'图片预览缺失，请恢复备份。')
+        if hashlib.sha256(target.read_bytes()).hexdigest()!=asset.result['normalized_sha256']:raise HTTPException(409,'图片预览完整性检查失败。')
+        return FileResponse(target,media_type='image/png')
 
     @router.get("/assets/{asset_id}/original")
     async def download_original(asset_id: str, user=Depends(current_user), session=Depends(database.session)):
