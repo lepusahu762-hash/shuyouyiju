@@ -170,3 +170,18 @@ class RevisionRecheck(Base):
     run_id: Mapped[str] = mapped_column(ForeignKey("calculation_runs.id"), index=True)
     result: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class PdfExport(Base):
+    __tablename__ = "pdf_exports"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey("report_revisions.id"), index=True)
+    recheck_id: Mapped[str | None] = mapped_column(ForeignKey("revision_rechecks.id"), nullable=True)
+    snapshot: Mapped[dict] = mapped_column(JSON)
+    approval_hash: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(20))
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    size_bytes: Mapped[int] = mapped_column(default=0)
+    created_at: Mapped[str] = mapped_column(String, default=now)

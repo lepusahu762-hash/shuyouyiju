@@ -18,6 +18,7 @@ from .ai import ai_router, BUSY
 from .ai_provider import BailianProvider
 from .rule_constraints import rules_router
 from .revisions import revisions_router
+from .exports import exports_router
 
 
 def create_app(settings: Settings | None = None, ai_provider=None):
@@ -105,6 +106,7 @@ def create_app(settings: Settings | None = None, ai_provider=None):
     app.include_router(calculations_router(database, current_user))
     app.include_router(rules_router(database, current_user))
     app.include_router(revisions_router(database, current_user))
+    app.include_router(exports_router(database, settings, current_user))
     app.include_router(ai_router(database, settings, current_user, ai_provider or BailianProvider(settings)))
     return app
 

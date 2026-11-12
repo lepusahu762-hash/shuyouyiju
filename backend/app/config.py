@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     max_columns: int = Field(default=200, ge=1, le=1000)
     max_cells: int = Field(default=1000000, ge=1)
     max_project_files: int = Field(default=20, ge=1, le=200)
+    # Embedded CJK TrueType font. Empty uses the local Windows SimSun or Linux
+    # WenQuanYi font, otherwise export fails explicitly instead of broken glyphs.
+    pdf_font_path: Path | None = None
     ai_api_key: SecretStr = SecretStr("")
     ai_base_url: str = ""
     ai_model: str = ""
