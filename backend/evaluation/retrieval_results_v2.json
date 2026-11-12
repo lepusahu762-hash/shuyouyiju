@@ -1,0 +1,1904 @@
+{
+  "dataset_version": "synthetic-rules-36-v1",
+  "top_k": 5,
+  "context_char_budget": 6000,
+  "timing": "每题本地重复5次中位数；不含数据库IO/网络；不是生产压测",
+  "metrics": "hit@5任一必要段；complete全部必要段；MRR未命中计0；negative_rejection无依据题没有候选；conflict_complete双方均返回",
+  "summary": {
+    "keyword-bigram-v1/all": {
+      "n": 36,
+      "relevant_n": 26,
+      "no_evidence_n": 10,
+      "conflict_n": 6,
+      "hit_at_5": 1.0,
+      "complete_recall": 0.0,
+      "mrr": 0.8012820512820512,
+      "negative_rejection": 0.0,
+      "conflict_complete": 0.6666666666666666,
+      "median_query_ms": 0.4779
+    },
+    "keyword-bigram-v1/dev": {
+      "n": 18,
+      "relevant_n": 13,
+      "no_evidence_n": 5,
+      "conflict_n": 3,
+      "hit_at_5": 1.0,
+      "complete_recall": 0.0,
+      "mrr": 0.8076923076923077,
+      "negative_rejection": 0.0,
+      "conflict_complete": 0.6666666666666666,
+      "median_query_ms": 0.4746
+    },
+    "keyword-bigram-v1/holdout": {
+      "n": 18,
+      "relevant_n": 13,
+      "no_evidence_n": 5,
+      "conflict_n": 3,
+      "hit_at_5": 1.0,
+      "complete_recall": 0.0,
+      "mrr": 0.7948717948717949,
+      "negative_rejection": 0.0,
+      "conflict_complete": 0.6666666666666666,
+      "median_query_ms": 0.4782
+    },
+    "bm25-context-v2/all": {
+      "n": 36,
+      "relevant_n": 26,
+      "no_evidence_n": 10,
+      "conflict_n": 6,
+      "hit_at_5": 1.0,
+      "complete_recall": 0.9615384615384616,
+      "mrr": 1.0,
+      "negative_rejection": 0.7,
+      "conflict_complete": 1.0,
+      "median_query_ms": 0.81465
+    },
+    "bm25-context-v2/dev": {
+      "n": 18,
+      "relevant_n": 13,
+      "no_evidence_n": 5,
+      "conflict_n": 3,
+      "hit_at_5": 1.0,
+      "complete_recall": 1.0,
+      "mrr": 1.0,
+      "negative_rejection": 0.6,
+      "conflict_complete": 1.0,
+      "median_query_ms": 0.8163499999999999
+    },
+    "bm25-context-v2/holdout": {
+      "n": 18,
+      "relevant_n": 13,
+      "no_evidence_n": 5,
+      "conflict_n": 3,
+      "hit_at_5": 1.0,
+      "complete_recall": 0.9230769230769231,
+      "mrr": 1.0,
+      "negative_rejection": 0.8,
+      "conflict_complete": 1.0,
+      "median_query_ms": 0.81185
+    }
+  },
+  "rows": [
+    {
+      "query_id": "service-1",
+      "split": "dev",
+      "query": "2026年校园服务的服务满意率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "service-archive:p1",
+        "service-main:p1",
+        "service-main:p2",
+        "service-main:p4",
+        "service-archive:p2"
+      ],
+      "required": [
+        "service-main:p1",
+        "service-main:p2",
+        "service-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.5302,
+      "failure_reasons": [
+        "必要段落未全召回：service-main:p3"
+      ]
+    },
+    {
+      "query_id": "service-1",
+      "split": "dev",
+      "query": "2026年校园服务的服务满意率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "service-main:p2",
+        "service-main:p1",
+        "service-main:p3",
+        "service-main:p4"
+      ],
+      "required": [
+        "service-main:p1",
+        "service-main:p2",
+        "service-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8252,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "service-2",
+      "split": "dev",
+      "query": "2026年校园服务，服务评价说满意的占多少？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "service-main:p1",
+        "service-main:p2",
+        "service-archive:p1",
+        "service-archive:p2",
+        "service-main:p4"
+      ],
+      "required": [
+        "service-main:p1",
+        "service-main:p2",
+        "service-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4749,
+      "failure_reasons": [
+        "必要段落未全召回：service-main:p3"
+      ]
+    },
+    {
+      "query_id": "service-2",
+      "split": "dev",
+      "query": "2026年校园服务，服务评价说满意的占多少？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "service-main:p2",
+        "service-main:p1",
+        "service-main:p3",
+        "service-main:p4"
+      ],
+      "required": [
+        "service-main:p1",
+        "service-main:p2",
+        "service-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8323,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "service-3",
+      "split": "dev",
+      "query": "服务推荐率怎么计算",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "service-archive:p1",
+        "service-archive:p2",
+        "service-archive:p5",
+        "service-main:p1",
+        "service-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4738,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "service-3",
+      "split": "dev",
+      "query": "服务推荐率怎么计算",
+      "strategy": "bm25-context-v2",
+      "ids": [],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": false,
+      "conflict_complete": null,
+      "median_ms": 0.5768,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "completion-1",
+      "split": "dev",
+      "query": "2026年后勤工单的工单办结率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "completion-archive:p1",
+        "completion-main:p1",
+        "completion-main:p2",
+        "completion-main:p4",
+        "completion-archive:p2"
+      ],
+      "required": [
+        "completion-main:p1",
+        "completion-main:p2",
+        "completion-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4742,
+      "failure_reasons": [
+        "必要段落未全召回：completion-main:p3"
+      ]
+    },
+    {
+      "query_id": "completion-1",
+      "split": "dev",
+      "query": "2026年后勤工单的工单办结率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "completion-main:p2",
+        "completion-main:p1",
+        "completion-main:p3",
+        "completion-main:p4"
+      ],
+      "required": [
+        "completion-main:p1",
+        "completion-main:p2",
+        "completion-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8145,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "completion-2",
+      "split": "dev",
+      "query": "2026年后勤工单，工单办完的比例怎么算？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "completion-main:p1",
+        "completion-archive:p1",
+        "completion-archive:p2",
+        "completion-main:p2",
+        "completion-main:p4"
+      ],
+      "required": [
+        "completion-main:p1",
+        "completion-main:p2",
+        "completion-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4793,
+      "failure_reasons": [
+        "必要段落未全召回：completion-main:p3"
+      ]
+    },
+    {
+      "query_id": "completion-2",
+      "split": "dev",
+      "query": "2026年后勤工单，工单办完的比例怎么算？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "completion-main:p2",
+        "completion-main:p1",
+        "completion-main:p3",
+        "completion-main:p4"
+      ],
+      "required": [
+        "completion-main:p1",
+        "completion-main:p2",
+        "completion-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8224,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "completion-3",
+      "split": "dev",
+      "query": "工单平均耗时怎么算",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "completion-archive:p1",
+        "completion-archive:p2",
+        "completion-archive:p5",
+        "completion-main:p1",
+        "completion-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4743,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "completion-3",
+      "split": "dev",
+      "query": "工单平均耗时怎么算",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "completion-main:p4",
+        "completion-main:p3",
+        "completion-main:p5",
+        "completion-main:p1",
+        "completion-archive:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.8122,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "attendance-1",
+      "split": "dev",
+      "query": "2026年春季活动的活动出席率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "attendance-archive:p1",
+        "attendance-main:p1",
+        "attendance-main:p2",
+        "attendance-main:p4",
+        "attendance-archive:p2"
+      ],
+      "required": [
+        "attendance-main:p1",
+        "attendance-main:p2",
+        "attendance-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.47,
+      "failure_reasons": [
+        "必要段落未全召回：attendance-main:p3"
+      ]
+    },
+    {
+      "query_id": "attendance-1",
+      "split": "dev",
+      "query": "2026年春季活动的活动出席率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "attendance-main:p2",
+        "attendance-main:p1",
+        "attendance-main:p3",
+        "attendance-main:p4"
+      ],
+      "required": [
+        "attendance-main:p1",
+        "attendance-main:p2",
+        "attendance-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8556,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "attendance-2",
+      "split": "dev",
+      "query": "2026年春季活动，报名之后到场的占比？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "attendance-main:p1",
+        "attendance-main:p2",
+        "attendance-archive:p5",
+        "attendance-main:p4",
+        "attendance-archive:p1"
+      ],
+      "required": [
+        "attendance-main:p1",
+        "attendance-main:p2",
+        "attendance-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.492,
+      "failure_reasons": [
+        "必要段落未全召回：attendance-main:p3"
+      ]
+    },
+    {
+      "query_id": "attendance-2",
+      "split": "dev",
+      "query": "2026年春季活动，报名之后到场的占比？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "attendance-main:p2",
+        "attendance-main:p1",
+        "attendance-main:p3",
+        "attendance-main:p4"
+      ],
+      "required": [
+        "attendance-main:p1",
+        "attendance-main:p2",
+        "attendance-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8465,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "attendance-3",
+      "split": "dev",
+      "query": "活动复购率怎么算",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "attendance-archive:p1",
+        "attendance-archive:p2",
+        "attendance-archive:p5",
+        "attendance-main:p1",
+        "attendance-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4638,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "attendance-3",
+      "split": "dev",
+      "query": "活动复购率怎么算",
+      "strategy": "bm25-context-v2",
+      "ids": [],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": false,
+      "conflict_complete": null,
+      "median_ms": 0.5825,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "returns-1",
+      "split": "dev",
+      "query": "2026年本店订单的订单退货率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "returns-archive:p1",
+        "returns-main:p1",
+        "returns-main:p2",
+        "returns-main:p4",
+        "returns-archive:p2"
+      ],
+      "required": [
+        "returns-main:p1",
+        "returns-main:p2",
+        "returns-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4739,
+      "failure_reasons": [
+        "必要段落未全召回：returns-main:p3"
+      ]
+    },
+    {
+      "query_id": "returns-1",
+      "split": "dev",
+      "query": "2026年本店订单的订单退货率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "returns-main:p2",
+        "returns-main:p1",
+        "returns-main:p3",
+        "returns-main:p4"
+      ],
+      "required": [
+        "returns-main:p1",
+        "returns-main:p2",
+        "returns-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8093,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "returns-2",
+      "split": "dev",
+      "query": "2026年本店订单，买了以后退掉的比例？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "returns-main:p1",
+        "returns-archive:p1",
+        "returns-archive:p2",
+        "returns-archive:p5",
+        "returns-main:p2"
+      ],
+      "required": [
+        "returns-main:p1",
+        "returns-main:p2",
+        "returns-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4712,
+      "failure_reasons": [
+        "必要段落未全召回：returns-main:p3"
+      ]
+    },
+    {
+      "query_id": "returns-2",
+      "split": "dev",
+      "query": "2026年本店订单，买了以后退掉的比例？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "returns-main:p2",
+        "returns-main:p1",
+        "returns-main:p3",
+        "returns-main:p4"
+      ],
+      "required": [
+        "returns-main:p1",
+        "returns-main:p2",
+        "returns-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8148,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "returns-3",
+      "split": "dev",
+      "query": "订单退货率2023年旧规则",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "returns-archive:p2",
+        "returns-archive:p1",
+        "returns-main:p2",
+        "returns-main:p4",
+        "returns-archive:p5"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4922,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "returns-3",
+      "split": "dev",
+      "query": "订单退货率2023年旧规则",
+      "strategy": "bm25-context-v2",
+      "ids": [],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": false,
+      "conflict_complete": null,
+      "median_ms": 0.6598,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "training-1",
+      "split": "dev",
+      "query": "2026年员工培训的培训达标率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "training-archive:p1",
+        "training-main:p1",
+        "training-main:p2",
+        "training-main:p4",
+        "training-archive:p2"
+      ],
+      "required": [
+        "training-main:p1",
+        "training-main:p2",
+        "training-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4889,
+      "failure_reasons": [
+        "必要段落未全召回：training-main:p3"
+      ]
+    },
+    {
+      "query_id": "training-1",
+      "split": "dev",
+      "query": "2026年员工培训的培训达标率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "training-main:p2",
+        "training-main:p1",
+        "training-main:p3",
+        "training-main:p4"
+      ],
+      "required": [
+        "training-main:p1",
+        "training-main:p2",
+        "training-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8132,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "training-2",
+      "split": "dev",
+      "query": "2026年员工培训，培训通过要求的占几成？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "training-main:p1",
+        "training-archive:p1",
+        "training-archive:p2",
+        "training-archive:p5",
+        "training-main:p2"
+      ],
+      "required": [
+        "training-main:p1",
+        "training-main:p2",
+        "training-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4729,
+      "failure_reasons": [
+        "必要段落未全召回：training-main:p3"
+      ]
+    },
+    {
+      "query_id": "training-2",
+      "split": "dev",
+      "query": "2026年员工培训，培训通过要求的占几成？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "training-main:p2",
+        "training-main:p1",
+        "training-main:p3",
+        "training-main:p4"
+      ],
+      "required": [
+        "training-main:p1",
+        "training-main:p2",
+        "training-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8179,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "training-3",
+      "split": "dev",
+      "query": "培训推荐意愿比例",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "training-archive:p1",
+        "training-archive:p2",
+        "training-archive:p5",
+        "training-main:p1",
+        "training-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4673,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "training-3",
+      "split": "dev",
+      "query": "培训推荐意愿比例",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "training-main:p4",
+        "training-main:p3",
+        "training-main:p5",
+        "training-main:p1",
+        "training-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.8018,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "conflict-1",
+      "split": "dev",
+      "query": "2026年本部申请的申请通过率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "conflict-main:p7",
+        "conflict-archive:p1",
+        "conflict-archive:p2",
+        "conflict-main:p1",
+        "conflict-main:p2"
+      ],
+      "required": [
+        "conflict-main:p1",
+        "conflict-main:p2",
+        "conflict-main:p3",
+        "conflict-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.4905,
+      "failure_reasons": [
+        "必要段落未全召回：conflict-main:p3"
+      ]
+    },
+    {
+      "query_id": "conflict-1",
+      "split": "dev",
+      "query": "2026年本部申请的申请通过率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "conflict-main:p2",
+        "conflict-main:p1",
+        "conflict-main:p3",
+        "conflict-main:p7",
+        "conflict-main:p4"
+      ],
+      "required": [
+        "conflict-main:p1",
+        "conflict-main:p2",
+        "conflict-main:p3",
+        "conflict-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.8667,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "conflict-2",
+      "split": "dev",
+      "query": "2026年本部申请，申请审核过了的占比？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "conflict-main:p1",
+        "conflict-archive:p2",
+        "conflict-archive:p1",
+        "conflict-archive:p5",
+        "conflict-main:p2"
+      ],
+      "required": [
+        "conflict-main:p1",
+        "conflict-main:p2",
+        "conflict-main:p3",
+        "conflict-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": false,
+      "median_ms": 0.486,
+      "failure_reasons": [
+        "必要段落未全召回：conflict-main:p3,conflict-main:p7"
+      ]
+    },
+    {
+      "query_id": "conflict-2",
+      "split": "dev",
+      "query": "2026年本部申请，申请审核过了的占比？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "conflict-main:p2",
+        "conflict-main:p1",
+        "conflict-main:p3",
+        "conflict-main:p7",
+        "conflict-main:p4"
+      ],
+      "required": [
+        "conflict-main:p1",
+        "conflict-main:p2",
+        "conflict-main:p3",
+        "conflict-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.8806,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "conflict-3",
+      "split": "dev",
+      "query": "申请通过率两个定义怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "conflict-main:p2",
+        "conflict-main:p4",
+        "conflict-archive:p1",
+        "conflict-archive:p2",
+        "conflict-main:p7"
+      ],
+      "required": [
+        "conflict-main:p1",
+        "conflict-main:p2",
+        "conflict-main:p3",
+        "conflict-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.492,
+      "failure_reasons": [
+        "必要段落未全召回：conflict-main:p1,conflict-main:p3"
+      ]
+    },
+    {
+      "query_id": "conflict-3",
+      "split": "dev",
+      "query": "申请通过率两个定义怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "conflict-main:p2",
+        "conflict-main:p1",
+        "conflict-main:p3",
+        "conflict-main:p7",
+        "conflict-main:p4"
+      ],
+      "required": [
+        "conflict-main:p1",
+        "conflict-main:p2",
+        "conflict-main:p3",
+        "conflict-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.8629,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "delivery-1",
+      "split": "holdout",
+      "query": "2025年城区配送的配送准时率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "delivery-archive:p1",
+        "delivery-archive:p2",
+        "delivery-main:p1",
+        "delivery-main:p2",
+        "delivery-main:p4"
+      ],
+      "required": [
+        "delivery-main:p1",
+        "delivery-main:p2",
+        "delivery-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 3,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4865,
+      "failure_reasons": [
+        "必要段落未全召回：delivery-main:p3"
+      ]
+    },
+    {
+      "query_id": "delivery-1",
+      "split": "holdout",
+      "query": "2025年城区配送的配送准时率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "delivery-main:p2",
+        "delivery-main:p1",
+        "delivery-main:p3",
+        "delivery-main:p4"
+      ],
+      "required": [
+        "delivery-main:p1",
+        "delivery-main:p2",
+        "delivery-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8063,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "delivery-2",
+      "split": "holdout",
+      "query": "2025年城区配送，送货没迟到的占几成？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "delivery-main:p1",
+        "delivery-archive:p2",
+        "delivery-archive:p1",
+        "delivery-archive:p5",
+        "delivery-main:p2"
+      ],
+      "required": [
+        "delivery-main:p1",
+        "delivery-main:p2",
+        "delivery-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4732,
+      "failure_reasons": [
+        "必要段落未全召回：delivery-main:p3"
+      ]
+    },
+    {
+      "query_id": "delivery-2",
+      "split": "holdout",
+      "query": "2025年城区配送，送货没迟到的占几成？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "delivery-main:p2",
+        "delivery-main:p1",
+        "delivery-main:p3",
+        "delivery-main:p4"
+      ],
+      "required": [
+        "delivery-main:p1",
+        "delivery-main:p2",
+        "delivery-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8128,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "delivery-3",
+      "split": "holdout",
+      "query": "配送破损率口径",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "delivery-archive:p1",
+        "delivery-archive:p2",
+        "delivery-archive:p5",
+        "delivery-main:p1",
+        "delivery-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.465,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "delivery-3",
+      "split": "holdout",
+      "query": "配送破损率口径",
+      "strategy": "bm25-context-v2",
+      "ids": [],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": false,
+      "conflict_complete": null,
+      "median_ms": 0.5835,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "renewal-1",
+      "split": "holdout",
+      "query": "2025年企业合同的合同续约率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "renewal-archive:p1",
+        "renewal-main:p1",
+        "renewal-main:p2",
+        "renewal-main:p4",
+        "renewal-archive:p2"
+      ],
+      "required": [
+        "renewal-main:p1",
+        "renewal-main:p2",
+        "renewal-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4781,
+      "failure_reasons": [
+        "必要段落未全召回：renewal-main:p3"
+      ]
+    },
+    {
+      "query_id": "renewal-1",
+      "split": "holdout",
+      "query": "2025年企业合同的合同续约率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "renewal-main:p2",
+        "renewal-main:p1",
+        "renewal-main:p3",
+        "renewal-main:p4"
+      ],
+      "required": [
+        "renewal-main:p1",
+        "renewal-main:p2",
+        "renewal-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8109,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "renewal-2",
+      "split": "holdout",
+      "query": "2025年企业合同，合同续签的比例？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "renewal-main:p1",
+        "renewal-main:p2",
+        "renewal-archive:p1",
+        "renewal-archive:p2",
+        "renewal-main:p4"
+      ],
+      "required": [
+        "renewal-main:p1",
+        "renewal-main:p2",
+        "renewal-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4762,
+      "failure_reasons": [
+        "必要段落未全召回：renewal-main:p3"
+      ]
+    },
+    {
+      "query_id": "renewal-2",
+      "split": "holdout",
+      "query": "2025年企业合同，合同续签的比例？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "renewal-main:p2",
+        "renewal-main:p1",
+        "renewal-main:p3",
+        "renewal-main:p4"
+      ],
+      "required": [
+        "renewal-main:p1",
+        "renewal-main:p2",
+        "renewal-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8436,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "renewal-3",
+      "split": "holdout",
+      "query": "合同平均金额怎么计算",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "renewal-archive:p1",
+        "renewal-archive:p2",
+        "renewal-archive:p5",
+        "renewal-main:p1",
+        "renewal-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4697,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "renewal-3",
+      "split": "holdout",
+      "query": "合同平均金额怎么计算",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "renewal-main:p4",
+        "renewal-main:p3",
+        "renewal-main:p5",
+        "renewal-main:p1",
+        "renewal-main:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.8269,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "complaint-1",
+      "split": "holdout",
+      "query": "2025年用户投诉的投诉解决率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "complaint-archive:p1",
+        "complaint-main:p1",
+        "complaint-main:p2",
+        "complaint-main:p4",
+        "complaint-archive:p2"
+      ],
+      "required": [
+        "complaint-main:p1",
+        "complaint-main:p2",
+        "complaint-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.476,
+      "failure_reasons": [
+        "必要段落未全召回：complaint-main:p3"
+      ]
+    },
+    {
+      "query_id": "complaint-1",
+      "split": "holdout",
+      "query": "2025年用户投诉的投诉解决率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "complaint-main:p2",
+        "complaint-main:p1",
+        "complaint-main:p3",
+        "complaint-main:p4"
+      ],
+      "required": [
+        "complaint-main:p1",
+        "complaint-main:p2",
+        "complaint-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8305,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "complaint-2",
+      "split": "holdout",
+      "query": "2025年用户投诉，投诉处理好了的占多少？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "complaint-main:p1",
+        "complaint-archive:p5",
+        "complaint-main:p2",
+        "complaint-archive:p1",
+        "complaint-archive:p2"
+      ],
+      "required": [
+        "complaint-main:p1",
+        "complaint-main:p2",
+        "complaint-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.475,
+      "failure_reasons": [
+        "必要段落未全召回：complaint-main:p3"
+      ]
+    },
+    {
+      "query_id": "complaint-2",
+      "split": "holdout",
+      "query": "2025年用户投诉，投诉处理好了的占多少？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "complaint-main:p2",
+        "complaint-main:p1",
+        "complaint-main:p3",
+        "complaint-main:p4"
+      ],
+      "required": [
+        "complaint-main:p1",
+        "complaint-main:p2",
+        "complaint-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.851,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "complaint-3",
+      "split": "holdout",
+      "query": "投诉解决率针对2022年",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "complaint-archive:p1",
+        "complaint-archive:p2",
+        "complaint-main:p2",
+        "complaint-main:p4",
+        "complaint-archive:p5"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.5156,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "complaint-3",
+      "split": "holdout",
+      "query": "投诉解决率针对2022年",
+      "strategy": "bm25-context-v2",
+      "ids": [],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": false,
+      "conflict_complete": null,
+      "median_ms": 0.653,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "usage-1",
+      "split": "holdout",
+      "query": "2025年实验设备的设备启用率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "usage-archive:p1",
+        "usage-main:p1",
+        "usage-main:p2",
+        "usage-main:p4",
+        "usage-archive:p2"
+      ],
+      "required": [
+        "usage-main:p1",
+        "usage-main:p2",
+        "usage-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4821,
+      "failure_reasons": [
+        "必要段落未全召回：usage-main:p3"
+      ]
+    },
+    {
+      "query_id": "usage-1",
+      "split": "holdout",
+      "query": "2025年实验设备的设备启用率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "usage-main:p2",
+        "usage-main:p1",
+        "usage-main:p3",
+        "usage-main:p4"
+      ],
+      "required": [
+        "usage-main:p1",
+        "usage-main:p2",
+        "usage-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8081,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "usage-2",
+      "split": "holdout",
+      "query": "2025年实验设备，机器开始使用的比例？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "usage-main:p1",
+        "usage-main:p2",
+        "usage-archive:p1",
+        "usage-archive:p2",
+        "usage-archive:p5"
+      ],
+      "required": [
+        "usage-main:p1",
+        "usage-main:p2",
+        "usage-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4777,
+      "failure_reasons": [
+        "必要段落未全召回：usage-main:p3"
+      ]
+    },
+    {
+      "query_id": "usage-2",
+      "split": "holdout",
+      "query": "2025年实验设备，机器开始使用的比例？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "usage-main:p1",
+        "usage-main:p2",
+        "usage-main:p4"
+      ],
+      "required": [
+        "usage-main:p1",
+        "usage-main:p2",
+        "usage-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8098,
+      "failure_reasons": [
+        "必要段落未全召回：usage-main:p3"
+      ]
+    },
+    {
+      "query_id": "usage-3",
+      "split": "holdout",
+      "query": "设备故障率计算口径",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "usage-main:p6",
+        "usage-archive:p1",
+        "usage-archive:p2",
+        "usage-archive:p5",
+        "usage-main:p1"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4705,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "usage-3",
+      "split": "holdout",
+      "query": "设备故障率计算口径",
+      "strategy": "bm25-context-v2",
+      "ids": [],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": false,
+      "conflict_complete": null,
+      "median_ms": 0.5786,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "coverage-1",
+      "split": "holdout",
+      "query": "2025年门店回访的回访完成率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "coverage-main:p7",
+        "coverage-archive:p1",
+        "coverage-main:p1",
+        "coverage-main:p2",
+        "coverage-main:p4"
+      ],
+      "required": [
+        "coverage-main:p1",
+        "coverage-main:p2",
+        "coverage-main:p3",
+        "coverage-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.4833,
+      "failure_reasons": [
+        "必要段落未全召回：coverage-main:p3"
+      ]
+    },
+    {
+      "query_id": "coverage-1",
+      "split": "holdout",
+      "query": "2025年门店回访的回访完成率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "coverage-main:p2",
+        "coverage-main:p1",
+        "coverage-main:p3",
+        "coverage-main:p7",
+        "coverage-main:p4"
+      ],
+      "required": [
+        "coverage-main:p1",
+        "coverage-main:p2",
+        "coverage-main:p3",
+        "coverage-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.8712,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "coverage-2",
+      "split": "holdout",
+      "query": "2025年门店回访，客户回访做完的占多少？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "coverage-main:p1",
+        "coverage-archive:p1",
+        "coverage-archive:p2",
+        "coverage-archive:p5",
+        "coverage-main:p2"
+      ],
+      "required": [
+        "coverage-main:p1",
+        "coverage-main:p2",
+        "coverage-main:p3",
+        "coverage-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": false,
+      "median_ms": 0.4895,
+      "failure_reasons": [
+        "必要段落未全召回：coverage-main:p3,coverage-main:p7"
+      ]
+    },
+    {
+      "query_id": "coverage-2",
+      "split": "holdout",
+      "query": "2025年门店回访，客户回访做完的占多少？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "coverage-main:p2",
+        "coverage-main:p1",
+        "coverage-main:p3",
+        "coverage-main:p7",
+        "coverage-main:p4"
+      ],
+      "required": [
+        "coverage-main:p1",
+        "coverage-main:p2",
+        "coverage-main:p3",
+        "coverage-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.9014,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "coverage-3",
+      "split": "holdout",
+      "query": "回访完成率两个冲突条款",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "coverage-main:p7",
+        "coverage-archive:p1",
+        "coverage-archive:p2",
+        "coverage-main:p2",
+        "coverage-main:p4"
+      ],
+      "required": [
+        "coverage-main:p1",
+        "coverage-main:p2",
+        "coverage-main:p3",
+        "coverage-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.4822,
+      "failure_reasons": [
+        "必要段落未全召回：coverage-main:p1,coverage-main:p3"
+      ]
+    },
+    {
+      "query_id": "coverage-3",
+      "split": "holdout",
+      "query": "回访完成率两个冲突条款",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "coverage-main:p2",
+        "coverage-main:p1",
+        "coverage-main:p3",
+        "coverage-main:p7",
+        "coverage-main:p4"
+      ],
+      "required": [
+        "coverage-main:p1",
+        "coverage-main:p2",
+        "coverage-main:p3",
+        "coverage-main:p7"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": true,
+      "median_ms": 0.8757,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "qualification-1",
+      "split": "holdout",
+      "query": "2025年批次样品的样品合格率分母和空值怎么办",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "qualification-archive:p1",
+        "qualification-main:p1",
+        "qualification-main:p2",
+        "qualification-main:p4",
+        "qualification-archive:p2"
+      ],
+      "required": [
+        "qualification-main:p1",
+        "qualification-main:p2",
+        "qualification-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 2,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4794,
+      "failure_reasons": [
+        "必要段落未全召回：qualification-main:p3"
+      ]
+    },
+    {
+      "query_id": "qualification-1",
+      "split": "holdout",
+      "query": "2025年批次样品的样品合格率分母和空值怎么办",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "qualification-main:p2",
+        "qualification-main:p1",
+        "qualification-main:p3",
+        "qualification-main:p4"
+      ],
+      "required": [
+        "qualification-main:p1",
+        "qualification-main:p2",
+        "qualification-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8225,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "qualification-2",
+      "split": "holdout",
+      "query": "2025年批次样品，样品检测过关的比例？空白怎么处理",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "qualification-main:p1",
+        "qualification-main:p2",
+        "qualification-archive:p1",
+        "qualification-archive:p2",
+        "qualification-archive:p5"
+      ],
+      "required": [
+        "qualification-main:p1",
+        "qualification-main:p2",
+        "qualification-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": false,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.4783,
+      "failure_reasons": [
+        "必要段落未全召回：qualification-main:p3"
+      ]
+    },
+    {
+      "query_id": "qualification-2",
+      "split": "holdout",
+      "query": "2025年批次样品，样品检测过关的比例？空白怎么处理",
+      "strategy": "bm25-context-v2",
+      "ids": [
+        "qualification-main:p2",
+        "qualification-main:p1",
+        "qualification-main:p3",
+        "qualification-main:p4"
+      ],
+      "required": [
+        "qualification-main:p1",
+        "qualification-main:p2",
+        "qualification-main:p3"
+      ],
+      "hit_at_5": true,
+      "complete_recall": true,
+      "first_rank": 1,
+      "no_evidence": false,
+      "false_usable": null,
+      "conflict_complete": null,
+      "median_ms": 0.8096,
+      "failure_reasons": []
+    },
+    {
+      "query_id": "qualification-3",
+      "split": "holdout",
+      "query": "样品破损率如何定义",
+      "strategy": "keyword-bigram-v1",
+      "ids": [
+        "qualification-archive:p5",
+        "qualification-main:p2",
+        "qualification-main:p4",
+        "qualification-archive:p1",
+        "qualification-archive:p2"
+      ],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": true,
+      "conflict_complete": null,
+      "median_ms": 0.4862,
+      "failure_reasons": [
+        "无依据题仍返回候选规则，需避免误当可用依据"
+      ]
+    },
+    {
+      "query_id": "qualification-3",
+      "split": "holdout",
+      "query": "样品破损率如何定义",
+      "strategy": "bm25-context-v2",
+      "ids": [],
+      "required": [],
+      "hit_at_5": null,
+      "complete_recall": null,
+      "first_rank": null,
+      "no_evidence": true,
+      "false_usable": false,
+      "conflict_complete": null,
+      "median_ms": 0.5794,
+      "failure_reasons": []
+    }
+  ]
+}

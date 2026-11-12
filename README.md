@@ -2,9 +2,11 @@
 
 React + TypeScript + Vite 前端，Python + FastAPI 后台。现有全站11页框架与真实账户、项目、资料、计算、AI单条核验和规则约束继续保留。
 
-**本轮接通单条结论 PDF 核验报告**：在现有“修改与交付”页明确选择原句、已保存修订版本和一次复核（也可明确不选，按待复核导出）。后台读取保存结果，生成含中文、公式、规则快照和证据摘录的真实PDF，支持受权限保护的分页预览、下载和项目导出历史。预览后依据变化会拒绝生成；旧PDF不会随资料、规则或修订变化而重写。演示、样例、截图及验收见 [PDF_EXPORT_PREVIEW.md](PDF_EXPORT_PREVIEW.md)。
+**本轮完成规则检索优化、固定评测与小样本真实模型对照**。保留原关键词基线，新任务采用本地BM25与相邻限制补齐，保存策略/查询/来源/耗时；资料页和核验页可查看规则、适用信息及定位。36条分组查询可离线复现，保留集仍有拒绝和上下文失败，详情见 [RETRIEVAL_PREVIEW.md](RETRIEVAL_PREVIEW.md)。
 
-修订保存、确定性重新核验继续保留，历史交付见 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md)。本轮真实模型请求 **0次**，没有修改模型配置；导出不重新计算或核验。此前AI接通与付费验收见 [AI_PREVIEW.md](AI_PREVIEW.md)，全站框架历史见 [SITE_PAGES_PREVIEW.md](SITE_PAGES_PREVIEW.md)。
+真实百炼 `qwen3.7-plus` / `cn-beijing` 本轮共9次请求（上限12），输入9575、输出2913、合计12488 tokens；两条有依据配对中改进检索带回空值/精度限制，无依据题停止。正常网页核验实际4÷10=40%，与50%差−10个百分点。评测命中、原建议参数检查与人工确认后的最终结果分开统计，不把小样本当普遍准确率。
+
+已有单条修订、确定性复核及PDF继续保留，历史见 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md)、[PDF_EXPORT_PREVIEW.md](PDF_EXPORT_PREVIEW.md)。旧AI任务保持原检索和规则快照，未补写新结果。本轮没有清库、修改模型配置或开发图像/对话分析。
 
 ## 目录
 
@@ -25,7 +27,9 @@ CALCULATION_PREVIEW.md      v0.4 计算、证据、单条核验历史交付
 AI_PREVIEW.md               v0.5 接入说明、配置步骤、模拟与真实验收边界
 SITE_PAGES_PREVIEW.md       全站框架历史交付
 REVIEW_PREVIEW.md           单条修订、版本与确定性复核历史交付
-PDF_EXPORT_PREVIEW.md       本轮单条PDF、演示、样例、权限与验收
+PDF_EXPORT_PREVIEW.md       单条PDF、演示、样例、权限与验收
+RETRIEVAL_PREVIEW.md        本轮检索、36题评测及少量真实对照
+backend/evaluation/        合成规则、固定分组与逐题结果（不含凭据）
 frontend/HOMEPAGE_PREVIEW.md 上轮历史记录
 artifacts/                 本地验收截图、结果、日志（不提交）
 ```
@@ -152,3 +156,15 @@ Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju\backend'
 ```
 
 文件写入仓库 `artifacts/ai-demo`，不会被产品自动装载。常规启动仍用上方两个终端；不要用 `tests/preview_ai.py` 代替真实后台，该模块仅用于清楚标记的模拟浏览器验收，使用独立 `artifacts/ai-browser-data`。生产后台依旧 `app.main:app`，保留 `backend/data` 中原有账户和原件。
+
+
+## 本地规则检索评测
+
+不需要模型账号或新服务，使用已有项目虚拟环境：
+
+```powershell
+Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju'
+& '.\backend\.venv\Scripts\python.exe' backend/scripts/evaluate_retrieval.py --split all --output artifacts/retrieval-recheck.json
+```
+
+原关键词方法和改进方案同组配对，详见 [RETRIEVAL_PREVIEW.md](RETRIEVAL_PREVIEW.md)。`compare_retrieval_live.py` 则会产生真实计费，属于显式验收工具，不是离线评测命令；本轮结果已保存，不需重复调用。

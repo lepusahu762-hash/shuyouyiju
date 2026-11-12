@@ -1,0 +1,1193 @@
+{
+  "synthetic_only": true,
+  "model": "qwen3.7-plus",
+  "region": "cn-beijing",
+  "run_request_cap": 12,
+  "actual_requests": 9,
+  "usage": {
+    "prompt_tokens": 9575,
+    "completion_tokens": 2913,
+    "total_tokens": 12488
+  },
+  "ledger": [
+    {
+      "ordinal": 1,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 1051,
+        "completion_tokens": 494,
+        "total_tokens": 1545
+      }
+    },
+    {
+      "ordinal": 2,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 1388,
+        "completion_tokens": 411,
+        "total_tokens": 1799
+      }
+    },
+    {
+      "ordinal": 3,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 1074,
+        "completion_tokens": 362,
+        "total_tokens": 1436
+      }
+    },
+    {
+      "ordinal": 4,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 1413,
+        "completion_tokens": 399,
+        "total_tokens": 1812
+      }
+    },
+    {
+      "ordinal": 5,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 1037,
+        "completion_tokens": 415,
+        "total_tokens": 1452
+      }
+    },
+    {
+      "ordinal": 6,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 290,
+        "completion_tokens": 108,
+        "total_tokens": 398
+      }
+    },
+    {
+      "ordinal": 7,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 486,
+        "completion_tokens": 19,
+        "total_tokens": 505
+      }
+    },
+    {
+      "ordinal": 8,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 2067,
+        "completion_tokens": 630,
+        "total_tokens": 2697
+      }
+    },
+    {
+      "ordinal": 9,
+      "status": "returned",
+      "http_status": 200,
+      "returned_model": "qwen3.7-plus",
+      "usage": {
+        "prompt_tokens": 769,
+        "completion_tokens": 75,
+        "total_tokens": 844
+      }
+    }
+  ],
+  "records": [
+    {
+      "query_id": "service-1",
+      "query": "2026年校园服务的服务满意率分母和空值怎么办",
+      "candidate": {
+        "quote": "服务满意率为50%。",
+        "reported_value": "50",
+        "metric": "服务满意率",
+        "unit": "percent",
+        "scope": "2026年校园服务",
+        "supported": true,
+        "reason": ""
+      },
+      "strategy": "keyword-bigram-v1",
+      "retrieval": {
+        "strategy_version": "keyword-bigram-v1",
+        "query": "2026年校园服务的服务满意率分母和空值怎么办",
+        "limit": 5,
+        "context_char_budget": 6000,
+        "duration_ms": 2.771,
+        "status": "candidates",
+        "items": [
+          {
+            "citation_id": "service-archive:p1",
+            "asset_id": "service-archive",
+            "name": "合成相近规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "附表第1段",
+            "text": "2024年归档：服务满意率以全部登记记录为分母，结果为空也纳入；仅适用于2024年，不适用于其他年度。",
+            "truncated": false,
+            "score": 5
+          },
+          {
+            "citation_id": "service-main:p1",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "正文第1段",
+            "text": "适用范围：2026年校园服务。本文件只按记录行统计，不代表人数，不去重。",
+            "truncated": false,
+            "score": 5
+          },
+          {
+            "citation_id": "service-main:p2",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "正文第2段",
+            "text": "服务满意率定义：以纳入标记为是的全部记录为分母，以其中服务评价为满意的记录为分子。",
+            "truncated": false,
+            "score": 5
+          },
+          {
+            "citation_id": "service-main:p4",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 3,
+            "location": "正文第4段",
+            "text": "服务好评率另行定义：分母仅限结果非空记录，不得与服务满意率混用。",
+            "truncated": false,
+            "score": 5
+          },
+          {
+            "citation_id": "service-archive:p2",
+            "asset_id": "service-archive",
+            "name": "合成相近规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "附表第2段",
+            "text": "分校适用规则：服务满意率按分校纳入标记为是的记录统计，不代表本部或城区。",
+            "truncated": false,
+            "score": 4
+          }
+        ],
+        "confirmation_required": true,
+        "notice": "候选并不等于已确认适用；请检查期间、对象、定义及所有限制。可能冲突的原文不能按日期自动裁决。"
+      },
+      "model": "qwen3.7-plus",
+      "region": "cn-beijing",
+      "parameters": {
+        "temperature": 0,
+        "max_tokens": 2500,
+        "enable_thinking": false
+      },
+      "status": "returned",
+      "raw_plan_correct": false,
+      "human_changes": [],
+      "final_correct": null,
+      "final_note": "对照仅生成方案，未人工确认、未执行计算，不能计为最终正确。",
+      "usage": {
+        "prompt_tokens": 1051,
+        "completion_tokens": 494,
+        "total_tokens": 1545
+      },
+      "proposal": {
+        "plan": {
+          "asset_id": "synthetic-table",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "服务满意率",
+          "scope_description": "2026年校园服务，按记录行统计，不去重",
+          "scope": [
+            {
+              "column_id": "c1",
+              "kind": "text",
+              "value": "是"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "c2",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "exclude",
+          "precision": 2
+        },
+        "citation_ids": [
+          "service-main:p1",
+          "service-main:p2"
+        ],
+        "questions": [
+          "规则 service-main:p2 定义分母为“纳入标记为是的全部记录”，未明确说明当“服务评价”为空时是否计入分母。而 service-archive:p1（仅适用于2024年）明确空值纳入。鉴于当前范围为2026年，且存在另一指标“服务好评率”明确排除空值，请确认2026年“服务满意率”在分子/分母中遇到空值时的具体处理逻辑：是排除空值记录（即 null_policy: exclude），还是将空值视为非满意（即保留在分母但不计入分子）？",
+          "请确认数据表中是否存在其他用于筛选“2026年”或“校园服务”范围的字段，当前 plan 仅基于提供的样本字段 c1/c2 构建，若存在时间或项目类型字段需补充到 scope 中。"
+        ],
+        "explanation": "根据 service-main:p2，分子为服务评价为满意的记录，分母为纳入标记为是的记录。由于规则未明确空值处理，且存在已废止的2024年规则（空值纳入）和混淆项好评率（空值排除），建议默认采用常见的排除空值策略进行初步核验，但必须通过 questions 确认口径以避免与‘好评率’或旧规则混淆。"
+      },
+      "citations_valid": true,
+      "no_evidence_respected": null,
+      "comparison_prompt_version": "paired-single-percentage-v1",
+      "raw_correct_criteria": "有依据2题：指定表/字段/等值条件、保留空值和0位精度、引用ID有效。仅评价建议的关键计算参数，范围及字段含义仍需确认；无依据题单独检查，不计入正例准确率。"
+    },
+    {
+      "query_id": "service-1",
+      "query": "2026年校园服务的服务满意率分母和空值怎么办",
+      "candidate": {
+        "quote": "服务满意率为50%。",
+        "reported_value": "50",
+        "metric": "服务满意率",
+        "unit": "percent",
+        "scope": "2026年校园服务",
+        "supported": true,
+        "reason": ""
+      },
+      "strategy": "bm25-context-v2",
+      "retrieval": {
+        "strategy_version": "bm25-context-v2",
+        "query": "2026年校园服务的服务满意率分母和空值怎么办",
+        "limit": 5,
+        "context_char_budget": 6000,
+        "duration_ms": 2.478,
+        "status": "candidates",
+        "items": [
+          {
+            "citation_id": "service-main:p2",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "正文第2段",
+            "text": "服务满意率定义：以纳入标记为是的全部记录为分母，以其中服务评价为满意的记录为分子。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 41
+              }
+            ],
+            "score": 13.00169,
+            "context_role": "match",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年校园服务。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "service-main:p1",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "正文第1段",
+            "text": "适用范围：2026年校园服务。本文件只按记录行统计，不代表人数，不去重。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 36
+              }
+            ],
+            "score": 13.00169,
+            "context_role": "adjacent_context",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年校园服务。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "service-main:p3",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 2,
+            "location": "正文第3段",
+            "text": "限制条款：分子字段缺失值仍计入分母，不得因评价或结果为空而排除；空值不匹配分子。显示精度为0位小数。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 50
+              }
+            ],
+            "score": 13.00169,
+            "context_role": "adjacent_context",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年校园服务。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "service-main:p4",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 3,
+            "location": "正文第4段",
+            "text": "服务好评率另行定义：分母仅限结果非空记录，不得与服务满意率混用。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 32
+              }
+            ],
+            "score": 7.1829,
+            "context_role": "match",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年校园服务。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          }
+        ],
+        "confirmation_required": true,
+        "notice": "候选并不等于已确认适用；请检查期间、对象、定义及所有限制。可能冲突的原文不能按日期自动裁决。"
+      },
+      "model": "qwen3.7-plus",
+      "region": "cn-beijing",
+      "parameters": {
+        "temperature": 0,
+        "max_tokens": 2500,
+        "enable_thinking": false
+      },
+      "status": "returned",
+      "raw_plan_correct": true,
+      "human_changes": [],
+      "final_correct": null,
+      "final_note": "对照仅生成方案，未人工确认、未执行计算，不能计为最终正确。",
+      "usage": {
+        "prompt_tokens": 1388,
+        "completion_tokens": 411,
+        "total_tokens": 1799
+      },
+      "proposal": {
+        "plan": {
+          "asset_id": "synthetic-table",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "服务满意率",
+          "scope_description": "2026年校园服务，按记录行统计，不去重",
+          "scope": [
+            {
+              "column_id": "c1",
+              "kind": "text",
+              "value": "是"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "c2",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0
+        },
+        "citation_ids": [
+          "service-main:p2",
+          "service-main:p3"
+        ],
+        "questions": [
+          "请确认字段 'c1' (纳入标记) 是否对应规则中的“纳入标记为是”，且值为“是”时计入分母。",
+          "请确认字段 'c2' (服务评价) 是否对应规则中的“服务评价”，且值为“满意”时计入分子。",
+          "规则要求空值计入分母但不匹配分子（null_policy: keep），请确认数据中 c2 为 null 的记录是否符合此逻辑。",
+          "请确认当前工作表 s1 的数据范围确实属于“2026年校园服务”。"
+        ],
+        "explanation": "根据规则 service-main:p2，分母为纳入标记为“是”的全部记录，分子为其中服务评价为“满意”的记录。根据 service-main:p3，分子字段缺失值仍计入分母，空值不匹配分子，故 null_policy 设为 keep。精度按规则设为0位小数。"
+      },
+      "citations_valid": true,
+      "no_evidence_respected": null,
+      "comparison_prompt_version": "paired-single-percentage-v1",
+      "raw_correct_criteria": "有依据2题：指定表/字段/等值条件、保留空值和0位精度、引用ID有效。仅评价建议的关键计算参数，范围及字段含义仍需确认；无依据题单独检查，不计入正例准确率。"
+    },
+    {
+      "query_id": "completion-2",
+      "query": "2026年后勤工单，工单办完的比例怎么算？空白怎么处理",
+      "candidate": {
+        "quote": "工单办结率为50%。",
+        "reported_value": "50",
+        "metric": "工单办结率",
+        "unit": "percent",
+        "scope": "2026年后勤工单",
+        "supported": true,
+        "reason": ""
+      },
+      "strategy": "keyword-bigram-v1",
+      "retrieval": {
+        "strategy_version": "keyword-bigram-v1",
+        "query": "2026年后勤工单，工单办完的比例怎么算？空白怎么处理",
+        "limit": 5,
+        "context_char_budget": 6000,
+        "duration_ms": 0.844,
+        "status": "candidates",
+        "items": [
+          {
+            "citation_id": "completion-main:p1",
+            "asset_id": "completion-main",
+            "name": "明确标注的合成规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "正文第1段",
+            "text": "适用范围：2026年后勤工单。本文件只按记录行统计，不代表人数，不去重。",
+            "truncated": false,
+            "score": 6
+          },
+          {
+            "citation_id": "completion-archive:p1",
+            "asset_id": "completion-archive",
+            "name": "合成相近规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "附表第1段",
+            "text": "2024年归档：工单办结率以全部登记记录为分母，结果为空也纳入；仅适用于2024年，不适用于其他年度。",
+            "truncated": false,
+            "score": 2
+          },
+          {
+            "citation_id": "completion-archive:p2",
+            "asset_id": "completion-archive",
+            "name": "合成相近规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "附表第2段",
+            "text": "分校适用规则：工单办结率按分校纳入标记为是的记录统计，不代表本部或城区。",
+            "truncated": false,
+            "score": 2
+          },
+          {
+            "citation_id": "completion-main:p2",
+            "asset_id": "completion-main",
+            "name": "明确标注的合成规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "正文第2段",
+            "text": "工单办结率定义：以受理状态为已受理的全部记录为分母，以其中办理结果为办结的记录为分子。",
+            "truncated": false,
+            "score": 2
+          },
+          {
+            "citation_id": "completion-main:p4",
+            "asset_id": "completion-main",
+            "name": "明确标注的合成规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 3,
+            "location": "正文第4段",
+            "text": "工单按时办结率另行定义：分母仅限结果非空记录，不得与工单办结率混用。",
+            "truncated": false,
+            "score": 2
+          }
+        ],
+        "confirmation_required": true,
+        "notice": "候选并不等于已确认适用；请检查期间、对象、定义及所有限制。可能冲突的原文不能按日期自动裁决。"
+      },
+      "model": "qwen3.7-plus",
+      "region": "cn-beijing",
+      "parameters": {
+        "temperature": 0,
+        "max_tokens": 2500,
+        "enable_thinking": false
+      },
+      "status": "returned",
+      "raw_plan_correct": false,
+      "human_changes": [],
+      "final_correct": null,
+      "final_note": "对照仅生成方案，未人工确认、未执行计算，不能计为最终正确。",
+      "usage": {
+        "prompt_tokens": 1074,
+        "completion_tokens": 362,
+        "total_tokens": 1436
+      },
+      "proposal": {
+        "plan": {
+          "asset_id": "synthetic-table",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "工单办结率",
+          "scope_description": "2026年后勤工单，受理状态为已受理的记录",
+          "scope": [
+            {
+              "column_id": "c1",
+              "kind": "text",
+              "value": "已受理"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "c2",
+              "kind": "text",
+              "value": "办结"
+            }
+          ],
+          "null_policy": "exclude",
+          "precision": 2
+        },
+        "citation_ids": [
+          "completion-main:p1",
+          "completion-main:p2"
+        ],
+        "questions": [
+          "数据表中缺失‘年度’和‘部门/类型’字段，无法通过筛选确认‘2026年’和‘后勤’范围，请确认当前全表数据是否仅包含目标范围记录？",
+          "规则要求分母为‘受理状态为已受理的全部记录’，建议 null_policy 设为 exclude 以排除非‘已受理’或状态为空的记录，请确认是否接受此过滤逻辑？"
+        ],
+        "explanation": "依据 completion-main:p2，分子为办理结果='办结'，分母为受理状态='已受理'。因表中无年度和部门字段，无法执行 scope 中的年份和类型筛选，需用户确认数据纯净度。"
+      },
+      "citations_valid": true,
+      "no_evidence_respected": null,
+      "comparison_prompt_version": "paired-single-percentage-v1",
+      "raw_correct_criteria": "有依据2题：指定表/字段/等值条件、保留空值和0位精度、引用ID有效。仅评价建议的关键计算参数，范围及字段含义仍需确认；无依据题单独检查，不计入正例准确率。"
+    },
+    {
+      "query_id": "completion-2",
+      "query": "2026年后勤工单，工单办完的比例怎么算？空白怎么处理",
+      "candidate": {
+        "quote": "工单办结率为50%。",
+        "reported_value": "50",
+        "metric": "工单办结率",
+        "unit": "percent",
+        "scope": "2026年后勤工单",
+        "supported": true,
+        "reason": ""
+      },
+      "strategy": "bm25-context-v2",
+      "retrieval": {
+        "strategy_version": "bm25-context-v2",
+        "query": "2026年后勤工单，工单办完的比例怎么算？空白怎么处理",
+        "limit": 5,
+        "context_char_budget": 6000,
+        "duration_ms": 0.798,
+        "status": "candidates",
+        "items": [
+          {
+            "citation_id": "completion-main:p2",
+            "asset_id": "completion-main",
+            "name": "明确标注的合成规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "正文第2段",
+            "text": "工单办结率定义：以受理状态为已受理的全部记录为分母，以其中办理结果为办结的记录为分子。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 43
+              }
+            ],
+            "score": 10.81253,
+            "context_role": "match",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年后勤工单。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "completion-main:p1",
+            "asset_id": "completion-main",
+            "name": "明确标注的合成规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "正文第1段",
+            "text": "适用范围：2026年后勤工单。本文件只按记录行统计，不代表人数，不去重。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 36
+              }
+            ],
+            "score": 10.81253,
+            "context_role": "adjacent_context",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年后勤工单。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "completion-main:p3",
+            "asset_id": "completion-main",
+            "name": "明确标注的合成规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 2,
+            "location": "正文第3段",
+            "text": "限制条款：分子字段缺失值仍计入分母，不得因评价或结果为空而排除；空值不匹配分子。显示精度为0位小数。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 50
+              }
+            ],
+            "score": 10.81253,
+            "context_role": "adjacent_context",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年后勤工单。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "completion-main:p4",
+            "asset_id": "completion-main",
+            "name": "明确标注的合成规则-completion",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 3,
+            "location": "正文第4段",
+            "text": "工单按时办结率另行定义：分母仅限结果非空记录，不得与工单办结率混用。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 34
+              }
+            ],
+            "score": 8.83295,
+            "context_role": "match",
+            "applicability": {
+              "periods": [
+                "2026年"
+              ],
+              "scope_quote": "适用范围：2026年后勤工单。本文件只按记录行统计，不代表人数，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          }
+        ],
+        "confirmation_required": true,
+        "notice": "候选并不等于已确认适用；请检查期间、对象、定义及所有限制。可能冲突的原文不能按日期自动裁决。"
+      },
+      "model": "qwen3.7-plus",
+      "region": "cn-beijing",
+      "parameters": {
+        "temperature": 0,
+        "max_tokens": 2500,
+        "enable_thinking": false
+      },
+      "status": "returned",
+      "raw_plan_correct": true,
+      "human_changes": [],
+      "final_correct": null,
+      "final_note": "对照仅生成方案，未人工确认、未执行计算，不能计为最终正确。",
+      "usage": {
+        "prompt_tokens": 1413,
+        "completion_tokens": 399,
+        "total_tokens": 1812
+      },
+      "proposal": {
+        "plan": {
+          "asset_id": "synthetic-table",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "工单办结率",
+          "scope_description": "2026年后勤工单，受理状态为已受理的记录",
+          "scope": [
+            {
+              "column_id": "c1",
+              "kind": "text",
+              "value": "已受理"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "c2",
+              "kind": "text",
+              "value": "办结"
+            }
+          ],
+          "null_policy": "keep",
+          "precision": 0
+        },
+        "citation_ids": [
+          "completion-main:p2",
+          "completion-main:p3"
+        ],
+        "questions": [
+          "请确认字段 'c1' (受理状态) 和 'c2' (办理结果) 是否准确对应规则中的‘受理状态’和‘办理结果’。",
+          "规则要求分子缺失值计入分母（null_policy: keep），即分母为所有'已受理'记录，分子仅为'办理结果'等于'办结'的记录。请确认此逻辑是否符合业务预期。",
+          "样本中存在受理状态为'否'但办理结果为'办结'的记录，根据规则应被排除在分母之外，请确认是否需额外过滤非'已受理'状态。"
+        ],
+        "explanation": "根据规则，工单办结率的分母是受理状态为'已受理'的全部记录，分子是其中办理结果为'办结'的记录。缺失的办理结果不计入分子但计入分母。精度为0位小数。"
+      },
+      "citations_valid": true,
+      "no_evidence_respected": null,
+      "comparison_prompt_version": "paired-single-percentage-v1",
+      "raw_correct_criteria": "有依据2题：指定表/字段/等值条件、保留空值和0位精度、引用ID有效。仅评价建议的关键计算参数，范围及字段含义仍需确认；无依据题单独检查，不计入正例准确率。"
+    },
+    {
+      "query_id": "service-3",
+      "query": "服务推荐率怎么计算",
+      "candidate": {
+        "quote": "服务推荐率为50%。",
+        "reported_value": "50",
+        "metric": "服务推荐率",
+        "unit": "percent",
+        "scope": "2026年校园服务",
+        "supported": true,
+        "reason": ""
+      },
+      "strategy": "keyword-bigram-v1",
+      "retrieval": {
+        "strategy_version": "keyword-bigram-v1",
+        "query": "服务推荐率怎么计算",
+        "limit": 5,
+        "context_char_budget": 6000,
+        "duration_ms": 0.546,
+        "status": "candidates",
+        "items": [
+          {
+            "citation_id": "service-archive:p1",
+            "asset_id": "service-archive",
+            "name": "合成相近规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "附表第1段",
+            "text": "2024年归档：服务满意率以全部登记记录为分母，结果为空也纳入；仅适用于2024年，不适用于其他年度。",
+            "truncated": false,
+            "score": 1
+          },
+          {
+            "citation_id": "service-archive:p2",
+            "asset_id": "service-archive",
+            "name": "合成相近规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "附表第2段",
+            "text": "分校适用规则：服务满意率按分校纳入标记为是的记录统计，不代表本部或城区。",
+            "truncated": false,
+            "score": 1
+          },
+          {
+            "citation_id": "service-archive:p5",
+            "asset_id": "service-archive",
+            "name": "合成相近规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 4,
+            "location": "附表第5段",
+            "text": "服务好评率分子定义与本文件主要指标不同，请先确认用户实际询问的指标。",
+            "truncated": false,
+            "score": 1
+          },
+          {
+            "citation_id": "service-main:p1",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 0,
+            "location": "正文第1段",
+            "text": "适用范围：2026年校园服务。本文件只按记录行统计，不代表人数，不去重。",
+            "truncated": false,
+            "score": 1
+          },
+          {
+            "citation_id": "service-main:p2",
+            "asset_id": "service-main",
+            "name": "明确标注的合成规则-service",
+            "sha256": "synthetic-corpus-v1",
+            "version": "synthetic-rules-36-v1",
+            "paragraph_index": 1,
+            "location": "正文第2段",
+            "text": "服务满意率定义：以纳入标记为是的全部记录为分母，以其中服务评价为满意的记录为分子。",
+            "truncated": false,
+            "score": 1
+          }
+        ],
+        "confirmation_required": true,
+        "notice": "候选并不等于已确认适用；请检查期间、对象、定义及所有限制。可能冲突的原文不能按日期自动裁决。"
+      },
+      "model": "qwen3.7-plus",
+      "region": "cn-beijing",
+      "parameters": {
+        "temperature": 0,
+        "max_tokens": 2500,
+        "enable_thinking": false
+      },
+      "status": "returned",
+      "raw_plan_correct": false,
+      "human_changes": [],
+      "final_correct": null,
+      "final_note": "对照仅生成方案，未人工确认、未执行计算，不能计为最终正确。",
+      "usage": {
+        "prompt_tokens": 1037,
+        "completion_tokens": 415,
+        "total_tokens": 1452
+      },
+      "proposal": {
+        "plan": {
+          "asset_id": "synthetic-table",
+          "sheet_id": "s1",
+          "operation": "ratio",
+          "metric": "服务推荐率",
+          "scope_description": "2026年校园服务，按记录行统计，不去重",
+          "scope": [
+            {
+              "column_id": "c1",
+              "kind": "text",
+              "value": "是"
+            }
+          ],
+          "numerator": [
+            {
+              "column_id": "c2",
+              "kind": "text",
+              "value": "满意"
+            }
+          ],
+          "null_policy": "exclude",
+          "precision": 2
+        },
+        "citation_ids": [
+          "service-main:p1",
+          "service-main:p2"
+        ],
+        "questions": [
+          "指标名称冲突：用户查询的是'服务推荐率'，但规则中仅定义了'服务满意率'。请确认'服务推荐率'是否等同于'服务满意率'（即分子为'服务评价=满意'）？",
+          "口径确认：规则 service-main:p2 定义分母为'纳入标记为是的全部记录'，建议 null_policy 设为 exclude 以排除未纳入记录，但需确认空值在'纳入标记'列是否应直接过滤。",
+          "时间范围：规则明确适用于'2026年校园服务'，请确认数据表中是否有对应的时间字段用于筛选，或当前全表即为该范围数据。"
+        ],
+        "explanation": "根据 service-main:p1 和 p2，确定了分母为纳入标记为是的记录，分子为服务评价为满意的记录。但存在核心指标名称不匹配问题（推荐率 vs 满意率），需用户确认映射关系。"
+      },
+      "citations_valid": true,
+      "no_evidence_respected": false,
+      "comparison_prompt_version": "paired-single-percentage-v1",
+      "raw_correct_criteria": "有依据2题：指定表/字段/等值条件、保留空值和0位精度、引用ID有效。仅评价建议的关键计算参数，范围及字段含义仍需确认；无依据题单独检查，不计入正例准确率。"
+    },
+    {
+      "query_id": "service-3",
+      "query": "服务推荐率怎么计算",
+      "candidate": {
+        "quote": "服务推荐率为50%。",
+        "reported_value": "50",
+        "metric": "服务推荐率",
+        "unit": "percent",
+        "scope": "2026年校园服务",
+        "supported": true,
+        "reason": ""
+      },
+      "strategy": "bm25-context-v2",
+      "retrieval": {
+        "strategy_version": "bm25-context-v2",
+        "query": "服务推荐率怎么计算",
+        "limit": 5,
+        "context_char_budget": 6000,
+        "duration_ms": 0.665,
+        "status": "no_evidence",
+        "items": [],
+        "confirmation_required": false,
+        "notice": "未找到可用候选规则，请补充资料或明确指标与期间。"
+      },
+      "model": "qwen3.7-plus",
+      "region": "cn-beijing",
+      "parameters": {
+        "temperature": 0,
+        "max_tokens": 2500,
+        "enable_thinking": false
+      },
+      "status": "no_evidence",
+      "raw_plan_correct": null,
+      "human_changes": [],
+      "final_correct": null,
+      "final_note": "对照仅生成方案，未人工确认、未执行计算，不能计为最终正确。",
+      "comparison_prompt_version": "paired-single-percentage-v1",
+      "raw_correct_criteria": "有依据2题：指定表/字段/等值条件、保留空值和0位精度、引用ID有效。仅评价建议的关键计算参数，范围及字段含义仍需确认；无依据题单独检查，不计入正例准确率。"
+    },
+    {
+      "kind": "normal_browser_workflow",
+      "model": "qwen3.7-plus",
+      "region": "cn-beijing",
+      "retrieval": {
+        "strategy_version": "bm25-context-v2",
+        "query": "满意率 纳入记录",
+        "limit": 5,
+        "context_char_budget": 6000,
+        "duration_ms": 3.749,
+        "status": "candidates",
+        "items": [
+          {
+            "citation_id": "e941f5c9-c423-4f48-b023-39e9c1574c86:v1:body:2",
+            "asset_id": "e941f5c9-c423-4f48-b023-39e9c1574c86",
+            "name": "合成统计规则.docx",
+            "sha256": "38e4018bbb2e88ca161cfb3ba2dc1776cdd1fa41877b57087b2128f101580979",
+            "version": "8c7b22b89c7ce3e64e024507068842b353c074d6502545e4c8f4c870b665f3e5",
+            "location": "body:2",
+            "paragraph_index": 1,
+            "text": "纳入记录满意率定义：纳入标记等于“是”的全部记录作为分母；分子为上述范围内服务评价等于“满意”的记录。计算为分子÷分母。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 60
+              }
+            ],
+            "score": 4.35109,
+            "context_role": "match",
+            "applicability": {
+              "periods": [],
+              "scope_quote": "适用范围：本资料为独立合成测试。统计表为“合成资料12条.csv”的“CSV”工作表，指标为“纳入记录满意率”。统计范围为纳入标记等于“是”的全部记录。采用记录占比，单位为记录／行，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "e941f5c9-c423-4f48-b023-39e9c1574c86:v1:body:1",
+            "asset_id": "e941f5c9-c423-4f48-b023-39e9c1574c86",
+            "name": "合成统计规则.docx",
+            "sha256": "38e4018bbb2e88ca161cfb3ba2dc1776cdd1fa41877b57087b2128f101580979",
+            "version": "8c7b22b89c7ce3e64e024507068842b353c074d6502545e4c8f4c870b665f3e5",
+            "location": "body:1",
+            "paragraph_index": 0,
+            "text": "适用范围：本资料为独立合成测试。统计表为“合成资料12条.csv”的“CSV”工作表，指标为“纳入记录满意率”。统计范围为纳入标记等于“是”的全部记录。采用记录占比，单位为记录／行，不去重。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 95
+              }
+            ],
+            "score": 4.35109,
+            "context_role": "adjacent_context",
+            "applicability": {
+              "periods": [],
+              "scope_quote": "适用范围：本资料为独立合成测试。统计表为“合成资料12条.csv”的“CSV”工作表，指标为“纳入记录满意率”。统计范围为纳入标记等于“是”的全部记录。采用记录占比，单位为记录／行，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          },
+          {
+            "citation_id": "e941f5c9-c423-4f48-b023-39e9c1574c86:v1:body:3",
+            "asset_id": "e941f5c9-c423-4f48-b023-39e9c1574c86",
+            "name": "合成统计规则.docx",
+            "sha256": "38e4018bbb2e88ca161cfb3ba2dc1776cdd1fa41877b57087b2128f101580979",
+            "version": "8c7b22b89c7ce3e64e024507068842b353c074d6502545e4c8f4c870b665f3e5",
+            "location": "body:3",
+            "paragraph_index": 2,
+            "text": "限制条款：服务评价为空的纳入记录也保留在分母，空值不匹配分子等值条件。空值策略必须为保留，不得排除。显示和比较精度为0位小数，采用ROUND_HALF_UP。",
+            "truncated": false,
+            "excerpt_ranges": [
+              {
+                "start": 0,
+                "end": 79
+              }
+            ],
+            "score": 4.35109,
+            "context_role": "adjacent_context",
+            "applicability": {
+              "periods": [],
+              "scope_quote": "适用范围：本资料为独立合成测试。统计表为“合成资料12条.csv”的“CSV”工作表，指标为“纳入记录满意率”。统计范围为纳入标记等于“是”的全部记录。采用记录占比，单位为记录／行，不去重。",
+              "status": "needs_confirmation",
+              "note": "仅提取原文适用信息；对象、范围与定义仍需人工确认"
+            },
+            "applicability_status": "needs_confirmation"
+          }
+        ],
+        "confirmation_required": true,
+        "notice": "候选并不等于已确认适用；请检查期间、对象、定义及所有限制。可能冲突的原文不能按日期自动裁决。",
+        "model_query": "满意率",
+        "query_source": "模型工具查询 + 已选候选的指标/范围原文；不是已确认适用性"
+      },
+      "raw_plan": {
+        "asset_id": "9e18c96f-30bf-4cd3-8892-0f9fbb7e8660",
+        "sheet_id": "s1",
+        "operation": "ratio",
+        "metric": "纳入记录满意率",
+        "scope_description": "纳入标记等于“是”的全部记录",
+        "scope": [
+          {
+            "column_id": "9e18c96f-30bf-4cd3-8892-0f9fbb7e8660:v1:s1:c2",
+            "kind": "text",
+            "value": "是"
+          }
+        ],
+        "numerator": [
+          {
+            "column_id": "9e18c96f-30bf-4cd3-8892-0f9fbb7e8660:v1:s1:c3",
+            "kind": "text",
+            "value": "满意"
+          }
+        ],
+        "null_policy": "keep",
+        "precision": 0,
+        "confirmed": false,
+        "context_hash": "a40d7ca5c1ab4dd34a7f105c01930f906ce83db56dfe8218674c3a0f40bf4e55"
+      },
+      "confirmed_plan": {
+        "asset_id": "9e18c96f-30bf-4cd3-8892-0f9fbb7e8660",
+        "sheet_id": "s1",
+        "operation": "ratio",
+        "metric": "纳入记录满意率",
+        "scope_description": "纳入标记等于“是”的全部记录",
+        "scope": [
+          {
+            "column_id": "9e18c96f-30bf-4cd3-8892-0f9fbb7e8660:v1:s1:c2",
+            "kind": "text",
+            "value": "是"
+          }
+        ],
+        "numerator": [
+          {
+            "column_id": "9e18c96f-30bf-4cd3-8892-0f9fbb7e8660:v1:s1:c3",
+            "kind": "text",
+            "value": "满意"
+          }
+        ],
+        "null_policy": "keep",
+        "precision": 0,
+        "confirmed": true,
+        "context_hash": "b9979e5bc54c37d9f91a423069e995387a386e7ce6a70ba83f2aeb46d1d396c1"
+      },
+      "human_parameter_changes": [],
+      "note": "用户逐项关联三段真实规则并保存快照，核对全部关键参数；没有修改AI建议的计算参数。",
+      "request_count": 4,
+      "usage_events": [
+        {
+          "prompt_tokens": 290,
+          "completion_tokens": 108,
+          "total_tokens": 398
+        },
+        {
+          "prompt_tokens": 486,
+          "completion_tokens": 19,
+          "total_tokens": 505
+        },
+        {
+          "prompt_tokens": 2067,
+          "completion_tokens": 630,
+          "total_tokens": 2697
+        },
+        {
+          "prompt_tokens": 769,
+          "completion_tokens": 75,
+          "total_tokens": 844
+        }
+      ],
+      "result": {
+        "status": "different",
+        "message": "在已确认的指标、范围与精度下，报告值与计算值存在差异。",
+        "reported_value": "50",
+        "calculated_value": "40",
+        "difference_pp": "-10",
+        "exact_difference_pp": {
+          "numerator": "-100",
+          "denominator": 10
+        },
+        "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+      },
+      "counts": {
+        "status": "completed",
+        "message": "按已确认条件完成全工作表计算。",
+        "unit": "记录/行",
+        "total": 12,
+        "included": 10,
+        "excluded": 2,
+        "numerator": 4,
+        "denominator": 10,
+        "numerator_unmatched": 6,
+        "null_rows": 2,
+        "numeric_unmatched_rows": 0,
+        "reasons": {
+          "null_excluded": {
+            "count": 0,
+            "label": "所选条件字段有空值，按确认策略排除"
+          },
+          "scope_unmatched": {
+            "count": 2,
+            "label": "未同时满足统计范围条件（含保留的空值或非数值未匹配）"
+          },
+          "numerator_unmatched": {
+            "count": 6,
+            "label": "已纳入分母，未同时满足分子条件（含空值或非数值未匹配）"
+          },
+          "matched": {
+            "count": 4,
+            "label": "同时满足范围和计数／分子条件"
+          }
+        },
+        "exact_fraction": {
+          "numerator": 4,
+          "denominator": 10,
+          "percent_multiplier": 100
+        },
+        "unrounded_decimal": "40",
+        "display_value": "40",
+        "rounding": "ROUND_HALF_UP",
+        "comparison_rule": "百分数按确认的小数位以十进制四舍五入（ROUND_HALF_UP）后严格相等；不使用容差。差值 = 计算值 − 报告值，单位为百分点。"
+      },
+      "final_correct": true,
+      "model_only_final_judgment": false
+    }
+  ]
+}
