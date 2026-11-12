@@ -104,7 +104,8 @@ def improved(paragraphs, query, limit=5, char_budget=6000):
         if used+len(text)>char_budget:continue
         info=applicability(p,paragraphs,query)
         if info['status']=='mismatch':continue
-        out.append({**p,'text':text,'truncated':truncated,'excerpt_ranges':ranges,'score':round(score,5),
+        out.append({**p,'text':text,'truncated':truncated,'excerpt_ranges':ranges,
+                    'quote_options':[p['text'][r['start']:r['end']] for r in ranges] if truncated else [],'score':round(score,5),
                     'context_role':role,'applicability':info,'applicability_status':info['status']});used+=len(text)
     return out
 
