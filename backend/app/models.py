@@ -88,3 +88,27 @@ class NumericCheck(Base):
     spec: Mapped[dict] = mapped_column(JSON)
     result: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class RuleMaterial(Base):
+    __tablename__ = "rule_materials"
+    asset_id: Mapped[str] = mapped_column(ForeignKey("assets.id"), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+
+
+class AITask(Base):
+    __tablename__ = "ai_tasks"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    status: Mapped[str] = mapped_column(String(40), default="extracting")
+    source: Mapped[dict] = mapped_column(JSON)
+    context: Mapped[dict] = mapped_column(JSON)
+    payload: Mapped[dict] = mapped_column(JSON, default=dict)
+    request_count: Mapped[int] = mapped_column(default=0)
+    tool_count: Mapped[int] = mapped_column(default=0)
+    trace: Mapped[list] = mapped_column(JSON, default=list)
+    run_id: Mapped[str | None] = mapped_column(ForeignKey("calculation_runs.id"), nullable=True)
+    check_id: Mapped[str | None] = mapped_column(ForeignKey("numeric_checks.id"), nullable=True)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)

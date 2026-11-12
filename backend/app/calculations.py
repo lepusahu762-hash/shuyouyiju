@@ -12,7 +12,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import select, func, insert
-from .models import Asset, CalculationRun, CalculationEvidence, NumericCheck, new_id
+from .models import Asset, CalculationRun, CalculationEvidence, NumericCheck, RuleMaterial, new_id
 from .projects import owned_project
 
 METHOD = "record-equality-v1"
@@ -159,7 +159,8 @@ def calculate(sheet, body):
 
 async def project_context(session, project):
     assets = (await session.scalars(select(Asset).where(Asset.project_id == project.id).order_by(Asset.id))).all()
-    context = {"rules": project.rules, "rules_version": project.rules_version,
+    roles = list((await session.scalars(select(RuleMaterial.asset_id).where(RuleMaterial.project_id == project.id).order_by(RuleMaterial.asset_id))).all())
+    context = {"rules": project.rules, "rules_version": project.rules_version, "rule_materials": roles,
                "assets": {asset.id: {"name": asset.original_name, "sha256": asset.sha256, "status": asset.status,
                                      "parsed_fingerprint": digest(asset.result), "annotation_version": asset.annotation_version,
                                      "annotations": asset.annotations} for asset in assets}}
@@ -168,7 +169,7 @@ async def project_context(session, project):
 
 def stale_reasons(run, current):
     reasons = []
-    if run.context["rules_version"] != current["rules_version"] or run.context["rules"] != current["rules"]:
+    if run.context["rules_version"] != current["rules_version"] or run.context["rules"] != current["rules"] or run.context.get("rule_materials", []) != current.get("rule_materials", []):
         reasons.append("项目统计口径已变更")
     if run.context["assets"] != current["assets"]:
         reasons.append("项目资料集合、解析内容或字段说明已变更")
@@ -183,6 +184,99 @@ def run_view(run, context, detail=True):
     if detail:
         value["context"] = run.context
     return value
+
+
+async def create_run_service(session, project_id, body, user):
+    project = await owned_project(session, project_id, user)
+    current, assets = await project_context(session, project)
+    if digest(current) != body.context_hash:
+        raise HTTPException(409, "资料或口径已变化。请重新载入设置并确认后再计算，旧记录会保留。")
+    asset = next((asset for asset in assets if asset.id == body.asset_id), None)
+    if asset is None:
+        raise HTTPException(404, "资料不存在或无权访问。")
+    if asset.kind != "table" or asset.status != "ready" or not asset.result:
+        raise HTTPException(409, "证据不足：请选择已解析成功的表格。")
+    sheet = next((sheet for sheet in asset.result["sheets"] if sheet["id"] == body.sheet_id), None)
+    if sheet is None:
+        raise HTTPException(422, "工作表不存在，请重新选择。")
+    result, evidence = calculate(sheet, body)
+    source = {"asset_id": asset.id, "name": asset.original_name, "sheet_id": sheet["id"], "sheet_name": sheet["name"],
+              "source_id": f"{asset.id}:v1:{sheet['id']}", "source_version": 1, "sha256": asset.sha256,
+              "parsed_fingerprint": digest(sheet), "columns": sheet["columns"], "annotations": asset.annotations}
+    run = CalculationRun(id=new_id(), project_id=project_id, spec=body.model_dump(exclude={"context_hash"}),
+                         context=current, source=source, result=result, method_version=METHOD)
+    session.add(run)
+    await session.flush()
+    # Bounded batches; never send a whole-sheet evidence object to the browser.
+    for start in range(0, len(evidence), 500):
+        await session.execute(insert(CalculationEvidence), [{"run_id": run.id, **row} for row in evidence[start:start+500]])
+    await session.commit()
+    return run_view(run, current)
+
+def check_view(check, run, context):
+    reasons = stale_reasons(run, context)
+    report_now = context["assets"].get(check.report["asset_id"])
+    if report_now != check.report["signature"]:
+        reasons.append("关联报告已变更或缺失")
+    return {"id": check.id, "run_id": check.run_id, "created_at": check.created_at, "report": check.report,
+            "spec": check.spec, "result": check.result, "status": "stale" if reasons else check.result["status"],
+            "stale": bool(reasons), "stale_reasons": reasons}
+
+async def create_check_service(session, run_id, body, user):
+    run = await session.get(CalculationRun, run_id)
+    if run is None:
+        raise HTTPException(404, "计算记录不存在或无权访问。")
+    project = await owned_project(session, run.project_id, user)
+    context, assets = await project_context(session, project)
+    report = next((asset for asset in assets if asset.id == body.report_asset_id), None)
+    if report is None:
+        raise HTTPException(404, "报告不存在或无权访问。")
+    if report.kind != "report" or report.status != "ready" or not report.result:
+        raise HTTPException(409, "证据不足：请先在资料页成功解析报告。")
+    paragraph = next((p for p in report.result["paragraphs"] if p["id"] == body.paragraph_id), None)
+    if paragraph is None:
+        raise HTTPException(422, "报告段落来源标识不存在，请重新选择。")
+    value = Decimal(body.reported_value)
+    if value > 100:
+        raise HTTPException(422, "本轮核验记录占比，报告百分比必须在 0 到 100 之间。")
+    status, message = "needs_confirmation", "请确认这条原文中的数值、指标、范围和精度与计算一致。"
+    result = {"status": status, "message": message, "reported_value": body.reported_value,
+              "calculated_value": run.result["display_value"], "difference_pp": None, "exact_difference_pp": None,
+              "comparison_rule": COMPARE_RULE}
+    tokens = re.findall(r"(?<![0-9A-Za-z_.,])([+\-−]?\s*[0-9]+(?:\.[0-9]+)?)\s*[%％]", paragraph["text"])
+    found = [Decimal(re.sub(r"\s", "", item).replace("−", "-")) for item in tokens]
+    if stale_reasons(run, context):
+        status, message = "stale", "资料或口径已变化，请重新计算后再核验；旧结果和证据仍保留。"
+    elif run.spec["operation"] != "ratio" or run.result["status"] == "insufficient":
+        status, message = "insufficient", "没有可用的百分比计算证据。请先完成非零分母的比例计算。"
+    elif run.result["status"] != "completed":
+        status, message = "needs_confirmation", "计算口径尚待确认，请先处理空值并重新计算。"
+    elif body.precision != run.spec["precision"]:
+        message = "报告精度与计算精度不一致，请确认相同小数位后再核验。"
+    elif max(0, -value.as_tuple().exponent) > body.precision:
+        message = "输入值的小数位多于确认的报告精度，请按原文重新确认。"
+    elif value not in found:
+        message = "输入的百分比未在所选原文中找到。本轮仅识别阿拉伯数字加 %／％，请选对应段落，不会改写原文。"
+    elif body.confirmed:
+        with localcontext() as ctx:
+            ctx.prec = 80
+            fraction = run.result["exact_fraction"]
+            raw = Decimal(fraction["numerator"]) * 100 / Decimal(fraction["denominator"])
+            quantum = Decimal(1).scaleb(-body.precision)
+            computed = raw.quantize(quantum, rounding=ROUND_HALF_UP)
+            reported = value.quantize(quantum, rounding=ROUND_HALF_UP)
+            difference = computed - reported
+            status = "consistent" if difference == 0 else "different"
+            message = "在已确认的指标、范围与精度下，数字与数据一致。" if status == "consistent" else "在已确认的指标、范围与精度下，报告值与计算值存在差异。"
+            result.update(calculated_value=format(computed, "f"), difference_pp=format(difference, "f"),
+                          exact_difference_pp={"numerator": str(Decimal(fraction["numerator"]) * 100 - value * fraction["denominator"]), "denominator": fraction["denominator"]})
+    result.update(status=status, message=message)
+    snapshot = {"asset_id": report.id, "name": report.original_name, "sha256": report.sha256,
+                "paragraph": paragraph, "signature": context["assets"][report.id]}
+    check = NumericCheck(run_id=run.id, report=snapshot, spec=body.model_dump(), result=result)
+    session.add(check)
+    await session.commit()
+    return check_view(check, run, context)
 
 
 def calculations_router(database, current_user):
@@ -203,31 +297,7 @@ def calculations_router(database, current_user):
 
     @router.post("/projects/{project_id}/runs", status_code=201)
     async def create_run(project_id: str, body: RunRequest, user=Depends(current_user), session=Depends(database.session)):
-        project = await owned_project(session, project_id, user)
-        current, assets = await project_context(session, project)
-        if digest(current) != body.context_hash:
-            raise HTTPException(409, "资料或口径已变化。请重新载入设置并确认后再计算，旧记录会保留。")
-        asset = next((asset for asset in assets if asset.id == body.asset_id), None)
-        if asset is None:
-            raise HTTPException(404, "资料不存在或无权访问。")
-        if asset.kind != "table" or asset.status != "ready" or not asset.result:
-            raise HTTPException(409, "证据不足：请选择已解析成功的表格。")
-        sheet = next((sheet for sheet in asset.result["sheets"] if sheet["id"] == body.sheet_id), None)
-        if sheet is None:
-            raise HTTPException(422, "工作表不存在，请重新选择。")
-        result, evidence = calculate(sheet, body)
-        source = {"asset_id": asset.id, "name": asset.original_name, "sheet_id": sheet["id"], "sheet_name": sheet["name"],
-                  "source_id": f"{asset.id}:v1:{sheet['id']}", "source_version": 1, "sha256": asset.sha256,
-                  "parsed_fingerprint": digest(sheet), "columns": sheet["columns"], "annotations": asset.annotations}
-        run = CalculationRun(id=new_id(), project_id=project_id, spec=body.model_dump(exclude={"context_hash"}),
-                             context=current, source=source, result=result, method_version=METHOD)
-        session.add(run)
-        await session.flush()
-        # Bounded batches; never send a whole-sheet evidence object to the browser.
-        for start in range(0, len(evidence), 500):
-            await session.execute(insert(CalculationEvidence), [{"run_id": run.id, **row} for row in evidence[start:start+500]])
-        await session.commit()
-        return run_view(run, current)
+        return await create_run_service(session, project_id, body, user)
 
     @router.get("/projects/{project_id}/runs")
     async def list_runs(project_id: str, offset: int = Query(0, ge=0), limit: int = Query(20, ge=1, le=50), user=Depends(current_user), session=Depends(database.session)):
@@ -263,14 +333,6 @@ def calculations_router(database, current_user):
                 "rows": [{**row.row, "in_scope": row.in_scope, "in_numerator": row.in_numerator,
                           "reason": row.reason, "reason_label": REASONS[row.reason]} for row in rows]}
 
-    def check_view(check, run, context):
-        reasons = stale_reasons(run, context)
-        report_now = context["assets"].get(check.report["asset_id"])
-        if report_now != check.report["signature"]:
-            reasons.append("关联报告已变更或缺失")
-        return {"id": check.id, "run_id": check.run_id, "created_at": check.created_at, "report": check.report,
-                "spec": check.spec, "result": check.result, "status": "stale" if reasons else check.result["status"],
-                "stale": bool(reasons), "stale_reasons": reasons}
 
     @router.get("/runs/{run_id}/checks")
     async def list_checks(run_id: str, offset: int = Query(0, ge=0), limit: int = Query(10, ge=1, le=50), user=Depends(current_user), session=Depends(database.session)):
@@ -283,56 +345,6 @@ def calculations_router(database, current_user):
 
     @router.post("/runs/{run_id}/checks", status_code=201)
     async def verify(run_id: str, body: CheckRequest, user=Depends(current_user), session=Depends(database.session)):
-        run, project = await owned_run(session, run_id, user)
-        context, assets = await project_context(session, project)
-        report = next((asset for asset in assets if asset.id == body.report_asset_id), None)
-        if report is None:
-            raise HTTPException(404, "报告不存在或无权访问。")
-        if report.kind != "report" or report.status != "ready" or not report.result:
-            raise HTTPException(409, "证据不足：请先在资料页成功解析报告。")
-        paragraph = next((p for p in report.result["paragraphs"] if p["id"] == body.paragraph_id), None)
-        if paragraph is None:
-            raise HTTPException(422, "报告段落来源标识不存在，请重新选择。")
-        value = Decimal(body.reported_value)
-        if value > 100:
-            raise HTTPException(422, "本轮核验记录占比，报告百分比必须在 0 到 100 之间。")
-        status, message = "needs_confirmation", "请确认这条原文中的数值、指标、范围和精度与计算一致。"
-        result = {"status": status, "message": message, "reported_value": body.reported_value,
-                  "calculated_value": run.result["display_value"], "difference_pp": None, "exact_difference_pp": None,
-                  "comparison_rule": COMPARE_RULE}
-        tokens = re.findall(r"(?<![0-9A-Za-z_.,])([+\-−]?\s*[0-9]+(?:\.[0-9]+)?)\s*[%％]", paragraph["text"])
-        found = [Decimal(re.sub(r"\s", "", item).replace("−", "-")) for item in tokens]
-        if stale_reasons(run, context):
-            status, message = "stale", "资料或口径已变化，请重新计算后再核验；旧结果和证据仍保留。"
-        elif run.spec["operation"] != "ratio" or run.result["status"] == "insufficient":
-            status, message = "insufficient", "没有可用的百分比计算证据。请先完成非零分母的比例计算。"
-        elif run.result["status"] != "completed":
-            status, message = "needs_confirmation", "计算口径尚待确认，请先处理空值并重新计算。"
-        elif body.precision != run.spec["precision"]:
-            message = "报告精度与计算精度不一致，请确认相同小数位后再核验。"
-        elif max(0, -value.as_tuple().exponent) > body.precision:
-            message = "输入值的小数位多于确认的报告精度，请按原文重新确认。"
-        elif value not in found:
-            message = "输入的百分比未在所选原文中找到。本轮仅识别阿拉伯数字加 %／％，请选对应段落，不会改写原文。"
-        elif body.confirmed:
-            with localcontext() as ctx:
-                ctx.prec = 80
-                fraction = run.result["exact_fraction"]
-                raw = Decimal(fraction["numerator"]) * 100 / Decimal(fraction["denominator"])
-                quantum = Decimal(1).scaleb(-body.precision)
-                computed = raw.quantize(quantum, rounding=ROUND_HALF_UP)
-                reported = value.quantize(quantum, rounding=ROUND_HALF_UP)
-                difference = computed - reported
-                status = "consistent" if difference == 0 else "different"
-                message = "在已确认的指标、范围与精度下，数字与数据一致。" if status == "consistent" else "在已确认的指标、范围与精度下，报告值与计算值存在差异。"
-                result.update(calculated_value=format(computed, "f"), difference_pp=format(difference, "f"),
-                              exact_difference_pp={"numerator": str(Decimal(fraction["numerator"]) * 100 - value * fraction["denominator"]), "denominator": fraction["denominator"]})
-        result.update(status=status, message=message)
-        snapshot = {"asset_id": report.id, "name": report.original_name, "sha256": report.sha256,
-                    "paragraph": paragraph, "signature": context["assets"][report.id]}
-        check = NumericCheck(run_id=run.id, report=snapshot, spec=body.model_dump(), result=result)
-        session.add(check)
-        await session.commit()
-        return check_view(check, run, context)
+        return await create_check_service(session, run_id, body, user)
 
     return router

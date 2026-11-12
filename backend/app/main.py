@@ -9,14 +9,16 @@ from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from .config import Settings
 from .database import Database
-from .models import Base, Asset, now
+from .models import Base, Asset, AITask, now
 from .auth import setup_auth, UserRead, UserCreate
 from .projects import project_router
 from .materials import material_router
 from .calculations import calculations_router
+from .ai import ai_router, BUSY
+from .ai_provider import BailianProvider
 
 
-def create_app(settings: Settings | None = None):
+def create_app(settings: Settings | None = None, ai_provider=None):
     settings = settings or Settings()
     database = Database(settings)
 
@@ -28,11 +30,12 @@ def create_app(settings: Settings | None = None):
         async with database.sessions() as session:
             # An interrupted parser cannot retain a fictitious running state after restart.
             await session.execute(update(Asset).where(Asset.status.in_(["uploaded", "parsing"])).values(status="failed", error="后台已重启，解析中断。原文件已保留，请重试解析。", updated_at=now()))
+            await session.execute(update(AITask).where(AITask.status.in_(BUSY)).values(status="failed", error="后台已重启，本阶段中断。已完成快照保留，可在剩余调用额度内重试。", updated_at=now()))
             await session.commit()
         yield
         await database.engine.dispose()
 
-    app = FastAPI(title="数有依据 API", version="0.4.0", lifespan=lifespan)
+    app = FastAPI(title="数有依据 API", version="0.5.0", lifespan=lifespan)
     app.state.database = database
     app.state.settings = settings
     origins = set(settings.allowed_origins.split(","))
@@ -91,13 +94,14 @@ def create_app(settings: Settings | None = None):
 
     @app.get("/api/health")
     async def health():
-        return {"status": "ok", "version": "0.4.0", "email_verification": False,
+        return {"status": "ok", "version": "0.5.0", "email_verification": False,
                 "limits": {"upload_bytes": settings.max_upload_bytes, "rows": settings.max_rows,
                            "columns": settings.max_columns, "files": settings.max_project_files}}
 
     app.include_router(project_router(database, current_user))
     app.include_router(material_router(database, settings, current_user))
     app.include_router(calculations_router(database, current_user))
+    app.include_router(ai_router(database, settings, current_user, ai_provider or BailianProvider(settings)))
     return app
 
 

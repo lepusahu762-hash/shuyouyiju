@@ -1,5 +1,5 @@
 from pathlib import Path
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +16,14 @@ class Settings(BaseSettings):
     max_columns: int = Field(default=200, ge=1, le=1000)
     max_cells: int = Field(default=1000000, ge=1)
     max_project_files: int = Field(default=20, ge=1, le=200)
+    ai_api_key: SecretStr = SecretStr("")
+    ai_base_url: str = ""
+    ai_model: str = ""
+    ai_region: str = ""
+    ai_timeout_seconds: int = Field(default=45, ge=5, le=120)
+    ai_max_tokens: int = Field(default=2500, ge=256, le=8000)
+    ai_max_requests: int = Field(default=6, ge=1, le=6)
+    ai_max_tool_calls: int = Field(default=4, ge=1, le=6)
 
     @property
     def storage_dir(self) -> Path:
