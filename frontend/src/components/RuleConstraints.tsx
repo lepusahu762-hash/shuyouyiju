@@ -5,6 +5,9 @@ import type { AIPlan, AITask, RuleCheck, RuleSnapshot, RuleSpec } from '../aiTyp
 import { conditionText, nullPolicyLabel } from '../calculationTypes'
 import { CalculationConditions } from './CalculationConditions'
 
+
+type RuleTask = Pick<AITask,'id'|'project_id'|'context_hash'|'rule_check'> & {payload:Pick<AITask['payload'],'plan'|'rule_snapshot'|'plan_revisions'|'citations'> & {draft_plan?:AIPlan|null}}
+
 const ruleFields: [keyof RuleSpec, string][] = [['asset_id', '表格资料'], ['sheet_id', '工作表'], ['operation', '计算类型'], ['metric', '指标'], ['scope_description', '统计范围说明'], ['scope', '分母／范围条件'], ['numerator', '分子条件'], ['null_policy', '空值策略'], ['precision', '显示及比较精度']]
 function ruleValue(key: keyof RuleSpec, value: unknown, tables: Asset[], spec?: RuleSpec) {
   const table = tables.find(t => t.id === spec?.asset_id)
@@ -40,7 +43,7 @@ export function RuleStatus({ check }: { check: RuleCheck }) {
   return <div className={`rule-status rule-${check.status}`} role="status"><b>{labels[check.status]}</b><p>{check.message}</p></div>
 }
 
-export function RuleComparison({ task, plan, check, tables }: { task: AITask; plan: AIPlan; check: RuleCheck; tables: Asset[] }) {
+export function RuleComparison({ task, plan, check, tables }: { task: RuleTask; plan: AIPlan; check: RuleCheck; tables: Asset[] }) {
   const bound = task.payload.rule_snapshot
   if (!bound) return <RuleStatus check={check} />
   const conflicts = check.conflicts.map(c => c.field)
@@ -61,9 +64,9 @@ export function RuleComparison({ task, plan, check, tables }: { task: AITask; pl
   </section>
 }
 
-export function RuleSetup({ task, tables, onBound }: { task: AITask; tables: Asset[]; onBound: (task: AITask) => void }) {
+export function RuleSetup<T extends RuleTask>({ task, tables, onBound, taskBase="/ai-tasks" }: { task: T; tables: Asset[]; onBound: (task: T) => void; taskBase?:string }) {
   const [head, setHead] = useState<{ items: RuleSnapshot[]; current_id: string | null; context_hash: string } | null>(null)
-  const [draft, setDraft] = useState<AIPlan>({ ...(task.payload.rule_snapshot?.constraints ?? task.payload.plan ?? { asset_id: '', sheet_id: '', operation: 'ratio', metric: '', scope_description: '', scope: [], numerator: [], null_policy: 'block', precision: 0 }), confirmed: false, context_hash: task.context_hash })
+  const [draft, setDraft] = useState<AIPlan>({ ...(task.payload.rule_snapshot?.constraints ?? task.payload.draft_plan ?? task.payload.plan ?? { asset_id: '', sheet_id: '', operation: 'ratio', metric: '', scope_description: '', scope: [], numerator: [], null_policy: 'block', precision: 0 }), confirmed: false, context_hash: task.context_hash })
   const [sources, setSources] = useState<Record<string, string>>({})
   const [quotes,setQuotes]=useState<Record<string,string>>({})
   const [confirmed, setConfirmed] = useState<string[]>([])
@@ -74,7 +77,7 @@ export function RuleSetup({ task, tables, onBound }: { task: AITask; tables: Ass
   useEffect(() => { api<typeof head>(`/projects/${task.project_id}/rule-snapshots`).then(setHead).catch(e => setError(e.message)) }, [task.project_id])
   const citations = task.payload.citations ?? []
   async function bind(id: string) {
-    const bound = await api<AITask>(`/ai-tasks/${task.id}/bind-rule`, { method: 'POST', body: JSON.stringify({ snapshot_id: id }) })
+    const bound = await api<T>(`${taskBase}/${task.id}/bind-rule`, { method: 'POST', body: JSON.stringify({ snapshot_id: id }) })
     onBound(bound)
   }
   async function action(save: boolean) {
@@ -113,7 +116,7 @@ export function RuleSetup({ task, tables, onBound }: { task: AITask; tables: Ass
   </details>
 }
 
-export function PlanRuleCheck({ task, tables, plan, onChecked }: { task: AITask; tables: Asset[]; plan: AIPlan; onChecked: (check: RuleCheck) => void }) {
+export function PlanRuleCheck({ task, tables, plan, onChecked, taskBase="/ai-tasks" }: { task: RuleTask; tables: Asset[]; plan: AIPlan; onChecked: (check: RuleCheck) => void; taskBase?:string }) {
   const [check, setCheck] = useState(task.rule_check)
   const [checked, setChecked] = useState(JSON.stringify({ ...plan, confirmed: false }))
   const [busy, setBusy] = useState(false)
@@ -122,7 +125,7 @@ export function PlanRuleCheck({ task, tables, plan, onChecked }: { task: AITask;
   async function inspect() {
     setBusy(true); setError('')
     try {
-      const response = await api<{ rule_check: RuleCheck }>(`/ai-tasks/${task.id}/plan-check`, { method: 'POST', body: JSON.stringify({ plan: { ...plan, confirmed: false } }) })
+      const response = await api<{ rule_check: RuleCheck }>(`${taskBase}/${task.id}/plan-check`, { method: 'POST', body: JSON.stringify({ plan: { ...plan, confirmed: false } }) })
       setCheck(response.rule_check); setChecked(JSON.stringify({ ...plan, confirmed: false })); onChecked(response.rule_check)
     } catch (e) { setError((e as Error).message) } finally { setBusy(false) }
   }

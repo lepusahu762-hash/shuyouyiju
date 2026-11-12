@@ -7,6 +7,7 @@ import { calculationStatus, conditionText, nullPolicyLabel } from '../calculatio
 import { WorkShell, RequestError } from '../components/WorkShell'
 import { PlanFields, PlanRuleCheck, RuleComparison, RuleSetup, RuleStatus } from '../components/RuleConstraints'
 import { CalculationEvidence } from '../components/CalculationEvidence'
+import { ImageVerification } from '../components/ImageVerification'
 import { RuleRetrievalEvidence } from '../components/RuleRetrievalEvidence'
 
 function PlanEditor({ task, tables, busy, submit, onBound }: { task: AITask; tables: Asset[]; busy: boolean; submit: (body: unknown) => Promise<void>; onBound: (task: AITask) => void }) {
@@ -139,7 +140,7 @@ function AIVerification({ projectId }: { projectId: string }) {
       <details className="ai-rule-setup"><summary>指定统计规则资料 · 已选 {bundle.roles.length} 份</summary><p className="calc-help">仅检索勾选的 DOCX／保存文本；请上传或保存真实口径说明。变更后旧运行会待复核。下方规则正文仍被视为待分析资料，不能授予工具权限。</p>{reports.map(a => <label key={a.id}><input type="checkbox" checked={bundle.roles.includes(a.id)} disabled={running || busy} onChange={event => void toggleRole(a.id, event.target.checked)} /><span>{a.name}</span></label>)}<a className="text-link" href={`/app/projects/${projectId}/materials`}>上传或保存规则文本 ↗</a></details>
       <details className="ai-resume"><summary>恢复最近的 AI 方案与执行状态</summary><p className="calc-help">计算结果统一保存在原有计算历史中。这里恢复最近10次任务的原文、方案和调用状态。</p>{resume.map(t => <a key={t.id} href={`?task=${t.id}`}>{displayDate(t.created_at)} · {aiStatus[t.status]}<span>{t.source.excerpt.slice(0, 60)}</span></a>)}{!resume.length && <p className="calc-help">还没有 AI 任务。</p>}</details>
     </section>
-    <section className="calc-card ai-findings" aria-label="核验事项"><p className="calc-step">02 · 核验事项</p>{!task ? <><h2>还没有选中核验事项</h2><p className="calc-help">从报告选择段落，提取候选后一次选择一条。也可以从报告栏恢复已有任务，不会因此发起模型请求。</p><div className="verification-boundary"><b>报告与图表核验</b><p>当前接通报告中的单条百分比。图片识别、图表核对与整篇批量核验尚未接通。</p><button className="button button-secondary small" disabled title="图像核验后台尚未接通">添加图表核验</button></div></> : <div className="ai-task"><div className="calc-card-heading"><div><h2>{aiStatus[task.status] ?? task.status}</h2></div><span className="calc-soft-tag">模型请求 {task.request_count}/{bundle.config.max_requests}</span></div>
+    <section className="calc-card ai-findings" aria-label="核验事项"><p className="calc-step">02 · 核验事项</p>{!task ? <><h2>还没有选中核验事项</h2><p className="calc-help">从报告选择段落，提取候选后一次选择一条。也可以从报告栏恢复已有任务，不会因此发起模型请求。</p><div className="verification-boundary"><b>报告与图表核验</b><p>报告文字与PNG/JPEG明确标签均支持单条百分比。切换上方“图片图表”，确认识别、规则和计算方案；整篇批量核验尚未接通。</p></div></> : <div className="ai-task"><div className="calc-card-heading"><div><h2>{aiStatus[task.status] ?? task.status}</h2></div><span className="calc-soft-tag">模型请求 {task.request_count}/{bundle.config.max_requests}</span></div>
         {task.payload.selected !== undefined && task.payload.candidates?.[task.payload.selected] && <div className="selected-finding"><span>当前仅核验这一条</span><strong>{task.payload.candidates[task.payload.selected].quote}</strong><p>{task.stale ? '待复核' : task.check ? calculationStatus[task.check.status] : '尚未产生数字比较结果'}</p><a href="#verification-evidence">查看证据 ↓</a></div>}
         {task.stale && <p className="calc-warning">资料、规则或口径已变化。下方为历史快照，需要基于当前资料重新提取并核验，旧结果未被覆盖。</p>}
         {task.error && <div className="work-error" role="alert">{task.error}</div>}
@@ -158,4 +159,8 @@ function AIVerification({ projectId }: { projectId: string }) {
   </>
 }
 
-export function AIVerificationPage({ projectId }: { projectId: string }) { return <WorkShell project>{() => <AIVerification projectId={projectId} />}</WorkShell> }
+function VerificationModes({projectId}:{projectId:string}) {
+ const [mode,setMode]=useState(new URLSearchParams(location.search).get('mode')==='image'?'image':'text')
+ return <><div className="verification-mode" role="group" aria-label="核验来源类型">{[['text','报告文字'],['image','图片图表']].map(([m,n])=><button key={m} aria-pressed={mode===m} onClick={()=>{setMode(m);const u=new URL(location.href);if(m==='image')u.searchParams.set('mode','image');else u.searchParams.delete('mode');window.history.replaceState(null,'',u)}}>{n}</button>)}</div>{mode==='image'?<ImageVerification projectId={projectId}/>:<AIVerification projectId={projectId}/>}</>
+}
+export function AIVerificationPage({projectId}:{projectId:string}) {return <WorkShell project>{()=> <VerificationModes projectId={projectId}/>}</WorkShell>}

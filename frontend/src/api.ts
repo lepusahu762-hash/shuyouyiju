@@ -7,12 +7,12 @@ export type Issue = { code: string; message: string; count: number; locations: s
 export type Sheet = { id: string; name: string; row_count: number; columns: Column[]; issues: Issue[] }
 export type FieldMeaning = { meaning: string; unit: string }
 export type Asset = {
-  id: string; project_id: string; name: string; kind: 'table' | 'report'; extension: string; size_bytes: number; sha256: string;
+  id: string; project_id: string; name: string; kind: 'table' | 'report' | 'image'; extension: string; size_bytes: number; sha256: string;
   status: 'uploaded' | 'parsing' | 'ready' | 'failed'; error: string | null; source_version: number;
-  summary: { sheets?: Sheet[]; paragraph_count?: number; notes?: string[]; encoding?: string; delimiter?: string };
+  summary: { width?:number; height?:number; source_id?:string; sheets?: Sheet[]; paragraph_count?: number; notes?: string[]; encoding?: string; delimiter?: string };
   annotations: Record<string, FieldMeaning>; annotation_version: number; created_at: string; updated_at: string;
 }
-export type Preview = { kind: 'table' | 'report'; total: number; offset: number; limit: number; columns?: Column[]; rows?: { id: string; source_row: number; source_line: number; cells: (string | number | boolean | null)[] }[]; paragraphs?: { id: string; location: string; text: string; style: string }[] }
+export type Preview = { width?:number;height?:number;source_id?:string;kind: 'table' | 'report' | 'image'; total: number; offset: number; limit: number; columns?: Column[]; rows?: { id: string; source_row: number; source_line: number; cells: (string | number | boolean | null)[] }[]; paragraphs?: { id: string; location: string; text: string; style: string }[] }
 
 export class ApiError extends Error {
   status: number
@@ -108,6 +108,8 @@ export function safeReturn(value: string | null): string {
     for (const key of ['check', 'revision']) { const id = query.get(key); if (id && uuid.test(id)) safeQuery.set(key, id) }
     const target = query.get('target'); if (target && /^\d{1,3}$/.test(target)) safeQuery.set('target', target)
   } else if (page === 'verify' || page === 'ai-verification') {
+    if(query.get('mode')==='image')safeQuery.set('mode','image')
+    const imageTask=query.get('imageTask');if(imageTask&&uuid.test(imageTask))safeQuery.set('imageTask',imageTask)
     const task = query.get('task')
     if (task && uuid.test(task)) safeQuery.set('task', task)
   }
