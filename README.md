@@ -1,6 +1,6 @@
 # 数有依据 · shuyouyiju
 
-React + TypeScript + Vite 前端，Python + FastAPI 后台。当前 v0.4 支持真实账户、个人项目、资料解析、记录数／比例计算、分页证据定位、单条报告百分比核验与历史快照。AI、规则检索和完整报告核验尚未接入。首页继续保留原有合成示例。
+React + TypeScript + Vite 前端，Python + FastAPI 后台。当前 v0.5 保留真实账户、项目、资料、统计计算、证据与历史，新增 AI 辅助单条百分比核验工作区、项目内真实规则检索、人工确认方案和受控模型工具调用。**当前本机缺少模型凭据，真实 AI 尚未接通**；模拟测试不能代表真实调用通过。首页保留原有合成示例。
 
 ## 目录
 
@@ -16,8 +16,9 @@ backend/
   .venv/                   项目虚拟环境（不提交）
   data/                    SQLite + originals 原文件（不提交）
 docs/shuyouyiju_product_spec_v1.md
-WORKSPACE_PREVIEW.md        本轮交付与验收报告
-CALCULATION_PREVIEW.md      v0.4 计算、证据、单条核验交付与演示步骤
+WORKSPACE_PREVIEW.md        v0.3 工作空间历史交付记录
+CALCULATION_PREVIEW.md      v0.4 计算、证据、单条核验历史交付
+AI_PREVIEW.md               v0.5 接入说明、配置步骤、模拟与真实验收边界
 frontend/HOMEPAGE_PREVIEW.md 上轮历史记录
 artifacts/                 本地验收截图、结果、日志（不提交）
 ```
@@ -118,8 +119,26 @@ Set-Location '..\backend'
 & '.\.venv\Scripts\python.exe' -m pytest tests -q
 ```
 
-v0.4 新增 `tests/test_calculations.py`，覆盖完整数据、证据集合、空值、零分母、条件校验、舍入、原文符号、失效和隔离。后台当前共 10 项测试；依赖 Starlette 对 TestClient 使用 httpx 发出一条弃用警告。前端构建与 lint 通过。当前浏览器流程与检查结果见 [CALCULATION_PREVIEW.md](CALCULATION_PREVIEW.md)；上轮记录保留在 [WORKSPACE_PREVIEW.md](WORKSPACE_PREVIEW.md)。
+v0.4 新增 `tests/test_calculations.py`，覆盖完整数据、证据集合、空值、零分母、条件校验、舍入、原文符号、失效和隔离。v0.5 后台当前共 15 项测试（含5项 AI 流程／协议模拟测试）；依赖 Starlette 对 TestClient 使用 httpx 发出一条弃用警告。前端构建与 lint 通过。本轮 AI 配置与浏览器检查见 [AI_PREVIEW.md](AI_PREVIEW.md)，原计算流程见 [CALCULATION_PREVIEW.md](CALCULATION_PREVIEW.md)；上轮记录保留在 [WORKSPACE_PREVIEW.md](WORKSPACE_PREVIEW.md)。
 
 ## 下一阶段
 
-下一阶段可扩展统计方法、真实 AI、规则检索和完整报告核验。修订复核、交付、邮件验证、找回密码、PDF/OCR 和完整版本历史尚未实现。当前工作区的真实计算完全由明确条件驱动，AI 尚未接入。
+下一阶段需在本地配置百炼账号并完成少量真实调用验收，再考虑扩展统计方法与完整报告核验。修订复核、交付、邮件验证、找回密码、PDF/OCR 和完整版本历史尚未实现。当前 AI 接入代码与模拟验收已完成，真实模型尚未接通；计算与比较仍由确定性后台执行。
+
+
+## v0.5 AI 辅助单条核验
+
+入口：项目的“资料与口径”或“计算与证据”顶部 → **AI 辅助单条核验**，路由 `/app/projects/:projectId/ai-verification`。原有手动流程继续可用。
+
+先在资料页上传/保存报告和规则，再在 AI 页指定“统计规则资料”。从一个段落提取最多5条候选，选择1条，检索实际规则，检查并修改字段和条件，明确采用的规则及冲突处理后执行。仅支持记录占比，跨期提升/百分点及复杂统计不判为通过。计算、证据与数字比较进入原有运行历史；任务额外保存原文、方案、模型与工具摘要，不另建计算历史系统。
+
+后台通过 `pydantic-settings` 实际读取 `backend/.env` 的 `SYJ_AI_API_KEY`、`SYJ_AI_BASE_URL`、`SYJ_AI_MODEL`、`SYJ_AI_REGION`。密钥仅在后台使用，不进入前端；无配置时页面明确禁用模型调用。支持百炼官方 Chat Completions API，地域地址要与 Key 一致，不使用 Coding Plan／Token Plan 编程订阅接口。每任务最多6次模型请求，失败和重试均计入；默认45秒超时、2500输出 tokens、4次工具调用，不自动切换模型。
+
+本地填写、官方文档、计费、演示资料及截图见 [AI_PREVIEW.md](AI_PREVIEW.md)。生成独立合成资料：
+
+```powershell
+Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju\backend'
+& '.\.venv\Scripts\python.exe' scripts/make_ai_demo.py
+```
+
+文件写入仓库 `artifacts/ai-demo`，不会被产品自动装载。常规启动仍用上方两个终端；不要用 `tests/preview_ai.py` 代替真实后台，该模块仅用于清楚标记的模拟浏览器验收，使用独立 `artifacts/ai-browser-data`。生产后台依旧 `app.main:app`，保留 `backend/data` 中原有账户和原件。
