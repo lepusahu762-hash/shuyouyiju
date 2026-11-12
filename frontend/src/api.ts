@@ -74,9 +74,45 @@ export function uploadFile(projectId: string, file: File, progress: (percentage:
 }
 
 export function safeReturn(value: string | null): string {
-  if (value === '/app') return value
-  return value && /^\/app\/projects\/[0-9a-f-]{36}\/(materials|calculations|ai-verification)$/.test(value) ? value : '/app'
+  if (value === '/app' || value === '/app/templates' || value === '/app/me') return value
+  if (!value?.startsWith('/')) return '/app'
+
+  const hashAt = value.indexOf('#')
+  const hash = hashAt >= 0 ? value.slice(hashAt + 1) : ''
+  const withoutHash = hashAt >= 0 ? value.slice(0, hashAt) : value
+  const queryAt = withoutHash.indexOf('?')
+  const pathname = queryAt >= 0 ? withoutHash.slice(0, queryAt) : withoutHash
+  const query = queryAt >= 0 ? new URLSearchParams(withoutHash.slice(queryAt + 1)) : new URLSearchParams()
+  const route = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/(materials|analysis|calculations|verify|ai-verification|review)$/)
+  if (!route) return '/app'
+
+  const [, , page] = route
+  const safeQuery = new URLSearchParams()
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const sourceId = /^[0-9a-f-]{36}:v\d+:[A-Za-z0-9:._-]{1,160}$/i
+  if (page === 'materials') {
+    const asset = query.get('asset')
+    const paragraph = query.get('paragraph')
+    const row = query.get('row')
+    const sheet = query.get('sheet')
+    const offset = query.get('offset')
+    if (asset && uuid.test(asset)) safeQuery.set('asset', asset)
+    if (paragraph && sourceId.test(paragraph)) safeQuery.set('paragraph', paragraph)
+    if (row && (/^\d{1,6}$/.test(row) || sourceId.test(row))) safeQuery.set('row', row)
+    if (sheet && /^[A-Za-z0-9_-]{1,64}$/.test(sheet)) safeQuery.set('sheet', sheet)
+    if (offset && /^\d{1,6}$/.test(offset)) safeQuery.set('offset', offset)
+  } else if (page === 'analysis' || page === 'calculations') {
+    const run = query.get('run')
+    if (run && uuid.test(run)) safeQuery.set('run', run)
+  } else if (page === 'verify' || page === 'ai-verification') {
+    const task = query.get('task')
+    if (task && uuid.test(task)) safeQuery.set('task', task)
+  }
+
+  const safeHash = hash === 'calculation-history' && (page === 'analysis' || page === 'calculations') ? `#${hash}` : ''
+  const safeSearch = safeQuery.size ? `?${safeQuery.toString()}` : ''
+  return pathname + safeSearch + safeHash
 }
-export function authHref() { return '/auth?next=' + encodeURIComponent(safeReturn(window.location.pathname)) }
+export function authHref() { return '/auth?next=' + encodeURIComponent(safeReturn(window.location.pathname + window.location.search + window.location.hash)) }
 export function displayDate(value: string) { return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) }
 export function displaySize(bytes: number) { return bytes < 1024 ? `${bytes} B` : bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KiB` : `${(bytes / 1024 / 1024).toFixed(1)} MiB` }

@@ -8,7 +8,9 @@ import { MaterialsPage } from './pages/MaterialsPage'
 import { CalculationsPage } from './pages/CalculationsPage'
 import './Calculations.css'
 import { AIVerificationPage } from './pages/AIVerificationPage'
+import { CasesPage, GuidePage, PersonalPage, ReviewPage, TemplatesPage } from './pages/SitePages'
 import './AI.css'
+import './SitePages.css'
 
 // Native links support browser history and new tabs. Vite serves the SPA entry
 // on direct /auth refresh; production hosts need the same history fallback.
@@ -16,13 +18,19 @@ function App() {
   const pathname = window.location.pathname.replace(/\/$/, '') || '/'
   if (pathname === '/') return <HomePage />
   if (pathname === '/auth') return <AuthPage />
+  if (pathname === '/cases') return <CasesPage />
+  if (pathname === '/guide') return <GuidePage />
   if (pathname === '/app') return <WorkspacePage />
+  if (pathname === '/app/templates') return <TemplatesPage />
+  if (pathname === '/app/me') return <PersonalPage />
   const materialRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/materials$/)
   if (materialRoute) return <MaterialsPage projectId={materialRoute[1]} />
-  const calculationRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/calculations$/)
+  const calculationRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/(?:analysis|calculations)$/)
   if (calculationRoute) return <CalculationsPage projectId={calculationRoute[1]} />
-  const aiRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/ai-verification$/)
+  const aiRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/(?:verify|ai-verification)$/)
   if (aiRoute) return <AIVerificationPage projectId={aiRoute[1]} />
+  const reviewRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/review$/)
+  if (reviewRoute) return <ReviewPage projectId={reviewRoute[1]} />
   return <main className="not-found"><a href="/"><Brand /></a><p className="section-kicker">404 · 页面不存在</p><h1>这个页面还没有到这里。</h1><p>回到首页，继续体验数据与证据的联动。</p><a className="button button-primary" href="/">返回首页<Icon name="arrow" /></a></main>
 }
 
