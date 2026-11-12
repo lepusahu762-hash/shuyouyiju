@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { Asset, Preview, Project } from '../api'
-import { api, displayDate } from '../api'
 import type { User } from '../api'
-import type { CalculationRun } from '../calculationTypes'
-import { WorkShell, RequestError } from '../components/WorkShell'
+import { WorkShell } from '../components/WorkShell'
 import { Brand, Icon } from '../components/ui'
 
 const cases = [
@@ -28,10 +25,10 @@ export function CasesPage() {
 
 const guides = [
   { id: 'start', title: '快速上手', body: <><p>注册并进入工作空间，新建项目后从“资料与口径”上传CSV／XLSX表格和DOCX报告。先指定统计规则资料，再核对字段、范围与空值策略。</p><p>“数据分析”目前提供可复核的条件计数和比例；“结论核验”支持选择报告段落，人工确认方案后比较单条百分比。每次已完成运行会进入原项目历史。</p><a className="text-link" href="/app">进入我的工作空间<Icon name="arrow" /></a></> },
-  { id: 'limits', title: '使用边界', body: <><p>已接通：账户与项目隔离、表格与DOCX解析、资料预览、手动计数／比例、条件组合、原始记录证据、单条数字核验、规则快照和AI辅助方案。</p><p>尚未接通：自然语言对话分析、分组图表计算、图像识别、报告修订保存、复核队列、成果导出、模板持久化、个人收藏／导出记录及历史版本差异。</p><p>模型建议不是核验结果。关键字段、口径、空值策略、精度和规则原文仍需用户确认；没有证据时不推断因果或基期变化。</p></> },
+  { id: 'limits', title: '使用边界', body: <><p>已接通：账户与项目隔离、表格与DOCX解析、资料预览、手动计数／比例、条件组合、原始记录证据、单条数字核验、规则快照、AI辅助方案、单条修订版本保存与确定性复核。</p><p>尚未接通：自然语言对话分析、分组图表计算、图像识别、整篇修订、复核队列、成果导出、模板持久化、个人收藏／导出记录及历史版本差异。</p><p>模型建议不是核验结果。关键字段、口径、空值策略、精度和规则原文仍需用户确认；没有证据时不推断因果或基期变化。</p></> },
   { id: 'privacy', title: '资料与隐私', body: <><p>项目与文件接口在后台校验账户归属。上传原件与解析结果分开保存，统计使用已解析数据，不改写原文件。</p><p>AI辅助核验会把完成当前任务所需的报告片段、字段样本及命中的规则段落发送至已配置的百炼模型服务。手动计算不调用模型。尚未接通邮件验证和密码找回。</p><p>该项目为本地测试版本，未部署公网；不要把测试环境当作正式生产服务。</p></> },
   { id: 'verification', title: '验证记录', body: <><p>本地现有验收覆盖账户隔离、资料解析、条件计算、证据分页、规则冲突阻断和AI单条核验。测试数量及真实模型调用情况以仓库最新 AI_PREVIEW.md 中逐轮记录为准。</p><p>模拟模型测试与真实模型验收分别记录；模拟结果不会标成真实模型输出。首页和案例页内的示例均为合成材料。</p></> },
-  { id: 'project', title: '项目说明', body: <><p>《数有依据》连接表格、统计规则、报告陈述与可定位证据，辅助检查数字在已确认口径下是否一致。</p><p>它不证明原始数据真实，也不自动证明因果关系。对话式分析、图表核验、修订交付和导出仍在后续开发范围。</p><a href="/">返回品牌首页</a></> },
+  { id: 'project', title: '项目说明', body: <><p>《数有依据》连接表格、统计规则、报告陈述与可定位证据，辅助检查数字在已确认口径下是否一致。</p><p>它不证明原始数据真实，也不自动证明因果关系。对话式分析、图表核验、整篇自动改写和导出仍在后续开发范围。</p><a href="/">返回品牌首页</a></> },
 ]
 
 export function GuidePage() {
@@ -69,43 +66,3 @@ function Personal({ user }: { user: User }) {
 }
 
 export function PersonalPage() { useEffect(() => { document.title = '个人空间 · 数有依据' }, []); return <WorkShell>{user => <Personal user={user} />}</WorkShell> }
-
-function ReviewWorkspace({ projectId }: { projectId: string }) {
-  const [project, setProject] = useState<Project | null>(null)
-  const [assets, setAssets] = useState<Asset[]>([])
-  const [runs, setRuns] = useState<CalculationRun[]>([])
-  const [ruleIds, setRuleIds] = useState<string[]>([])
-  const [runTotal, setRunTotal] = useState<number | null>(null)
-  const [reportOffset, setReportOffset] = useState(0)
-  const [reportId, setReportId] = useState('')
-  const [previewResponse, setPreviewResponse] = useState<{ assetId: string; offset: number; preview?: Preview; error?: string } | null>(null)
-  const [error, setError] = useState('')
-  const [loadAttempt, setLoadAttempt] = useState(0)
-  const [previewAttempt, setPreviewAttempt] = useState(0)
-  const preview = previewResponse?.assetId === reportId && previewResponse.offset === reportOffset ? previewResponse.preview : null
-  const previewError = previewResponse?.assetId === reportId && previewResponse.offset === reportOffset ? previewResponse.error : undefined
-  useEffect(() => {
-    let active = true
-    Promise.all([api<Project>(`/projects/${projectId}`), api<Asset[]>(`/projects/${projectId}/assets`), api<{ items: CalculationRun[]; total: number }>(`/projects/${projectId}/runs?offset=0&limit=10`), api<string[]>(`/projects/${projectId}/rule-materials`)]).then(([p,a,r,roles]) => {
-      if (!active) return
-      setProject(p); document.title = `${p.name} · 修改与交付 · 数有依据`; setAssets(a); setRuns(r.items); setRunTotal(r.total); setRuleIds(roles); setReportId(a.find(x => x.kind === 'report' && x.status === 'ready' && !roles.includes(x.id))?.id ?? '')
-      setError('')
-    }).catch(cause => { if (active) setError((cause as Error).message) })
-    return () => { active = false }
-  }, [projectId, loadAttempt])
-  useEffect(() => {
-    if (!reportId) return
-    let active = true
-    api<Preview>(`/assets/${reportId}/preview?offset=${reportOffset}&limit=20`).then(value => {
-      if (active) setPreviewResponse({ assetId: reportId, offset: reportOffset, preview: value })
-    }).catch(cause => {
-      if (active) setPreviewResponse({ assetId: reportId, offset: reportOffset, error: (cause as Error).message })
-    })
-    return () => { active = false }
-  }, [reportId, reportOffset, previewAttempt])
-  if (!project) return error ? <RequestError message={error} retry={() => setLoadAttempt(value => value + 1)} /> : <p className="work-loading">正在读取原稿与历史…</p>
-  const reports = assets.filter(a => a.kind === 'report' && a.status === 'ready' && !ruleIds.includes(a.id))
-  return <><div className="materials-heading"><div><p className="section-kicker">修改与交付 · 界面预览</p><h1>{project?.name ?? '修改与交付'}</h1><p>查看原稿与已有计算依据；修订保存、复核及导出尚未接通。</p></div></div>{error && <RequestError message={error} retry={() => { setError(''); setLoadAttempt(value => value + 1) }} />}<div className="review-status-band"><b>修订工作区预览</b><span>修订保存尚未接通</span><span>历史计算：{runTotal ?? '—'} 条</span></div><div className="review-layout"><section className="review-document-grid"><div className="review-document"><div className="review-pane-heading"><h2>原稿</h2><label className="work-field">报告资料<select aria-label="原稿报告资料" value={reportId} onChange={e => { setReportId(e.target.value); setReportOffset(0) }}><option value="">选择已保存报告</option>{reports.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select></label></div>{preview?.paragraphs?.map(p => <article key={p.id}><small>{p.location}</small><p>{p.text}</p><code>{p.id}</code></article>)}<div className="preview-pagination"><span>{preview ? `共 ${preview.total} 段 · 每页20段` : ''}</span><div><button disabled={!reportOffset} onClick={() => setReportOffset(value => Math.max(0, value - 20))}>上一页原稿</button><button disabled={!preview || reportOffset + 20 >= preview.total} onClick={() => setReportOffset(value => value + 20)}>下一页原稿</button></div></div>{reportId && previewError && <RequestError message={previewError} retry={() => setPreviewAttempt(value => value + 1)} />}{reportId && !preview && !previewError && <p className="calc-loading">读取原稿段落…</p>}{!reports.length && <div className="empty-panel"><h3>项目中还没有已解析报告。</h3><p>先到资料与口径上传DOCX或粘贴报告文本。</p><a href={`/app/projects/${projectId}/materials`}>前往资料与口径<Icon name="arrow" /></a></div>}</div><div className="review-document revised"><div className="review-pane-heading"><h2>修订稿</h2><span>尚未保存</span></div><div className="empty-panel"><span className="empty-icon"><Icon name="edit" /></span><h3>当前没有已保存的修订稿。</h3><p>系统尚未提供修改建议的接受、编辑、撤回或修订版本保存接口。原稿保持不变。</p></div><label className="work-field">修订文本<textarea disabled rows={8} placeholder="修订稿编辑将在后续版本接入。" /></label><button className="button button-secondary" disabled title="报告修订接口尚未接通">保存修订</button></div></section><aside className="review-side"><section><h2>修改依据</h2><p className="calc-help">从项目现有计算历史中查看来源快照，此处最多列出最近10条。人工修改不会自动改变原核验状态。</p>{runs.length ? runs.map(run => <a className="review-evidence-link" key={run.id} href={`/app/projects/${projectId}/calculations?run=${run.id}`}><b>{run.spec.metric}</b><span>{run.source.name} · {displayDate(run.created_at)}</span><small>{run.result.display_value ?? '无数值'}{run.spec.operation === 'ratio' && run.result.display_value !== null ? '%' : ''} · {run.stale ? '待复核' : '历史快照'}</small></a>) : <p className="calc-empty-small">还没有计算历史。运行后的结果会保存在数据分析页。</p>}</section><section><h2>版本与复核</h2><p>报告修订版本对比、复核清单及受影响结论追踪尚未实现。</p><a href={`/app/projects/${projectId}/calculations#calculation-history`}>查看现有计算历史<Icon name="arrow" /></a><button className="button button-secondary" disabled title="修订和重新核验接口尚未接通">修改后重新核验</button></section><section><h2>成果导出</h2><p>尚未生成PDF、DOCX、XLSX或图表文件。</p><button className="button button-secondary" disabled title="导出后台尚未接通">预览并导出</button></section></aside></div></>
-}
-
-export function ReviewPage({ projectId }: { projectId: string }) { return <WorkShell project>{() => <ReviewWorkspace projectId={projectId} />}</WorkShell> }

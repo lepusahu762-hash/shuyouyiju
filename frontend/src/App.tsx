@@ -8,9 +8,11 @@ import { MaterialsPage } from './pages/MaterialsPage'
 import { CalculationsPage } from './pages/CalculationsPage'
 import './Calculations.css'
 import { AIVerificationPage } from './pages/AIVerificationPage'
-import { CasesPage, GuidePage, PersonalPage, ReviewPage, TemplatesPage } from './pages/SitePages'
+import { CasesPage, GuidePage, PersonalPage, TemplatesPage } from './pages/SitePages'
 import './AI.css'
 import './SitePages.css'
+import { ReviewPage } from './pages/ReviewPage'
+import './Review.css'
 
 // Native links support browser history and new tabs. Vite serves the SPA entry
 // on direct /auth refresh; production hosts need the same history fallback.

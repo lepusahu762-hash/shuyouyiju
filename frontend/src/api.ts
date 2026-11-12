@@ -104,6 +104,9 @@ export function safeReturn(value: string | null): string {
   } else if (page === 'analysis' || page === 'calculations') {
     const run = query.get('run')
     if (run && uuid.test(run)) safeQuery.set('run', run)
+  } else if (page === 'review') {
+    for (const key of ['check', 'revision']) { const id = query.get(key); if (id && uuid.test(id)) safeQuery.set(key, id) }
+    const target = query.get('target'); if (target && /^\d{1,3}$/.test(target)) safeQuery.set('target', target)
   } else if (page === 'verify' || page === 'ai-verification') {
     const task = query.get('task')
     if (task && uuid.test(task)) safeQuery.set('task', task)
