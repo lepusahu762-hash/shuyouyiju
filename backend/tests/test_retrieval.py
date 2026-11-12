@@ -29,6 +29,13 @@ def test_missing_metric_period_and_empty_corpus_never_claim_evidence():
     assert baseline(ps,'金额合格率如何定义')  # The old incidental lexical hit is reproducible.
 
 
+def test_publication_date_is_not_applicability_and_never_selects_newest():
+    ps=corpus(['发布日期：2024年。','完成率定义：有效为分母，完成为分子。'])
+    result=search(ps,'2026年完成率')
+    assert result['items'] and all(p['applicability']['periods']==[] for p in result['items'])
+    assert result['confirmation_required']
+
+
 def test_sentence_excerpts_have_exact_ranges_and_omissions():
     text='普通档案说明。'*300+'关键限制：缺失值仍计入，不得排除。'+'普通说明。'*100
     quote,cut,ranges=excerpt(text,'缺失值不得排除',1600)

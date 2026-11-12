@@ -42,14 +42,27 @@ def excerpt(text, query, maximum=1600):
     return ''.join(out),True,ranges
 
 
+def explicit_periods(text):
+    """Publication/upload dates are never evidence of statistical applicability."""
+    positive=[];negative=[]
+    for clause in re.split(r'[。！？；\n]',text):
+        if not re.search(r'适用|统计期|统计范围|期间|范围',clause):continue
+        for match in re.finditer(r'20\d{2}年',clause):
+            before=clause[max(0,match.start()-8):match.start()]
+            (negative if re.search(r'不适用[于至]?$',before) else positive).append(match.group())
+    return list(dict.fromkeys(positive)),list(dict.fromkeys(negative))
+
+
 def applicability(p, corpus, query):
-    own=re.findall(r'20\d{2}年',p['text'])
+    own,excluded=explicit_periods(p['text'])
     # Inherit only the document's explicit scope header; never infer upload dates.
     header=next((x['text'] for x in corpus if x['asset_id']==p['asset_id'] and x['paragraph_index']==0),'')
-    scope=header if re.search(r'适用|范围|归档',header) else ''
-    years=own or re.findall(r'20\d{2}年',scope)
+    scope=excerpt(header,query,400)[0] if re.search(r'适用|范围',header) else ''
+    inherited,inherited_excluded=explicit_periods(header)
+    years=own or inherited
+    excluded=excluded or inherited_excluded
     requested=re.findall(r'20\d{2}年',query)
-    mismatch=bool(requested and years and not set(requested)&set(years))
+    mismatch=bool(requested and (set(requested)&set(excluded) or years and not set(requested)&set(years)))
     return {'periods':list(dict.fromkeys(years)),'scope_quote':scope,
             'status':'mismatch' if mismatch else 'needs_confirmation',
             'note':'显式期间不一致，不能直接采用' if mismatch else '仅提取原文适用信息；对象、范围与定义仍需人工确认'}
@@ -64,7 +77,7 @@ def improved(paragraphs, query, limit=5, char_budget=6000):
     named=[x.split('的')[-1].split('年')[-1] for x in named]
     if named and not any(name in normalized(p['text']) for name in named for p in paragraphs):return []
     asked_years=set(re.findall(r'20\d{2}年',query))
-    available=set(y for p in paragraphs for y in re.findall(r'20\d{2}年',p['text']))
+    available=set(y for p in paragraphs for y in explicit_periods(p['text'])[0])
     if asked_years and available and not asked_years & available:return []
     ranked=[]
     for i,p in enumerate(paragraphs):
