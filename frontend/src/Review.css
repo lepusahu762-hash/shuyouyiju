@@ -86,3 +86,7 @@
 
 .pdf-zoom-button { margin-bottom:10px; padding:5px 0; }
 .pdf-page-image.is-zoomed img { width:774px; min-width:774px; max-width:none; }
+
+/* Keep the selected revision controls close to a long source paragraph. */
+.revision-original { max-height: 480px; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+@media(max-width:680px) { .revision-original { max-height: 320px; } }

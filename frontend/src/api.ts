@@ -35,7 +35,19 @@ function errorMessage(payload: unknown, status: number): string {
   return '请求未完成，请检查输入后重试。'
 }
 
-export async function api<T>(url: string, options: RequestInit = {}): Promise<T> {
+// Coalesce only simultaneous default GETs. Never cache settled data, errors,
+// writes, or callers with AbortSignals (one component must not cancel another).
+const pendingReads = new Map<string, Promise<unknown>>()
+export function api<T>(url: string, options: RequestInit = {}): Promise<T> {
+  if (Object.keys(options).length) return request<T>(url, options)
+  const existing = pendingReads.get(url)
+  if (existing) return existing as Promise<T>
+  const pending = request<T>(url, options).finally(() => { pendingReads.delete(url) })
+  pendingReads.set(url, pending)
+  return pending
+}
+
+async function request<T>(url: string, options: RequestInit): Promise<T> {
   let response: Response
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), 30000)

@@ -1,3 +1,5 @@
+import '../Calculations.css'
+import '../AI.css'
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import type { CalculationRun, Evidence, EvidenceRow, NumericResult } from '../calculationTypes'

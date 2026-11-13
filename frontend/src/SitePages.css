@@ -98,3 +98,12 @@
   .site-page .nav-actions { gap: 11px; }
   .site-page .nav-cta { padding-inline: 10px; font-size: 11px; }
 }
+
+.capability-list { display:grid; gap:12px; margin:20px 0; }
+.capability-list article { padding:16px; border:1px solid #e5eaf2; border-radius:9px; background:#fff; }
+.capability-list h3 { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:15px; color:#253047; }
+.capability-list h3 span { border:1px solid #dce5f5; border-radius:5px; padding:2px 7px; font-size:12px; color:#45618b; font-weight:400; }
+.capability-list article p { margin-bottom:0; }
+.case-support { border-left:3px solid #6385ee; padding-left:12px; }
+.personal-layout > *, .guide-layout > * { min-width:0; }
+@media(max-width:600px) { .personal-facts > div { grid-template-columns:minmax(0,.5fr) minmax(0,1fr); } .personal-nav { width:100%; } .guide-nav button,.personal-nav button { min-height:44px; } }

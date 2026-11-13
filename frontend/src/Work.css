@@ -347,3 +347,32 @@ html:has(.work-app) { scroll-padding-top: 160px; }
   .work-header { top: 0; }
   .work-mobile-nav { top: 64px; }
 }
+
+/* Readable, compact workspace hierarchy without exposing audit IDs by default. */
+.work-app details > summary { cursor: pointer; line-height: 1.7; color: #52627c; }
+.work-app details[open] > summary { margin-bottom: 12px; }
+.work-app p, .work-app h1, .work-app h2, .work-app h3, .work-app dd { overflow-wrap: anywhere; }
+.work-app textarea { line-height: 1.7; }
+.work-app .work-field { gap: 9px; }
+.work-app .work-field input, .work-app .work-field select { min-height: 42px; }
+.work-app .calc-help, .work-app .inspector-description { color: #5d6b81; }
+.work-app .calc-card { box-shadow: 0 3px 14px #182d4b04; }
+.work-app .ai-tabs { flex-wrap: wrap; }
+.work-app .personal-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.work-app .personal-nav { min-width: 0; }
+.work-app .calc-pagination { flex-wrap: wrap; }
+.work-app .calc-pagination > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.work-app fieldset { min-width: 0; }
+.work-app .analysis-session-picker select { width: 100%; }
+@media (max-width: 600px) {
+  .work-mobile-nav { justify-content: flex-start; }
+  .work-header .workspace-project-name { display: none; }
+  .work-account { flex-shrink: 0; }
+  .work-mobile-nav > a { flex: 1 0 auto; }
+  .project-nav a { min-height: 44px; }
+  .work-app .button { min-height: 44px; white-space: normal; text-align: center; line-height: 1.6; }
+  .work-app .calc-pagination button, .work-app .ai-tabs button, .work-app .analysis-followups button { min-height: 40px; }
+  .work-app .revision-actions, .work-app .pdf-export-preview, .work-app .image-history-item { min-width: 0; }
+  .work-app .revision-actions .button { max-width: 100%; }
+  .work-app .analysis-tabs { flex-wrap: wrap; }
+}

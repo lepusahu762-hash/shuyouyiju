@@ -13,6 +13,7 @@ async function main(){
  try{
  await page.goto(base+state.route+'?task='+state.tid);await page.locator('.ai-result').waitFor();
  await page.getByRole('tab',{name:'规则原文',exact:true}).click();await page.locator('.rule-retrieval-evidence article').first().waitFor();
+ await page.locator('.rule-retrieval-evidence details').first().evaluate(el=>el.open=true);
  check('实际任务显示新检索版本及三个独立段落',await page.locator('.rule-retrieval-evidence').innerText().then(t=>t.includes('bm25-context-v2'))&&await page.locator('.rule-retrieval-evidence article').count()===3);
  await page.locator('.rule-retrieval-evidence details').first().evaluate(el=>el.open=true);
  await page.locator('.ai-evidence-card').screenshot({path:path.join(out,'retrieved-rules-desktop.png')});

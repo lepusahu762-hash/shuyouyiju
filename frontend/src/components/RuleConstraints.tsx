@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import '../Calculations.css'
+import '../AI.css'
+import { Fragment, useEffect, useState } from 'react'
 import { api } from '../api'
 import type { Asset } from '../api'
 import type { AIPlan, AITask, RuleCheck, RuleSnapshot, RuleSpec, Citation } from '../aiTypes'
@@ -98,14 +100,14 @@ export function RuleSnapshotEditor({projectId,tables,initial,citations,onSaved,o
     <p className="calc-help">规则约束须由你逐项核对原文。下面预填的是未确认草稿，不代表已确认规则。有歧义或原文缺失时，先补充规则资料并重新读取；不能用勾选知晓绕过冲突。保存新版本将使旧确认失效。</p>
     {head?.current_id && onBindCurrent && <button type="button" className="button button-secondary small" disabled={busy} onClick={() => void action(false)}>绑定当前已确认规则，重新检查</button>}
     <fieldset disabled={busy}><PlanFields plan={draft} tables={tables} disabled={busy} edit={patch => { setDraft(p => ({ ...p, ...patch })); setConfirmed([]) }} />
-      <div className="rule-confirm-fields">{ruleFields.map(([key, label]) => <div className="rule-field-confirm" key={key}>
+      <div className="rule-confirm-fields">{ruleFields.map(([key, label], index) => <Fragment key={key}>{[0,4,7].includes(index)&&<h3 className="rule-group-heading">{index===0?'1 · 数据与指标':index===4?'2 · 统计范围与条件':'3 · 空值与比较精度'}</h3>}<div className="rule-field-confirm">
         <b>{label}：{ruleValue(key, draft[key], tables, draft)}</b>
-        <label className="work-field">{label}的原文来源<select aria-label={`${label}的原文来源`} value={sources[key] ?? ''} onChange={e => { const citation=citations.find(c=>c.citation_id===e.target.value);setSources(s => ({ ...s, [key]: e.target.value })); setQuotes(s=>({...s,[key]:citation?.quote_options?.length?'':citation?.text.slice(0,4000)??''})); setConfirmed(c => c.filter(k => k !== key)) }}><option value="">选择支持本项的真实规则段落</option>{citations.map(c => <option key={c.citation_id} value={c.citation_id}>{c.name} · {c.location} · {c.text}</option>)}</select></label>
+        <label className="work-field">{label}的原文来源<select aria-label={`${label}的原文来源`} value={sources[key] ?? ''} onChange={e => { const citation=citations.find(c=>c.citation_id===e.target.value);setSources(s => ({ ...s, [key]: e.target.value })); setQuotes(s=>({...s,[key]:citation?.quote_options?.length?'':citation?.text.slice(0,4000)??''})); setConfirmed(c => c.filter(k => k !== key)) }}><option value="">选择支持本项的真实规则段落</option>{citations.map(c => <option key={c.citation_id} value={c.citation_id}>{c.name} · {c.location} · {c.text.slice(0,100)}{c.text.length>100?'…（展开核对原文）':''}</option>)}</select></label>
         {sources[key] && <details className="rule-source-detail"><summary>查看原文与连续引用</summary><blockquote>{citations.find(c => c.citation_id === sources[key])?.text}</blockquote>
         {!citations.find(c=>c.citation_id===sources[key])?.quote_options?.length&&<label className="work-field">{label}的连续引用<textarea aria-label={`${label}的连续引用`} maxLength={4000} value={quotes[key]??citations.find(c=>c.citation_id===sources[key])?.text.slice(0,4000)??''} onChange={e=>{setQuotes(s=>({...s,[key]:e.target.value}));setConfirmed(c=>c.filter(k=>k!==key))}}/><small>最多4000字，必须是所选段落的连续原文。长段落请人工选择实际支持本项的条款，不保留省略标记。</small></label>}</details>}
         {!!citations.find(c=>c.citation_id===sources[key])?.quote_options?.length&&<label className="work-field">{label}的连续原文条款<select value={quotes[key]??''} aria-label={`${label}的连续原文条款`} onChange={e=>{setQuotes(s=>({...s,[key]:e.target.value}));setConfirmed(c=>c.filter(k=>k!==key))}}><option value="">请选择实际支持本项的原文，不包含省略标记</option>{citations.find(c=>c.citation_id===sources[key])?.quote_options?.map((q,i)=><option value={q} key={i}>{q}</option>)}</select></label>}
-        <label className="calc-confirm"><input type="checkbox" aria-label={`确认规则${label}`} checked={confirmed.includes(key)} disabled={!sources[key]} onChange={e => setConfirmed(c => e.target.checked ? [...c, key] : c.filter(k => k !== key))} /><span>我已明确本项含义，确认此设置及对应原文。</span></label>
-      </div>)}</div>
+        <label className="calc-confirm"><input type="checkbox" aria-label={`确认规则${label}`} checked={confirmed.includes(key)} disabled={!sources[key]} onChange={e => setConfirmed(c => e.target.checked ? [...c, key] : c.filter(k => k !== key))} /><span>我已核对原文，确认此设置及含义。</span></label>
+      </div></Fragment>)}</div>
       <label className="work-field">尚未明确的规则或歧义<textarea value={unresolved} onChange={e => setUnresolved(e.target.value)} placeholder="没有待确认内容时留空；有内容则不能保存为已确认规则。" /></label>
       <label className="work-field">本次规则确认／变更依据<textarea aria-label="规则变更依据" maxLength={1500} value={reason} onChange={e => setReason(e.target.value)} placeholder="说明你如何核对原文；修改已有规则时，明确写出修改原因。" /></label>
       {error && <div className="work-error" role="alert">{error}<button type="button" onClick={()=>{setConfirmed([]);api<typeof head>(`/projects/${projectId}/rule-snapshots`).then(v=>{setHead(v);setError('已读取当前资料与版本。草稿保留，请逐项重新核对后确认。')}).catch(e=>setError(e.message))}}>重新读取当前规则</button></div>}
