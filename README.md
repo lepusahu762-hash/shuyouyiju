@@ -1,5 +1,7 @@
 # 数有依据 · shuyouyiju
 
+**队友接手／无GitHub账号：先读 [HANDOFF.md](HANDOFF.md)，离线恢复与交还见 [docs/OFFLINE_HANDOFF.md](docs/OFFLINE_HANDOFF.md)。** 源码包不含作者数据库/密钥，页面优化默认不调用百炼。
+
 React + TypeScript + Vite 前端，Python + FastAPI 后台、SQLite。原项目持续增量开发，保留真实账户、资料、规则、计算、AI任务、修订和PDF历史。
 
 **v0.15（2026-11-13）：修复写后旧列表，完成同项目统一真实演示。** 已撤回通用GET合并并防止晚旧响应覆盖；本轮7次真实请求含1次图片格式失败，保留失败与人工修改记录。
@@ -77,19 +79,9 @@ npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 
 ## 新机器安装
 
-使用 Python 3.12/3.13（本次实际验证 3.13.11）及 Vite 8 支持的 Node.js 版本。以下建环境命令仅在 `.venv` 尚不存在时执行；换机器后重新创建，不复制旧虚拟环境。
+请按 [NEW_MACHINE_SETUP.md](NEW_MACHINE_SETUP.md) 安装Python3.13、创建本机venv、按锁安装前后端依赖。无GitHub账号可用离线包的完整Git bundle恢复，见 [离线交接](docs/OFFLINE_HANDOFF.md)，无需作者账号或私人数据库。
 
-```powershell
-Set-Location 'D:\Desktop\chuanzhibei\shuyouyiju\backend'
-& 'C:\Users\LENOVO\miniconda3\python.exe' -m venv .venv
-& '.\.venv\Scripts\python.exe' -m pip install -r requirements.txt
-# 可选：需要覆盖默认配置时复制一次，已有 .env 时先保留原配置。
-Copy-Item .env.example .env
-Set-Location '..\frontend'
-npm ci
-```
-
-在其他电脑上，将创建虚拟环境的解释器路径换成当地 Python 3.12/3.13 的完整路径。无需执行 Activate.ps1，因此不依赖 PowerShell 激活脚本策略。
+上方D盘和解释器路径仅为作者已有电脑启动示例，队友使用自己的workspace路径；不要复制作者虚拟环境，不要覆盖已有.env。新电脑默认留空百炼Key，真实页面与手动业务仍可开发。
 
 ## 数据与认证
 

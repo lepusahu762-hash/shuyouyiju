@@ -2,19 +2,32 @@
 
 源码不包含开发者数据库、密钥、账户或演示历史。使用自己的测试账户和合成资料。不要向聊天粘贴API Key；不要从开发机复制data作为必需依赖。
 
+包内的MANIFEST.json和VALIDATION.md记载该交接基线及本轮恢复/运行验证；下方“本轮”隔离记录是v0.15历史，不能代表队友电脑已验收。离线交付不含依赖安装器/缓存，首次安装通常需要网络。
+
 ## 已验证版本与依赖来源
 
 本机/隔离安装使用Python **3.13.11**、Node **24.22.2**、npm **11.19.1**。电脑默认Python3.8不适用；通过`py -0p`确认后显式选择3.13。安装包来自Python/Node官方发行版。当前项目锁定FastAPI0.162.4、fastapi-users15.0.5、SQLAlchemy2.0.57、aiosqlite0.22.1、openpyxl3.1.5、python-docx1.2.0、Pillow13.0.0、ReportLab4.5.1、pypdf6.21.4、PyMuPDF1.28.2；完整锁见`backend/requirements.txt`。前端锁定React19.3.1、TypeScript7.0.2、Vite8.3.7，安装使用`frontend/package-lock.json`和`npm ci`，不要只按package.json范围重新解析。
 
-本轮已在忽略的隔离目录仅复制源码（无.env/data/.venv/node_modules），新建venv、联网执行完整pip安装和npm ci、生产构建均通过。**这仍是同一台Windows上的干净依赖验证，不是另一台机器或Linux的完整部署测试。** 隔离服务启动动作被自动审批拒绝，未验证该副本的网页登录及全流程；原项目真实网页流程另外通过。团队应在另一台机器照下列步骤验收，不把本机成功写成所有环境成功。
+v0.15历史记录：曾在忽略的隔离目录仅复制源码（无.env/data/.venv/node_modules），新建venv、联网执行完整pip安装和npm ci、生产构建通过；当时隔离服务启动动作被自动审批拒绝，未验证该副本的网页登录全流程。**本次离线交接的最新验证请以包根VALIDATION.md为准；同一台Windows上的干净验证仍不代表队友电脑或Linux已验收。** 团队应在另一台机器照下列步骤检查。
 
-## 安装
+## 获取源码：离线包或GitHub二选一
+
+**没有GitHub账号优先用离线包**：按包根START_HERE及[离线协作](docs/OFFLINE_HANDOFF.md)从history/shuyouyiju.bundle恢复workspace。安装Git本身不要求GitHub账户；恢复完整历史后直接进入下面的共用依赖安装。不要另行GitHub登录，不复制作者.git配置或数据库。
+
+如果已有合法仓库读取权限，也可用下方GitHub获取方式：
 
 先取得私有仓库的合法读取权限；私有仓库推送不等于评委已获权限。本轮未邀请评委、未改可见性。克隆原开发分支后，进入实际克隆目录：
 
 ```powershell
 git clone --branch codex/ai-assisted-verification https://github.com/lepusahu762-hash/shuyouyiju.git
 Set-Location .\shuyouyiju
+```
+
+## 依赖安装（共用步骤）
+
+在已恢复/获取的仓库根运行，GitHub克隆者和bundle接收者相同。建议放在短路径如`D:/Projects/shuyouyiju`，避免Windows路径过长。
+
+```powershell
 py -0p
 py -3.13 -m venv backend/.venv
 & .\backend\.venv\Scripts\python.exe -m pip install -r backend/requirements.txt
@@ -23,7 +36,7 @@ npm ci
 npm run build
 npm run lint
 Set-Location ..
-Copy-Item backend/.env.example backend/.env
+if (-not (Test-Path backend/.env)) { Copy-Item backend/.env.example backend/.env }
 ```
 
 Copy-Item只用于**新克隆没有.env时**。已配置机器不要覆盖原.env。数据目录默认独立位于这个克隆的`backend/data`，首次启动自动建表。`.venv`不能从别的机器直接拷贝。
