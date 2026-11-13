@@ -1,22 +1,17 @@
-> v0.13（2026-11-13）：已修复整体空值暂停仍对局部分组排名的问题，并在资料页接通不依赖核验任务的独立规则确认。新账户全程网页上传、指定规则、逐项确认后进入分析；真实百炼2/4次，4121输入＋510输出＝4631 tokens。暂停与正常流程、1440/390布局、重登/重启恢复及旧历史回归已验收。详见 [RULE_ONBOARDING_PREVIEW.md](RULE_ONBOARDING_PREVIEW.md)。
-
 # 数有依据 · shuyouyiju
 
-React + TypeScript + Vite 前端，Python + FastAPI 后台。现有全站11页框架与真实账户、项目、资料、计算、AI单条核验和规则约束继续保留。
+React + TypeScript + Vite 前端，Python + FastAPI 后台、SQLite。原项目持续增量开发，保留真实账户、资料、规则、计算、AI任务、修订和PDF历史。
 
-**当前新增：对话式分析、单字段分组图表和源行联动已接通。** 模型提出受限方案，人工确认后由完整工作表计算；支持记录数、规则占比、分组计数/组内占比、最高最低并列与等值追加筛选。原手动入口和历史保留。本轮真实百炼4次请求，8627输入＋1065输出＝9692 tokens，方案原建议与人工确认分别留存。操作、能力边界、离线/真实验收及截图见 [ANALYSIS_PREVIEW.md](ANALYSIS_PREVIEW.md)。
+**v0.14（2026-11-13）：全站体验与视觉打磨、生产资源按需加载和并发GET去重。** 修复分析提问失败清空输入、320px项目/个人区溢出，规则逐项来源确认分组、技术审计折叠、键盘页签与长原稿阅读优化。11页×关键状态在320/390/768/1440px检查；真实模型新增请求0次。生产包体积减少不等于加载速度全面提升：性能表保留最终时序变慢的结果。
 
-以下图片、检索与单条核验用量均为此前轮次，不能相加冒充本轮调用。
+- 当前11页、八项能力、参赛阻断及未实现清单：[RELEASE_READINESS.md](RELEASE_READINESS.md)。全站界面框架完成不代表八项能力全部完成。
+- 本轮修复、实际截图、生产测量前后、测试、检查路线和生产预览启动：[EXPERIENCE_PREVIEW.md](EXPERIENCE_PREVIEW.md)。本机生产预览 <http://127.0.0.1:4173/>，开发预览 <http://127.0.0.1:5173/>，均非公网。
+- 独立确认统计规则、暂停不排名：[RULE_ONBOARDING_PREVIEW.md](RULE_ONBOARDING_PREVIEW.md)。
+- 对话/单字段分组：[ANALYSIS_PREVIEW.md](ANALYSIS_PREVIEW.md)；图片单条核验：[IMAGE_VERIFICATION_PREVIEW.md](IMAGE_VERIFICATION_PREVIEW.md)。
+- 单条修订复核：[REVIEW_PREVIEW.md](REVIEW_PREVIEW.md)；单条PDF：[PDF_EXPORT_PREVIEW.md](PDF_EXPORT_PREVIEW.md)；规则检索评测：[RETRIEVAL_PREVIEW.md](RETRIEVAL_PREVIEW.md)。
+- 百炼配置与逐轮真实/模拟记录：[AI_PREVIEW.md](AI_PREVIEW.md)。各历史文档的请求次数只属于其轮次，不能相加或当成本轮。
 
-**此前交付：图片图表单条百分比核验已接通**。在“结论核验”切换“图片图表”，上传PNG/JPEG，选择一个明确标签，确认识别与规则后，由原引擎计算并保存图片/原始行/规则证据。真实百炼qwen3.7-plus共4次调用：50%→40%差异、40%一致、无标签与模糊图均停止；接口返回3924输入/874输出/4798总tokens。识别与计算状态独立，图片核验PDF尚未接通。演示、限额、真实与离线验收见 [IMAGE_VERIFICATION_PREVIEW.md](IMAGE_VERIFICATION_PREVIEW.md)。
-
-以下检索轮次记录为历史交付，本轮保留全部原有功能和数据。
-
-**本轮完成规则检索优化、固定评测与小样本真实模型对照**。保留原关键词基线，新任务采用本地BM25与相邻限制补齐，保存策略/查询/来源/耗时；资料页和核验页可查看规则、适用信息及定位。36条分组查询可离线复现，保留集仍有拒绝和上下文失败，详情见 [RETRIEVAL_PREVIEW.md](RETRIEVAL_PREVIEW.md)。
-
-真实百炼 `qwen3.7-plus` / `cn-beijing` 本轮共9次请求（上限12），输入9575、输出2913、合计12488 tokens；两条有依据配对中改进检索带回空值/精度限制，无依据题停止。正常网页核验实际4÷10=40%，与50%差−10个百分点。评测命中、原建议参数检查与人工确认后的最终结果分开统计，不把小样本当普遍准确率。
-
-已有单条修订、确定性复核及PDF继续保留，历史见 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md)、[PDF_EXPORT_PREVIEW.md](PDF_EXPORT_PREVIEW.md)。旧AI任务保持原检索和规则快照，未补写新结果。此前检索轮次没有清库或修改模型配置；本轮对话分析见顶部新记录。
+当前真实功能限于已确认口径下的记录计数/占比、单字段分组、单条百分比核验、报告文字单条修订/复核和PDF。邮件、模板套用、隔离案例副本、整篇改写、复杂统计及图片PDF等未接通；主页示例不能代表工作区支持任意公式。仓库保持私有，源码推送不代表评委已有访问权，本轮未邀请账号或部署公网。
 
 ## 目录
 

@@ -1,6 +1,6 @@
 # 全站页面与导航交付 · 2026-11-12
 
-> 后续更新：“修改与交付”已于修订轮次接通真实单条修订版本保存及确定性复核，导出仍未实现。本文是全站框架完成时的历史记录；该页当前能力以 [REVIEW_PREVIEW.md](REVIEW_PREVIEW.md) 为准。
+> 当前v0.14全站能力以 [RELEASE_READINESS.md](RELEASE_READINESS.md) 为准，体验/性能/截图见 [EXPERIENCE_PREVIEW.md](EXPERIENCE_PREVIEW.md)。单条修订、确定性复核及单条PDF现均已接通；下文为当时框架交付的历史状态，不覆盖现有功能。
 
 本轮在原目录 `D:\Desktop\chuanzhibei\shuyouyiju`、原分支 `codex/ai-assisted-verification`、基线 `dbb9ac1` 上继续开发。完整阅读 `docs/shuyouyiju_product_spec_v1.md`，沿用现有 React / TypeScript / Vite、FastAPI 接口与 SQLite 数据。仓库及 D 盘祖先目录没有找到 AGENTS.md；没有重新初始化前后端、修改模型配置或清理运行数据。
 
