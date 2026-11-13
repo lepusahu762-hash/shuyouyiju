@@ -1,5 +1,7 @@
 # 全站体验、视觉与性能验收 · v0.14 · 2026-11-13
 
+> 后续v0.15已因写后旧读取问题撤回通用GET合并，增加资料列表时序保护。下方数据是v0.14历史测量，请求次数不再代表当前版本；保留不利性能数据。最新见[统一验收](UNIFIED_DEMO_PREVIEW.md)。
+
 本轮从原目录 `D:\Desktop\chuanzhibei\shuyouyiju`、原分支 `codex/ai-assisted-verification`、实际HEAD `e1ba0eb8978355b64aec4b945ea079d07226b407` 开始，初始工作区干净。已核对README、完整产品需求、页面与规则/分析/核验/修订相关实现。项目及祖先目录未找到AGENTS.md。沿用原React/TypeScript/Vite与FastAPI/SQLite；没有初始化新项目、修改模型配置或清库。
 
 ## 实际修复

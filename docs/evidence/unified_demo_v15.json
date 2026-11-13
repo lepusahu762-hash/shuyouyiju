@@ -1,0 +1,250 @@
+{
+  "synthetic_only": true,
+  "source_head": "e2a96bd02630e54324c9ebb0edfeab11472cb399",
+  "model": "qwen3.7-plus",
+  "region": "cn-beijing",
+  "real_requests": 7,
+  "request_limit": 8,
+  "requests": [
+    {
+      "ordinal": 1,
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 2245,
+        "completion_tokens": 244,
+        "total_tokens": 2489
+      },
+      "content_status": "accepted"
+    },
+    {
+      "ordinal": 2,
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 283,
+        "completion_tokens": 98,
+        "total_tokens": 381
+      },
+      "content_status": "accepted"
+    },
+    {
+      "ordinal": 3,
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 476,
+        "completion_tokens": 19,
+        "total_tokens": 495
+      },
+      "content_status": "accepted"
+    },
+    {
+      "ordinal": 4,
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 1535,
+        "completion_tokens": 439,
+        "total_tokens": 1974
+      },
+      "content_status": "accepted"
+    },
+    {
+      "ordinal": 5,
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 779,
+        "completion_tokens": 73,
+        "total_tokens": 852
+      },
+      "content_status": "accepted"
+    },
+    {
+      "ordinal": 6,
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 1015,
+        "completion_tokens": 219,
+        "total_tokens": 1234
+      },
+      "content_status": "invalid_image_schema"
+    },
+    {
+      "ordinal": 7,
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 1073,
+        "completion_tokens": 217,
+        "total_tokens": 1290
+      },
+      "content_status": "accepted"
+    }
+  ],
+  "analysis": {
+    "original_plan": {
+      "operation": "ratio",
+      "metric": "有效记录满意率",
+      "group_by": "所属学院",
+      "group_null_policy": "keep"
+    },
+    "result": {
+      "total": 12,
+      "denominator": 10,
+      "numerator": 4,
+      "display": "40",
+      "groups": {
+        "A": "3/6=50%",
+        "B": "1/4=25%",
+        "null": "0/0=no_value"
+      }
+    }
+  },
+  "text": {
+    "original_plan": {
+      "operation": "ratio",
+      "metric": "有效记录满意率",
+      "scope_description": "纳入状态为有效的全部记录",
+      "scope": [
+        {
+          "field": "纳入状态",
+          "kind": "text",
+          "value": "有效"
+        }
+      ],
+      "numerator": [
+        {
+          "field": "反馈等级",
+          "kind": "text",
+          "value": "满意"
+        }
+      ],
+      "null_policy": "keep",
+      "precision": 0,
+      "group_by": null,
+      "group_null_policy": null
+    },
+    "manual_changed_fields": [
+      "scope_description"
+    ],
+    "final_plan": {
+      "operation": "ratio",
+      "metric": "有效记录满意率",
+      "scope_description": "纳入状态为有效；不限定期间",
+      "scope": [
+        {
+          "field": "纳入状态",
+          "kind": "text",
+          "value": "有效"
+        }
+      ],
+      "numerator": [
+        {
+          "field": "反馈等级",
+          "kind": "text",
+          "value": "满意"
+        }
+      ],
+      "null_policy": "keep",
+      "precision": 0
+    },
+    "reported": "50",
+    "calculated": "40",
+    "difference_pp": "-10",
+    "status": "different"
+  },
+  "image": {
+    "failed_raw_recognition": {
+      "candidates": [
+        {
+          "label": "满意",
+          "value": "50%",
+          "unit": "%",
+          "category": "满意",
+          "metric": "有效记录满意率",
+          "period": "不限定期间",
+          "bbox": {
+            "x": 0.25,
+            "y": 0.35,
+            "width": 0.5,
+            "height": 0.5
+          },
+          "explicit": true,
+          "uncertainties": [
+            "统计单位明确为“记录”而非人数",
+            "图片顶部声明为“非真实调查/演示”，数据不可信"
+          ]
+        }
+      ],
+      "message": "图中仅包含一个明确标记的数值标签“50%”，对应类别“满意”。指标为“有效记录满意率”，期间为“不限定期间”。请注意图片声明此为演示数据。"
+    },
+    "successful_raw_recognition": [
+      {
+        "label": "50%",
+        "value": "50",
+        "unit": "%",
+        "category": "满意",
+        "metric": "有效记录满意率",
+        "period": "不限定期间",
+        "bbox": {
+          "x": 0.25,
+          "y": 0.35,
+          "width": 0.5,
+          "height": 0.5
+        },
+        "explicit": true,
+        "uncertainties": [
+          "统计单位明确为“记录”而非人数",
+          "图片标注为“非真实调查”，数据仅供参考"
+        ]
+      }
+    ],
+    "manual_edits": [],
+    "reported": "50",
+    "calculated": "40",
+    "difference_pp": "-10",
+    "status": "different",
+    "prompt_versions": [
+      "image-label-single-percentage-v1",
+      "image-label-single-percentage-v2"
+    ]
+  },
+  "revision": {
+    "version": 1,
+    "text": "本独立合成演示中，有效记录满意率为40%。",
+    "saved_status_before_recheck": "pending",
+    "recheck_status": "consistent",
+    "original_check_status": "different"
+  },
+  "pdf": {
+    "page_count": 5,
+    "status": "consistent",
+    "sha256": "afc7e53e4c949a3d87cfbda1a8f6b9b268538175c8666bc0230b801839451542",
+    "download_bytes_verified": true
+  },
+  "browser_checks": [
+    "所有结果仍为当前规则且原文字差异保留",
+    "materials 1440px 无页面横向溢出",
+    "materials 1440px直接刷新恢复",
+    "analysis 1440px 无页面横向溢出",
+    "analysis 1440px直接刷新恢复",
+    "text 1440px 无页面横向溢出",
+    "text 1440px直接刷新恢复",
+    "image 1440px 无页面横向溢出",
+    "image 1440px直接刷新恢复",
+    "review 1440px 无页面横向溢出",
+    "review 1440px直接刷新恢复",
+    "materials 390px 无页面横向溢出",
+    "materials 390px直接刷新恢复",
+    "analysis 390px 无页面横向溢出",
+    "analysis 390px直接刷新恢复",
+    "text 390px 无页面横向溢出",
+    "text 390px直接刷新恢复",
+    "image 390px 无页面横向溢出",
+    "image 390px直接刷新恢复",
+    "review 390px 无页面横向溢出",
+    "review 390px直接刷新恢复",
+    "图表B组关联4条记录并定位原始行8",
+    "文字规则引用定位实际保存规则段落",
+    "报告原句可定位",
+    "只读检查无写请求或模型调用入口",
+    "无前端运行异常"
+  ],
+  "blocked_mutations_during_replay": 0
+}
