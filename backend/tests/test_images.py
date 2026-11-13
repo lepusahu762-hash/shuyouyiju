@@ -198,3 +198,12 @@ def test_image_limits_crop_and_six_attempts(tmp_path):
         noise=Image.effect_noise((100,100),100).convert('RGB');out=io.BytesIO();noise.save(out,format='PNG')
         assert c.post(f'/api/projects/{pid}/assets',headers=HEADERS,files={'file':('large.png',out.getvalue())}).status_code==413
         oversized=upload(c,pid,'oversized.png',png());assert oversized['status']=='failed' and '像素' in oversized['error']
+
+
+def test_invalid_percent_value_fails_and_preserves_raw_recognition(tmp_path):
+    provider=Vision();provider.response={'candidates':[{**label(),'value':'50%','label':'满意'}],'message':'离线构造格式错误，不是真实模型'}
+    with TestClient(create_app(configured(tmp_path),provider)) as c:
+        pid,table,image,rule,raw=seed(c);t=start(c,pid,image)
+        assert t['status']=='failed' and t['run_id'] is None and t['result'] is None
+        assert t['payload']['raw_recognition']==provider.response
+        assert t['request_count']==1 and provider.calls==1
