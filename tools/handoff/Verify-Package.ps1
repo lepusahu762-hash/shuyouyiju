@@ -15,7 +15,12 @@ foreach ($entry in $manifest.files) {
     if (-not (Test-Path -LiteralPath $absolute -PathType Leaf)) { throw "Missing file: $($entry.path)" }
     $actual = Get-Item -LiteralPath $absolute
     if ($actual.Length -ne $entry.size_bytes) { throw "Size mismatch: $($entry.path)" }
-    $hash = (Get-FileHash -LiteralPath $absolute -Algorithm SHA256).Hash
+    # Use .NET directly so Windows PowerShell also works when Get-FileHash's
+    # script module is unavailable through an inherited PSModulePath.
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    $stream = [IO.File]::OpenRead($absolute)
+    try { $hash = [BitConverter]::ToString($sha256.ComputeHash($stream)).Replace('-', '') }
+    finally { $stream.Dispose(); $sha256.Dispose() }
     if ($hash -ne $entry.sha256) { throw "SHA256 mismatch: $($entry.path)" }
 }
 foreach ($actual in Get-ChildItem -LiteralPath $resolvedRoot -File -Recurse -Force) {
