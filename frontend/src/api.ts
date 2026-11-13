@@ -35,16 +35,10 @@ function errorMessage(payload: unknown, status: number): string {
   return '请求未完成，请检查输入后重试。'
 }
 
-// Coalesce only simultaneous default GETs. Never cache settled data, errors,
-// writes, or callers with AbortSignals (one component must not cancel another).
-const pendingReads = new Map<string, Promise<unknown>>()
+// Each read has its own lifetime. Do not share pre-write requests with post-write
+// refreshes, including writes performed outside fetch (XHR uploads).
 export function api<T>(url: string, options: RequestInit = {}): Promise<T> {
-  if (Object.keys(options).length) return request<T>(url, options)
-  const existing = pendingReads.get(url)
-  if (existing) return existing as Promise<T>
-  const pending = request<T>(url, options).finally(() => { pendingReads.delete(url) })
-  pendingReads.set(url, pending)
-  return pending
+  return request<T>(url, options)
 }
 
 async function request<T>(url: string, options: RequestInit): Promise<T> {

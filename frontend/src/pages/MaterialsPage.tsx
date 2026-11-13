@@ -71,8 +71,12 @@ function Materials({ projectId }: { projectId: string }) {
     return () => cancelAnimationFrame(frame)
   }, [preview])
 
+  const assetRead = useRef(0)
+  const invalidateAssetReads = useCallback(() => { assetRead.current++ }, [])
   const refreshAssets = useCallback(async () => {
+    const request = ++assetRead.current
     const values = await api<Asset[]>(`/projects/${projectId}/assets`)
+    if (request !== assetRead.current) return
     setAssets(values)
     setSelectedId(current => values.some(asset => asset.id === current) ? current : values[0]?.id ?? '')
   }, [projectId])
@@ -82,13 +86,13 @@ function Materials({ projectId }: { projectId: string }) {
     if (refreshLibrary) setRuleEpoch(n => n + 1)
   }
   const load = useCallback(() => {
-    return Promise.all([api<Project>(`/projects/${projectId}`), api<Asset[]>(`/projects/${projectId}/assets`), api<{ limits: { upload_bytes: number; files: number } }>('/health')]).then(([value, files, health]) => {
+    return Promise.all([api<Project>(`/projects/${projectId}`), refreshAssets(), api<{ limits: { upload_bytes: number; files: number } }>('/health')]).then(([value, , health]) => {
       setLimits(health.limits)
-      setProject(value); setAssets(files); setSelectedId(current => files.some(asset => asset.id === current) ? current : files[0]?.id ?? ''); setError('')
+      setProject(value); setError('')
       document.title = `${value.name} · 资料与口径 · 数有依据`
     }).catch(cause => setError((cause as Error).message)).finally(() => setLoading(false))
-  }, [projectId])
-  useEffect(() => { void load() }, [load])
+  }, [projectId, refreshAssets])
+  useEffect(() => { void load(); return invalidateAssetReads }, [load, invalidateAssetReads])
   useEffect(() => {
     if (!assets.some(asset => ['uploaded', 'parsing'].includes(asset.status))) return
     const timer = window.setTimeout(() => { void refreshAssets().catch(cause => setError((cause as Error).message)) }, 1000)
@@ -128,6 +132,7 @@ function Materials({ projectId }: { projectId: string }) {
     setUploads(current => current.map(entry => entry.id === item.id ? { ...entry, status: 'uploading', error: '', progress: 0 } : entry))
     try {
       const asset = await uploadFile(projectId, item.file, progress => setUploads(current => current.map(entry => entry.id === item.id ? { ...entry, progress } : entry)))
+      assetRead.current++ // A successful XHR invalidates every earlier list read.
       setAssets(current => [...current.filter(entry => entry.id !== asset.id), asset])
       setUploads(current => current.filter(entry => entry.id !== item.id))
       setSelectedId(current => current || asset.id)
@@ -158,6 +163,7 @@ function Materials({ projectId }: { projectId: string }) {
     setSavingReport(true); setReportError('')
     try {
       const asset = await api<Asset>(`/projects/${projectId}/reports`, { method: 'POST', body: JSON.stringify({ name: reportName.trim(), text: reportText }) })
+      assetRead.current++ // Preserve the saved report if an earlier read arrives late.
       setAssets(current => [...current, asset]); setSelectedId(current => current || asset.id)
       pasteDialog.current?.close(); setReportName(''); setReportText('')
       await refreshAssets().catch(cause => setError((cause as Error).message))
