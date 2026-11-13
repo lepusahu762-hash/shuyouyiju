@@ -8,4 +8,4 @@ export type AnalysisTurn={id:string;session_id:string;question:string;parent_id:
  original_proposal?:{action:string;plan:AnalysisPlan|null;message:string;questions:string[];citation_ids:string[]};confirmed_plan?:AnalysisPlan;inherited_plan?:AnalysisPlan;
  answer?:{kind?:string;message:string;groups?:string[];tie_count?:number;questions?:string[]};confirmation?:{at:string;plan:AnalysisPlan;reason:string};raw_model_message?:unknown;answer_run_id?:string};trace:unknown[]}
 export type AnalysisSession={id:string;project_id?:string;name:string;head_id:string|null;created_at?:string;items:AnalysisTurn[];total:number}
-export const analysisStatus:Record<string,string>={understanding:'理解问题',searching:'检索规则',planning:'形成受限方案',awaiting_confirmation:'等待确认',calculating:'执行完整表格计算',completed:'结果已保存',clarify:'需要澄清',unsupported:'超出首版范围',failed:'执行失败',cancelled:'已取消',stale:'依据变化 · 历史结果'}
+export const analysisStatus:Record<string,string>={understanding:'理解问题',searching:'检索规则',planning:'形成受限方案',awaiting_confirmation:'等待确认',calculating:'执行完整表格计算',completed:'执行结束 · 已保存记录',clarify:'需要澄清',unsupported:'超出首版范围',failed:'执行失败',cancelled:'已取消',stale:'依据变化 · 历史结果'}

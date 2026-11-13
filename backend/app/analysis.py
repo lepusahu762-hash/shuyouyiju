@@ -16,6 +16,7 @@ from .rule_constraints import latest_snapshot,base_context,snapshot_view,enforce
 from .ai import retrieval
 from .ai_provider import AIError,configuration,function,tool_arguments
 from .ai_audit import token_usage
+from .group_calculations import comparable_result
 
 PROMPT='bounded-analysis-v1'
 BUSY={'understanding','searching','planning'}
@@ -91,6 +92,7 @@ def catalog(asset,sheet):
 
 
 def rank_answer(run,which):
+    if not comparable_result(run.result):return {'kind':which,'message':'整体统计仍待确认或证据不足，任务虽已结束，结果不能用于排名。记录和计数仅供诊断，请处理空值策略后重新确认计算。','groups':[],'tie_count':0,'comparable':False}
     groups=run.result.get('groups',[]);keys=set(run.result.get('extrema',{}).get(which,[]))
     items=[g for g in groups if g['key'] in keys]
     if not items:return {'kind':which,'message':'没有可排名的有效分组；零分母或待确认组不参与排名。','groups':[],'tie_count':0}
@@ -148,7 +150,14 @@ def analysis_router(database,settings,current_user,provider):
         d={k:getattr(t,k) for k in ['id','session_id','question','parent_id','payload','request_count','trace','run_id','error','created_at']}
         d.update(status='stale' if stale else t.status,saved_status=t.status,stale=stale)
         rid=t.run_id or t.payload.get('answer_run_id')
-        if rid:d['run']=run_view(await session.get(CalculationRun,rid),current)
+        if rid:
+            stored=await session.get(CalculationRun,rid);d['run']=run_view(stored,current)
+            if not comparable_result(stored.result):
+                payload=dict(t.payload);answer=payload.get('answer',{})
+                if answer.get('kind') in {'lowest','highest'}:
+                    payload['historical_answer']=answer;payload['answer']=rank_answer(stored,answer['kind'])
+                else:payload['answer']={**answer,'message':'执行已结束，但统计结果待确认或证据不足；不提供正式数值比较。下方记录和计数仅供诊断。'}
+                d['payload']=payload
         return d
 
     async def active(session,t,p):
@@ -244,7 +253,7 @@ plan={operation:count或ratio,metric:基础规则原名,group_by:字段id或null
         if action=='view_group':
             g=next((g for g in run.result.get('groups',[]) if g['key']==key),None)
             if not g:raise HTTPException(409,'组对象不明确，请先点击图表或数据表选中一组。')
-            answer={'kind':action,'groups':[key],'message':f"已定位{g['label']}（{g['type']}）的保存记录：分子{g['result']['numerator']}，分母{g['result']['denominator']}；可在证据区分页查看。"}
+            answer={'kind':action,'groups':[key],'message':('诊断信息：整体统计未可比较。' if not comparable_result(run.result) else '')+f"已定位{g['label']}（{g['type']}）的保存记录：分子{g['result']['numerator']}，分母{g['result']['denominator']}；可在证据区分页查看。"}
         else:answer=rank_answer(run,action)
         t.payload={**t.payload,'answer':answer,'answer_run_id':rid};t.status='completed'
         t.trace=[*t.trace,{'event':'read_saved_result','at':now(),'run_id':rid,'action':action}]

@@ -1,5 +1,6 @@
 """One typed categorical partition, using exactly the existing row engine."""
 from fractions import Fraction
+from copy import deepcopy
 from fastapi import HTTPException
 from .calculations import calculate, blank, digest, REASONS
 
@@ -21,6 +22,25 @@ def extrema(groups,operation):
     low=min(map(exact,usable));high=max(map(exact,usable))
     return {'lowest':[g['key'] for g in usable if exact(g)==low],'highest':[g['key'] for g in usable if exact(g)==high],
             'rule':'以各组精确分数比较；并列全部列出；不是显著性检验或因果解释。'}
+
+
+def comparable_result(result):
+    """Execution may finish while statistics are paused. Never rank partial groups."""
+    return result.get('status')=='completed'
+
+
+def public_group_result(result):
+    # Read-time safety for legacy snapshots; never mutate persisted results.
+    if comparable_result(result) or 'groups' not in result:return result
+    value=deepcopy(result)
+    notice='整体统计未产生可比较结果；以下计数仅供诊断，不提供正式百分比或最高最低结论。'
+    for group in value['groups']:
+        group['result'].update(status=value['status'],display_value=None,exact_fraction=None,unrounded_decimal=None,
+                               diagnostic=True,message=notice)
+    value.update(comparable=False,diagnostic=True,comparison_notice=notice,
+                 display_value=None,exact_fraction=None,unrounded_decimal=None)
+    value['extrema']={'lowest':[],'highest':[],'rule':notice}
+    return value
 
 
 def calculate_groups(sheet,body):
@@ -54,4 +74,5 @@ def calculate_groups(sheet,body):
     overall['reasons'][GROUP_REASON]={'count':len(excluded),'label':REASONS[GROUP_REASON]}
     overall['extrema']=extrema(groups,body.operation)
     overall['aggregation_note']='总体由总体分子÷总体分母计算，不平均各组百分比。各组数值单位为记录/行；不同类型的同名值分开。'
-    return overall,evidence
+    overall['comparable']=comparable_result(overall)
+    return public_group_result(overall),evidence

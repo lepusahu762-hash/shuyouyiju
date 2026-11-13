@@ -189,13 +189,15 @@ def stale_reasons(run, current):
 
 def run_view(run, context, detail=True):
     reasons = stale_reasons(run, context)
+    from .group_calculations import public_group_result
+    result=public_group_result(run.result)
     value = {"id": run.id, "project_id": run.project_id, "created_at": run.created_at, "method_version": run.method_version,
-             "spec": run.spec, "source": run.source, "result": run.result, "stale": bool(reasons), "stale_reasons": reasons,
+             "spec": run.spec, "source": run.source, "result": result, "stale": bool(reasons), "stale_reasons": reasons,
              "status": "stale" if reasons else run.result["status"]}
-    if 'groups' in run.result:
-        value['result']={**run.result,'groups':run.result['groups'][:20],'groups_truncated':len(run.result['groups'])>20,
-                         'extrema':{**run.result['extrema'],**{k:run.result['extrema'][k][:20] for k in ['lowest','highest']},
-                                    'tie_counts':{k:len(run.result['extrema'][k]) for k in ['lowest','highest']}}}
+    if 'groups' in result:
+        value['result']={**result,'groups':result['groups'][:20],'groups_truncated':len(result['groups'])>20,
+                         'extrema':{**result['extrema'],**{k:result['extrema'][k][:20] for k in ['lowest','highest']},
+                                    'tie_counts':{k:len(result['extrema'][k]) for k in ['lowest','highest']}}}
     if detail:
         value["context"] = run.context
     return value
@@ -224,7 +226,7 @@ async def create_run_service(session, project_id, body, user, *, commit=True):
               "source_id": f"{asset.id}:v1:{sheet['id']}", "source_version": 1, "sha256": asset.sha256,
               "parsed_fingerprint": digest(sheet), "columns": sheet["columns"], "annotations": asset.annotations}
     run = CalculationRun(id=new_id(), project_id=project_id, spec=body.model_dump(exclude={"context_hash"},exclude_none=True),
-                         context=current, source=source, result=result, method_version='record-single-group-v1' if body.group_by else METHOD)
+                         context=current, source=source, result=result, method_version='record-single-group-v2' if body.group_by else METHOD)
     session.add(run)
     await session.flush()
     # Bounded batches; never send a whole-sheet evidence object to the browser.
@@ -367,14 +369,16 @@ def calculations_router(database, current_user):
                      order:Literal['source','ascending','descending']='source',category:str|None=Query(None,max_length=64),user=Depends(current_user),session=Depends(database.session)):
         from fractions import Fraction
         run,_=await owned_run(session,run_id,user)
-        rows=run.result.get('groups',[])
+        from .group_calculations import public_group_result,comparable_result
+        result=public_group_result(run.result)
+        rows=result.get('groups',[])
         if category is not None:rows=[g for g in rows if g['key']==category]
-        if order!='source':
+        if order!='source' and comparable_result(result):
             usable=[g for g in rows if g['result']['exact_fraction'] is not None]
             unavailable=[g for g in rows if g['result']['exact_fraction'] is None]
             usable.sort(key=lambda g:Fraction(g['result']['exact_fraction']['numerator'],g['result']['exact_fraction']['denominator']),reverse=order=='descending')
             rows=usable+unavailable
-        return {'items':rows[offset:offset+limit],'total':len(rows),'offset':offset,'limit':limit,'order':order}
+        return {'items':rows[offset:offset+limit],'total':len(rows),'offset':offset,'limit':limit,'order':order if comparable_result(result) else 'source','comparable':comparable_result(result),'notice':result.get('comparison_notice')}
 
 
     @router.get("/runs/{run_id}/checks")
