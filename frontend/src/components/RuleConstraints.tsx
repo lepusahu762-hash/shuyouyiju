@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import type { Asset } from '../api'
-import type { AIPlan, AITask, RuleCheck, RuleSnapshot, RuleSpec } from '../aiTypes'
+import type { AIPlan, AITask, RuleCheck, RuleSnapshot, RuleSpec, Citation } from '../aiTypes'
 import { conditionText, nullPolicyLabel } from '../calculationTypes'
 import { CalculationConditions } from './CalculationConditions'
 
@@ -26,15 +26,15 @@ export function PlanFields({ plan, tables, edit, disabled }: { plan: AIPlan; tab
   const table = tables.find(t => t.id === plan.asset_id)
   const sheet = table?.summary.sheets?.find(s => s.id === plan.sheet_id)
   return <fieldset disabled={disabled} className="rule-plan-fields">
-    <label className="work-field">表格资料<select value={plan.asset_id} onChange={e => edit({ asset_id: e.target.value, sheet_id: '', scope: [], numerator: [] })}><option value="">请选择</option>{tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
-    <label className="work-field">工作表<select value={plan.sheet_id} onChange={e => edit({ sheet_id: e.target.value, scope: [], numerator: [] })}><option value="">请选择</option>{table?.summary.sheets?.map(s => <option value={s.id} key={s.id}>{s.name} · {s.row_count} 条</option>)}</select></label>
-    <label className="work-field">计算类型<select value={plan.operation} onChange={e => edit({ operation: e.target.value as AIPlan['operation'] })}><option value="ratio">记录占比</option><option value="count">记录计数</option></select></label>
-    <label className="work-field">指标<input value={plan.metric} maxLength={120} onChange={e => edit({ metric: e.target.value })} /></label>
-    <label className="work-field">范围说明<textarea value={plan.scope_description} maxLength={1000} onChange={e => edit({ scope_description: e.target.value })} /></label>
+    <label className="work-field">表格资料<select aria-label="表格资料" value={plan.asset_id} onChange={e => edit({ asset_id: e.target.value, sheet_id: '', scope: [], numerator: [] })}><option value="">请选择</option>{tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
+    <label className="work-field">工作表<select aria-label="工作表" value={plan.sheet_id} onChange={e => edit({ sheet_id: e.target.value, scope: [], numerator: [] })}><option value="">请选择</option>{table?.summary.sheets?.map(s => <option value={s.id} key={s.id}>{s.name} · {s.row_count} 条</option>)}</select></label>
+    <label className="work-field">计算类型<select aria-label="计算类型" value={plan.operation} onChange={e => edit({ operation: e.target.value as AIPlan['operation'] })}><option value="ratio">记录占比</option><option value="count">记录计数</option></select></label>
+    <label className="work-field">指标<input aria-label="指标" value={plan.metric} maxLength={120} onChange={e => edit({ metric: e.target.value })} /></label>
+    <label className="work-field">范围说明<textarea aria-label="范围说明" value={plan.scope_description} maxLength={1000} onChange={e => edit({ scope_description: e.target.value })} /></label>
     <CalculationConditions title="范围" help="并且组合；没有条件表示全表，仍须明确确认。" columns={sheet?.columns ?? []} items={plan.scope} onChange={scope => edit({ scope })} disabled={disabled || !sheet} />
     <CalculationConditions title="分子" help="只在分母范围内筛选。" columns={sheet?.columns ?? []} items={plan.numerator} onChange={numerator => edit({ numerator })} disabled={disabled || !sheet} />
-    <label className="work-field">空值处理<select value={plan.null_policy} onChange={e => edit({ null_policy: e.target.value as AIPlan['null_policy'] })}>{Object.entries(nullPolicyLabel).map(([v, text]) => <option key={v} value={v}>{text}</option>)}</select></label>
-    <label className="work-field">显示与比较精度<select value={plan.precision} onChange={e => edit({ precision: Number(e.target.value) })}>{Array.from({ length: 7 }, (_, i) => <option key={i} value={i}>{i} 位小数</option>)}</select></label>
+    <label className="work-field">空值处理<select aria-label="空值处理" value={plan.null_policy} onChange={e => edit({ null_policy: e.target.value as AIPlan['null_policy'] })}>{Object.entries(nullPolicyLabel).map(([v, text]) => <option key={v} value={v}>{text}</option>)}</select></label>
+    <label className="work-field">显示与比较精度<select aria-label="显示与比较精度" value={plan.precision} onChange={e => edit({ precision: Number(e.target.value) })}>{Array.from({ length: 7 }, (_, i) => <option key={i} value={i}>{i} 位小数</option>)}</select></label>
   </fieldset>
 }
 
@@ -64,9 +64,12 @@ export function RuleComparison({ task, plan, check, tables }: { task: RuleTask; 
   </section>
 }
 
-export function RuleSetup<T extends RuleTask>({ task, tables, onBound, taskBase="/ai-tasks" }: { task: T; tables: Asset[]; onBound: (task: T) => void; taskBase?:string }) {
+export function RuleSnapshotEditor({projectId,tables,initial,citations,onSaved,onBindCurrent,hasBound=false,stale=false}: {
+  projectId:string;tables:Asset[];initial:AIPlan;citations:Citation[];onSaved:(snapshot:RuleSnapshot)=>Promise<void>|void;
+  onBindCurrent?:(id:string)=>Promise<void>;hasBound?:boolean;stale?:boolean
+}) {
   const [head, setHead] = useState<{ items: RuleSnapshot[]; current_id: string | null; context_hash: string } | null>(null)
-  const [draft, setDraft] = useState<AIPlan>({ ...(task.payload.rule_snapshot?.constraints ?? task.payload.draft_plan ?? task.payload.plan ?? { asset_id: '', sheet_id: '', operation: 'ratio', metric: '', scope_description: '', scope: [], numerator: [], null_policy: 'block', precision: 0 }), confirmed: false, context_hash: task.context_hash })
+  const [draft, setDraft] = useState<AIPlan>(initial)
   const [sources, setSources] = useState<Record<string, string>>({})
   const [quotes,setQuotes]=useState<Record<string,string>>({})
   const [confirmed, setConfirmed] = useState<string[]>([])
@@ -74,46 +77,48 @@ export function RuleSetup<T extends RuleTask>({ task, tables, onBound, taskBase=
   const [reason, setReason] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-  useEffect(() => { api<typeof head>(`/projects/${task.project_id}/rule-snapshots`).then(setHead).catch(e => setError(e.message)) }, [task.project_id])
-  const citations = task.payload.citations ?? []
-  async function bind(id: string) {
-    const bound = await api<T>(`${taskBase}/${task.id}/bind-rule`, { method: 'POST', body: JSON.stringify({ snapshot_id: id }) })
-    onBound(bound)
-  }
+  useEffect(() => { api<typeof head>(`/projects/${projectId}/rule-snapshots`).then(setHead).catch(e => setError(e.message)) }, [projectId])
   async function action(save: boolean) {
     setBusy(true); setError('')
     try {
       if (!head) throw new Error('请先读取当前规则。')
-      if (!save) { if (head.current_id) await bind(head.current_id); return }
+      if (!save) { if (head.current_id) await onBindCurrent?.(head.current_id); return }
       const constraints = Object.fromEntries(ruleFields.map(([key]) => [key, draft[key]]))
       for(const [key] of ruleFields){const c=citations.find(c=>c.citation_id===sources[key]);if(c?.quote_options?.length&&!quotes[key])throw new Error('节选段落需逐项选择支持该约束的连续原文条款，不能将省略标记保存为引用。')}
-      const snapshot = await api<RuleSnapshot>(`/projects/${task.project_id}/rule-snapshots`, { method: 'POST', body: JSON.stringify({
+      const snapshot = await api<RuleSnapshot>(`/projects/${projectId}/rule-snapshots`, { method: 'POST', body: JSON.stringify({
         previous_id: head.current_id, context_hash: head.context_hash, constraints,
-        sources: Object.fromEntries(ruleFields.map(([key]) => { const c = citations.find(c => c.citation_id === sources[key]); return [key, { asset_id: c?.asset_id, paragraph_id: c?.citation_id, quote: c?.quote_options?.length?quotes[key]:c?.text }] })),
+        sources: Object.fromEntries(ruleFields.map(([key]) => { const c = citations.find(c => c.citation_id === sources[key]); return [key, { asset_id: c?.asset_id, paragraph_id: c?.citation_id, quote: c?.quote_options?.length?quotes[key]:(quotes[key]??c?.text) }] })),
         confirmed_fields: confirmed, unresolved: unresolved.trim() ? [unresolved.trim()] : [], change_reason: reason,
       }) })
-      setHead(await api(`/projects/${task.project_id}/rule-snapshots`))
-      await bind(snapshot.id)
+      setHead(await api(`/projects/${projectId}/rule-snapshots`))
+      setConfirmed([]);await onSaved(snapshot)
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
-  return <details className="rule-setup" open={!task.payload.rule_snapshot || task.rule_check.status === 'stale'}><summary>明确并保存规则约束{task.payload.rule_snapshot ? '／修改规则' : ' · 必须先完成'}</summary>
-    <p className="calc-help">规则约束须由你逐项核对原文。下面预填的是未确认草稿，不代表已确认规则。有歧义或原文缺失时，先补充规则资料并重新生成方案；不能用勾选知晓绕过冲突。保存新版本将使旧确认失效。</p>
-    {head?.current_id && <button type="button" className="button button-secondary small" disabled={busy} onClick={() => void action(false)}>绑定当前已确认规则，重新检查</button>}
+  return <details className="rule-setup" open={!hasBound || stale}><summary>明确并保存规则约束{hasBound ? '／修改规则' : ' · 必须先完成'}</summary>
+    <p className="calc-help">规则约束须由你逐项核对原文。下面预填的是未确认草稿，不代表已确认规则。有歧义或原文缺失时，先补充规则资料并重新读取；不能用勾选知晓绕过冲突。保存新版本将使旧确认失效。</p>
+    {head?.current_id && onBindCurrent && <button type="button" className="button button-secondary small" disabled={busy} onClick={() => void action(false)}>绑定当前已确认规则，重新检查</button>}
     <fieldset disabled={busy}><PlanFields plan={draft} tables={tables} disabled={busy} edit={patch => { setDraft(p => ({ ...p, ...patch })); setConfirmed([]) }} />
       <div className="rule-confirm-fields">{ruleFields.map(([key, label]) => <div className="rule-field-confirm" key={key}>
         <b>{label}：{ruleValue(key, draft[key], tables, draft)}</b>
-        <label className="work-field">{label}的原文来源<select aria-label={`${label}的原文来源`} value={sources[key] ?? ''} onChange={e => { setSources(s => ({ ...s, [key]: e.target.value })); setQuotes(s=>({...s,[key]:''})); setConfirmed(c => c.filter(k => k !== key)) }}><option value="">选择支持本项的真实规则段落</option>{citations.map(c => <option key={c.citation_id} value={c.citation_id}>{c.name} · {c.location} · {c.text}</option>)}</select></label>
-        {sources[key] && <blockquote>{citations.find(c => c.citation_id === sources[key])?.text}</blockquote>}
+        <label className="work-field">{label}的原文来源<select aria-label={`${label}的原文来源`} value={sources[key] ?? ''} onChange={e => { const citation=citations.find(c=>c.citation_id===e.target.value);setSources(s => ({ ...s, [key]: e.target.value })); setQuotes(s=>({...s,[key]:citation?.quote_options?.length?'':citation?.text.slice(0,4000)??''})); setConfirmed(c => c.filter(k => k !== key)) }}><option value="">选择支持本项的真实规则段落</option>{citations.map(c => <option key={c.citation_id} value={c.citation_id}>{c.name} · {c.location} · {c.text}</option>)}</select></label>
+        {sources[key] && <details className="rule-source-detail"><summary>查看原文与连续引用</summary><blockquote>{citations.find(c => c.citation_id === sources[key])?.text}</blockquote>
+        {!citations.find(c=>c.citation_id===sources[key])?.quote_options?.length&&<label className="work-field">{label}的连续引用<textarea aria-label={`${label}的连续引用`} maxLength={4000} value={quotes[key]??citations.find(c=>c.citation_id===sources[key])?.text.slice(0,4000)??''} onChange={e=>{setQuotes(s=>({...s,[key]:e.target.value}));setConfirmed(c=>c.filter(k=>k!==key))}}/><small>最多4000字，必须是所选段落的连续原文。长段落请人工选择实际支持本项的条款，不保留省略标记。</small></label>}</details>}
         {!!citations.find(c=>c.citation_id===sources[key])?.quote_options?.length&&<label className="work-field">{label}的连续原文条款<select value={quotes[key]??''} aria-label={`${label}的连续原文条款`} onChange={e=>{setQuotes(s=>({...s,[key]:e.target.value}));setConfirmed(c=>c.filter(k=>k!==key))}}><option value="">请选择实际支持本项的原文，不包含省略标记</option>{citations.find(c=>c.citation_id===sources[key])?.quote_options?.map((q,i)=><option value={q} key={i}>{q}</option>)}</select></label>}
         <label className="calc-confirm"><input type="checkbox" aria-label={`确认规则${label}`} checked={confirmed.includes(key)} disabled={!sources[key]} onChange={e => setConfirmed(c => e.target.checked ? [...c, key] : c.filter(k => k !== key))} /><span>我已明确本项含义，确认此设置及对应原文。</span></label>
       </div>)}</div>
       <label className="work-field">尚未明确的规则或歧义<textarea value={unresolved} onChange={e => setUnresolved(e.target.value)} placeholder="没有待确认内容时留空；有内容则不能保存为已确认规则。" /></label>
       <label className="work-field">本次规则确认／变更依据<textarea aria-label="规则变更依据" maxLength={1500} value={reason} onChange={e => setReason(e.target.value)} placeholder="说明你如何核对原文；修改已有规则时，明确写出修改原因。" /></label>
-      {error && <p className="work-error" role="alert">{error}</p>}
-      <button type="button" className="button button-primary" disabled={busy || !head || confirmed.length !== ruleFields.length || !!unresolved.trim() || !reason.trim()} onClick={() => void action(true)}>{busy ? '正在保存与检查…' : '保存新规则快照并检查方案'}</button>
+      {error && <div className="work-error" role="alert">{error}<button type="button" onClick={()=>{setConfirmed([]);api<typeof head>(`/projects/${projectId}/rule-snapshots`).then(v=>{setHead(v);setError('已读取当前资料与版本。草稿保留，请逐项重新核对后确认。')}).catch(e=>setError(e.message))}}>重新读取当前规则</button></div>}
+      <button type="button" className="button button-primary" disabled={busy || !head || confirmed.length !== ruleFields.length || !!unresolved.trim() || !reason.trim()} onClick={() => void action(true)}>{busy ? '正在保存与检查…' : onBindCurrent?'保存新规则快照并检查方案':'保存已确认规则快照'}</button>
     </fieldset>
     {!!head?.items.length && <details><summary>已保存的规则版本（最近10版）</summary>{head.items.map(s => <p className="calc-help" key={s.id}>v{s.version} · {s.created_at} · {s.change_reason}<br />{s.id}</p>)}</details>}
   </details>
+}
+
+export function RuleSetup<T extends RuleTask>({task,tables,onBound,taskBase='/ai-tasks'}:{task:T;tables:Asset[];onBound:(task:T)=>void;taskBase?:string}) {
+  async function bind(id:string){onBound(await api<T>(`${taskBase}/${task.id}/bind-rule`,{method:'POST',body:JSON.stringify({snapshot_id:id})}))}
+  const initial:AIPlan={...(task.payload.rule_snapshot?.constraints??task.payload.draft_plan??task.payload.plan??{asset_id:'',sheet_id:'',operation:'ratio',metric:'',scope_description:'',scope:[],numerator:[],null_policy:'block',precision:0}),confirmed:false,context_hash:task.context_hash}
+  return <RuleSnapshotEditor projectId={task.project_id} tables={tables} initial={initial} citations={task.payload.citations??[]} hasBound={!!task.payload.rule_snapshot} stale={task.rule_check.status==='stale'} onBindCurrent={bind} onSaved={s=>bind(s.id)}/>
 }
 
 export function PlanRuleCheck({ task, tables, plan, onChecked, taskBase="/ai-tasks" }: { task: RuleTask; tables: Asset[]; plan: AIPlan; onChecked: (check: RuleCheck) => void; taskBase?:string }) {

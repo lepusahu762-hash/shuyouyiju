@@ -120,7 +120,7 @@ def rules_router(database, current_user):
         project = await owned_project(session, pid, user)
         context, _ = await project_context(session, project)
         rows = (await session.scalars(select(RuleSnapshot).where(RuleSnapshot.project_id == pid).order_by(RuleSnapshot.version.desc()).offset(offset).limit(limit))).all()
-        return {"items": [snapshot_view(s) for s in rows], "current_id": context.get("constraint_snapshot_id"), "context_hash": digest(context)}
+        return {"items": [snapshot_view(s) for s in rows], "current_id": context.get("constraint_snapshot_id"), "context_hash": digest(context), "current_valid": bool((current := await latest_snapshot(session,pid)) and digest(current.context)==digest(base_context(context)))}
 
     @router.post("/projects/{pid}/rule-snapshots", status_code=201)
     async def save(pid: str, body: SaveRule, user=Depends(current_user), session=Depends(database.session)):

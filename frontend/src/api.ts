@@ -115,7 +115,7 @@ export function safeReturn(value: string | null): string {
     if (task && uuid.test(task)) safeQuery.set('task', task)
   }
 
-  const safeHash = hash === 'calculation-history' && (page === 'analysis' || page === 'calculations') ? `#${hash}` : ''
+  const safeHash = page==='materials'&&hash==='confirm-rules'?'#confirm-rules':hash === 'calculation-history' && (page === 'analysis' || page === 'calculations') ? `#${hash}` : ''
   const safeSearch = safeQuery.size ? `?${safeQuery.toString()}` : ''
   return pathname + safeSearch + safeHash
 }
