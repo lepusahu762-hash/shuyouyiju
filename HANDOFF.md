@@ -69,6 +69,6 @@ ChatGPT/Codex的订阅不提供本项目百炼API凭据。页面优化、注册/
 
 纯样式/布局：前端`npm run build`、`npm run lint`，实际检查涉及页1440/768/390/320、长中文/文件名、错误与空态、键盘/弹窗、表格内部滚动、直接访问刷新和来源链接；表单改动保留失败输入。不是每次都运行全部后台测试。
 
-请求改动额外运行`node scripts/test-api.cjs`、`node scripts/test-write-refresh.cjs`；资料列表涉及XHR时可选生产4173下`check-material-race.cjs`（会创建合成资料，不调用模型）。后台改动在`backend`用项目venv运行对应tests，临时目录设`../artifacts/你的检查名`。账户/规则/来源/修订/导出防线不能为演示绕过。
+请求改动额外运行`node scripts/test-api.cjs`、`node scripts/test-write-refresh.cjs`；资料列表涉及XHR时可选生产4173下`check-material-race.cjs`（会创建合成资料，不调用模型）。后台改动在`backend`用项目venv运行对应tests，临时目录设`../artifacts/你的检查名`；干净克隆需先在仓库根创建`artifacts`父目录，见NEW_MACHINE_SETUP命令。账户/规则/来源/修订/导出防线不能为演示绕过。
 
 每个真实模块保留提交，提交前`git diff --check`和`git status --short`，确认没有.env、DB、uploads、PDF、session、node_modules、venv等。队友可用本地Git姓名邮箱（不需GitHub），基于交接分支创建`codex/teammate-ui`；交还Git bundle、提交清单、测试及必要脱敏截图即可，详见 [离线协作与交还](docs/OFFLINE_HANDOFF.md)。不要把整个个人工作区ZIP回传，也不要强推/改main/公开仓库。

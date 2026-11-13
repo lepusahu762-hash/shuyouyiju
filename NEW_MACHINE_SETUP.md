@@ -93,6 +93,8 @@ npm run preview -- --host 127.0.0.1 --port 4173
 离线检查在backend工作目录运行：
 
 ```powershell
+# 在仓库根先创建忽略的测试输出目录；干净克隆中该目录原本不存在
+New-Item -ItemType Directory -Force artifacts | Out-Null
 Set-Location backend
 & .\.venv\Scripts\python.exe -m pytest tests/test_unified_demo.py tests/test_materials.py tests/test_images.py -q --basetemp=../artifacts/fresh-pytest
 Set-Location ../frontend
