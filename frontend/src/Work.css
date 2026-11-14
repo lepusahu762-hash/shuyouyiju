@@ -376,3 +376,28 @@ html:has(.work-app) { scroll-padding-top: 160px; }
   .work-app .revision-actions .button { max-width: 100%; }
   .work-app .analysis-tabs { flex-wrap: wrap; }
 }
+
+/* Teammate round 1: readable workspace controls and mobile action groups. */
+.work-app .sidebar-link, .work-app .project-nav a { font-size: 14px; }
+.work-app .work-page-heading p:last-child, .work-app .workspace-empty p { font-size: 15px; line-height: 1.85; }
+.work-app .work-field, .work-app .inspector-description, .work-app .work-footnote { font-size: 14px; line-height: 1.8; }
+.work-app .work-field input, .work-app .work-field select, .work-app .work-field textarea { font-size: 15px; color: #253047; }
+.work-app .panel-top h2, .work-app .inspector-heading h2 { font-size: 16px; font-weight: 600; color: #253047; }
+.work-app .material-top-actions { flex-wrap: wrap; }
+.work-app .material-top-actions .button { min-height: 44px; font-size: 14px; }
+.work-app .project-search input { font-size: 14px; min-height: 44px; }
+.work-app .work-error { font-size: 14px; }
+.work-app .projects-table-wrap:focus-visible { outline: 3px solid #7b9aff; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .work-app .material-top-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .work-app .material-top-actions .button { width: 100%; padding-inline: 8px; }
+  .work-app .project-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; position: static; margin-inline: 0; padding: 8px 0; }
+  .work-app .project-nav a { justify-content: center; padding-inline: 6px; border-radius: 5px; }
+  .work-app .project-nav a.current { background: #edf2ff; }
+  .work-app .work-mobile-nav > a { font-size: 13px; min-height: 40px; }
+  .work-app .mobile-material-tabs button { font-size: 14px; min-height: 44px; }
+  .work-app .work-field input, .work-app .work-field select, .work-app .work-field textarea { font-size: 16px; }
+  .work-app .project-search { width: 100%; }
+  .work-app .project-search input { width: 100%; }
+  .work-app .work-page-heading > .button { width: 100%; justify-content: center; }
+}
