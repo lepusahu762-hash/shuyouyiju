@@ -59,6 +59,22 @@ npm run preview -- --host 127.0.0.1 --port 4173
 
 浏览器访问http://127.0.0.1:4173/，注册自己的测试账户。前端默认代理/api到127.0.0.1:8000；两终端持续运行。端口占用先识别原进程，不要结束其他项目服务；改端口时同时核对Vite代理SYJ_API_TARGET和后台SYJ_ALLOWED_ORIGINS，不在前端写密钥。默认cookie用于本机HTTP，不是公网部署配置。
 
+## 已安装依赖后的便捷启动
+
+在仓库根，使用本项目已安装好依赖的 Python 环境执行：
+
+```powershell
+& '你的虚拟环境\Scripts\python.exe' tools/start_local.py --node '你的Node路径\node.exe'
+# 只检查/启动服务，不打开浏览器时加 --no-browser
+```
+
+此脚本启动本仓库的 FastAPI（8000）和 Vite 开发前端（5173），然后打开
+http://127.0.0.1:5173/。服务只监听本机，Windows 下后台运行；关机后需重新启动。
+脚本复用已响应的数有依据服务，遇到其他占用不会结束进程；日志在
+`artifacts/local-server/*-launcher.log`。它不下载依赖、不修改数据库、不配置模型。
+如果旧虚拟环境因 Windows 路径过长安装失败，可在短路径新建环境并按锁安装，
+再用那个环境的 Python 启动；不要直接搬动已有 venv。
+
 ## 合成资料与中文字体
 
 ```powershell
