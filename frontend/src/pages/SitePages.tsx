@@ -28,7 +28,7 @@ export function CasesPage() {
 
 const guides = [
   { id: 'start', title: '快速上手', body: <><p>注册并新建项目，在“资料与口径”上传CSV／XLSX，再用“补充规则说明”保存文本并指定为规则资料。点击“确认统计规则”，为各项约束选择真实原文、逐项确认并保存快照，无需先上传待核验报告或图片。</p><p>保存规则后直接进入“数据分析”：提问、检查方案、确认计算、点击分组定位原始行与规则。也可使用手动计数和比例；核验报告时再上传DOCX/文本或PNG/JPEG，选择一条百分比。报告文字核验结果可进入“修改与交付”，保存修订后需另行复核，最后导出选定版本的单条PDF。</p><a className="text-link" href="/app">进入我的工作空间<Icon name="arrow" /></a></> },
-  { id: 'limits', title: '使用边界', body: <><p>参赛测试版 · 以下按当前可运行功能列示。首页与案例的合成演示不代表工作区支持所有计算。</p><div className="capability-list">{capabilities.map(c=><article key={c.name}><h3>{c.name}<span>{c.state}</span></h3><p>{c.detail}</p></article>)}</div><p>尚未实现：模板套用与保存、收藏、个人汇总导出记录、邮件验证/找回密码、隔离访客工作区和公网部署。项目内的单条PDF记录已接通。</p><p>模型建议需人工确认，结果只表示在所选资料和规则下的一条数字比较，不证明数据真实、统计显著性或因果关系。</p></> },
+  { id: 'limits', title: '使用边界', body: <><p>参赛测试版 · 以下按当前可运行功能列示。首页与案例的合成演示不代表工作区支持所有计算。</p><div className="capability-list">{capabilities.map(c=><article key={c.name}><h3>{c.name}<span>{c.state}</span></h3><p>{c.detail}</p></article>)}</div><p>模板中心已支持添加、编辑个人模板，以及用内置或个人模板创建项目；模板内容仍需结合本次资料人工完善与确认。尚未实现：收藏、个人汇总导出记录、邮件验证/找回密码、隔离访客工作区和公网部署。项目内的单条PDF记录已接通。</p><p>模型建议需人工确认，结果只表示在所选资料和规则下的一条数字比较，不证明数据真实、统计显著性或因果关系。</p></> },
   { id: 'privacy', title: '资料与隐私', body: <><p>项目与文件接口在后台校验账户归属。上传原件与解析结果分开保存，统计使用已解析数据，不改写原文件。</p><p>AI辅助核验会把完成当前任务所需的报告片段、字段样本及命中的规则段落发送至已配置的百炼模型服务。图片识别会发送用户选中的转正图片区域；只处理明确数值，不根据图形大小猜测。手动计算不调用模型。尚未接通邮件验证和密码找回。</p><p>该项目为本地测试版本，未部署公网；不要把测试环境当作正式生产服务。</p></> },
   { id: 'verification', title: '验证记录', body: <><p>本地现有验收覆盖账户隔离、资料解析、条件计算、证据分页、规则冲突阻断和AI单条核验。最新体验验收、性能条件与版本清单见仓库 RELEASE_READINESS.md、EXPERIENCE_PREVIEW.md；业务真实调用按AI_PREVIEW.md逐轮记录。未开展真实用户研究，不声称准确率或用户满意度。</p><p>模拟模型测试与真实模型验收分别记录；模拟结果不会标成真实模型输出。首页和案例页内的示例均为合成材料。</p></> },
   { id: 'project', title: '项目说明', body: <><p>《数有依据》连接表格、统计规则、报告陈述与可定位证据，辅助检查数字在已确认口径下是否一致。</p><p>它不证明原始数据真实，也不自动证明因果关系。复杂对话统计、无标签图形估值、整篇自动改写、批量及DOCX／XLSX导出仍在后续开发范围。</p><a href="/">返回品牌首页</a></> },
@@ -39,21 +39,6 @@ export function GuidePage() {
   useEffect(() => { document.title = '使用帮助与项目说明 · 数有依据' }, [])
   return <div className="site-page" onKeyDown={tabKeys}><PublicHeader /><main className="site-page-main guide-main"><div className="site-page-heading"><p className="section-kicker">帮助与项目说明</p><h1>了解当前可以完成的工作。</h1><p>功能边界以现有接口与验收记录为准，页面预览不等同于服务已接通。</p></div><div className="guide-layout"><nav className="guide-nav" aria-label="帮助目录" role="tablist">{guides.map(tab => <button key={tab.id} role="tab" aria-selected={active === tab.id} onClick={() => {setActive(tab.id);history.replaceState(null,'','/guide#'+tab.id)}}>{tab.title}</button>)}</nav><section className="guide-content" role="tabpanel"><h2>{guides.find(tab => tab.id === active)?.title}</h2>{guides.find(tab => tab.id === active)?.body}</section></div></main><footer className="site-page-footer"><a href="/cases">案例体验</a><a href="/auth">登录</a><a href="/">返回首页</a></footer></div>
 }
-
-const templateCards = [
-  ['校园调查统计口径', '调查数据', '包含有效样本范围、分子分母说明和来源记录的结构预览。'],
-  ['经营月报检查清单', '月度报表', '包含期间、金额单位与增长／百分点定义的结构预览。'],
-  ['活动反馈摘要', '反馈统计', '包含分组样本规模、加权说明及空值规则的结构预览。'],
-]
-
-function Templates() {
-  const [filter, setFilter] = useState('全部')
-  const [query, setQuery] = useState('')
-  const shown = templateCards.filter(item => (filter === '全部' || item[1] === filter) && item.join(' ').includes(query.trim()))
-  return <><div className="work-page-heading"><div><p className="section-kicker">复用结构 · 预览</p><h1>模板中心</h1><p>展示可复用的口径和报告结构。模板保存与套用尚未接入。</p></div></div><div className="template-toolbar"><label className="project-search">搜索模板<input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="查找名称或用途" /></label><div className="segmented-control">{['全部', '调查数据', '月度报表', '反馈统计'].map(item => <button key={item} aria-pressed={filter === item} onClick={() => setFilter(item)}>{item}</button>)}</div></div><div className="template-grid">{shown.map(item => <article className="template-item" key={item[0]}><div className="template-topline"><span>{item[1]}</span><span>界面预览</span></div><h2>{item[0]}</h2><p>{item[2]}</p><details><summary>预览目录结构</summary><ul><li>数据范围与字段</li><li>指标定义及来源</li><li>需要人工确认的口径</li></ul></details><button className="button button-secondary small" disabled title="模板 API 尚未接通">使用模板</button></article>)}</div>{!shown.length && <p className="calc-empty-small">没有匹配模板。可以更改筛选条件。</p>}<div className="preview-disclaimer">收藏、创建副本、编辑和保存模板尚未接通；本页没有写入个人模板记录。</div></>
-}
-
-export function TemplatesPage() { useEffect(() => { document.title = '模板中心 · 数有依据' }, []); return <WorkShell>{(_user: User) => <Templates />}</WorkShell> }
 
 function Personal({ user }: { user: User }) {
   const [active, setActive] = useState('account')

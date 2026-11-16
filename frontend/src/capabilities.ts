@@ -1,5 +1,6 @@
 // Current, deliberately bounded release claims. Roadmap items are never success states.
 export const capabilities = [
+  { name: '模板中心', state: '有限支持', detail: '添加和编辑个人模板，使用内置或个人模板创建项目并保留内容快照；不携带数据、已确认规则或计算结果，仍需独立确认口径。' },
   { name: '数据体检', state: '有限支持', detail: 'CSV/XLSX空值、重复表头与位置提示；不自动清洗或判断数据真实性。' },
   { name: '统计规则与依据库', state: '已实现', detail: '规则文本/DOCX、本地关键词与BM25检索、逐项确认快照、来源定位及后台冲突阻断。' },
   { name: '对话式分析', state: '有限支持', detail: '记录数、记录占比、单分类字段分组、最高最低/并列、等值并且筛选；方案需人工确认。' },

@@ -1,0 +1,37 @@
+.templates-page { min-width: 0; }
+.template-boundary { margin: 0 0 22px; padding: 14px 16px; border-left: 3px solid #6788e8; background: #f0f4fc; color: #4d5c74; font-size: 14px; line-height: 1.8; }
+.template-notice { padding: 12px 16px; margin-bottom: 18px; background: #edf6f1; color: #285d47; font-size: 14px; line-height: 1.8; }
+.templates-page .template-toolbar { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(120px, .5fr) minmax(120px, .5fr) auto; align-items: end; }
+.templates-page .work-field { margin: 0; min-width: 0; }
+.template-count { margin-bottom: 14px; color: #657084; font-size: 14px; }
+.templates-page .template-topline { font-size: 13px; flex-wrap: wrap; }
+.templates-page .template-item { padding: 22px; gap: 16px; overflow-wrap: anywhere; }
+.templates-page .template-item h2 { font-size: 19px; line-height: 1.5; }
+.templates-page .template-item > p { font-size: 15px; min-height: 0; }
+.templates-page .template-item .template-goal { font-size: 13px; color: #52617a; }
+.templates-page .template-item details, .project-template-panel details { font-size: 14px; }
+.template-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 6px; }
+.template-actions .button { min-height: 44px; font-size: 14px; padding: 10px 14px; white-space: normal; }
+.template-content { display: grid; gap: 16px; margin-top: 14px; min-width: 0; }
+.template-content h3 { font-size: 14px; margin-bottom: 8px; color: #334155; }
+.template-content p { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.9; color: #536177; }
+.template-dialog { width: min(680px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; }
+.template-dialog form { display: grid; gap: 18px; min-width: 0; }
+.template-dialog .work-dialog-heading, .template-dialog .work-dialog-actions { margin: 0; }
+.template-dialog textarea { resize: vertical; min-height: 80px; }
+.template-dialog .template-boundary { margin: 0; }
+.template-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.project-template-panel { display: grid; justify-items: start; gap: 12px; margin-bottom: 22px; padding: 20px; border: 1px solid #d9e2f4; border-radius: 8px; background: #fff; min-width: 0; overflow-wrap: anywhere; }
+.project-template-panel h2 { font-size: 18px; line-height: 1.6; }
+.project-template-panel p { font-size: 14px; line-height: 1.8; color: #58667b; }
+.project-template-panel .button { white-space: normal; }
+@media (max-width: 1000px) { .templates-page .template-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .templates-page .work-page-heading > .button { width: 100%; }
+  .templates-page .template-toolbar > :first-child { grid-column: 1 / -1; }
+  .templates-page .template-toolbar > .button { grid-column: 1 / -1; }
+  .template-dialog { padding: 18px; }
+  .template-dialog input, .template-dialog select, .template-dialog textarea, .templates-page .template-toolbar input, .templates-page .template-toolbar select { font-size: 16px; }
+  .template-form-row { grid-template-columns: minmax(0, 1fr); }
+  .template-actions .button { flex: 1 1 130px; }
+}

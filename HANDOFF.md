@@ -14,14 +14,14 @@
 | AI文字单条、图片明确标签单百分比核验与历史 | AI需队友自己的百炼API权限；只核验一条，不是整篇/整图通过，不按图形大小猜值 |
 | 文字单数字修订、不可覆盖版本、确定性重算复核、单条文字PDF | 保存先待复核；改含义转人工；无图片PDF/整篇/批量/DOCX/XLSX导出 |
 
-首页和案例展示是明确标注的示例，不能当成工作区支持任意分析。模板套用、收藏、账户汇总导出、完整文件版本比较、协作和公网部署未接通。全站框架完成不等于八项能力全部完成。
+首页和案例展示是明确标注的示例，不能当成工作区支持任意分析。收藏、账户汇总导出、完整文件版本比较、协作和公网部署未接通。模板已支持个人添加/编辑、内置另存、使用模板创建新项目；带入规则草稿和报告提纲，不带入已确认规则或结果。见 docs/TEMPLATES.md。全站框架完成不等于所有业务全部完成。
 
 ## 页面和主要代码入口
 
 | 页面/入口 | 路由 | 常用文件 |
 | --- | --- | --- |
 | 首页 | `/` | `frontend/src/pages/HomePage.tsx`、`App.css`、`components/FeatureDemos.tsx` |
-| 案例/帮助/模板/个人 | `/cases`、`/guide`、`/app/templates`、`/app/me` | `pages/SitePages.tsx`、`SitePages.css`、`capabilities.ts` |
+| 案例/帮助/模板/个人 | `/cases`、`/guide`、`/app/templates`、`/app/me` | `pages/SitePages.tsx`、`pages/TemplatesPage.tsx`、`SitePages.css`、`Templates.css`、`capabilities.ts` |
 | 登录/项目 | `/auth`、`/app` | `pages/AuthPage.tsx`、`WorkspacePage.tsx` |
 | 资料与口径 | `/app/projects/:id/materials` | `pages/MaterialsPage.tsx`、`components/MaterialEditors.tsx`、`RuleConfirmation.tsx`、`RuleLibrary.tsx` |
 | 数据分析 | `/app/projects/:id/analysis` | `components/analysis/`会话/方案/图表/证据组件；手动入口`pages/CalculationsPage.tsx` |

@@ -38,6 +38,27 @@ class Project(Base):
     updated_at: Mapped[str] = mapped_column(String, default=now)
 
 
+class ProjectTemplate(Base):
+    __tablename__ = "project_templates"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
+    owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"), index=True)
+    content: Mapped[dict] = mapped_column(JSON)
+    version: Mapped[int] = mapped_column(default=1)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class ProjectTemplateSnapshot(Base):
+    __tablename__ = "project_template_snapshots"
+    __table_args__ = (UniqueConstraint("owner_id", "request_id"),)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), primary_key=True)
+    owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"), index=True)
+    request_id: Mapped[str] = mapped_column(String(36))
+    request: Mapped[dict] = mapped_column(JSON)
+    snapshot: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+
+
 class Asset(Base):
     __tablename__ = "assets"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)

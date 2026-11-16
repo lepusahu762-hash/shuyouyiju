@@ -20,7 +20,7 @@ async function loadPage() {
   if (pathname === '/cases') { const { CasesPage } = await import('./pages/SitePages'); return <CasesPage /> }
   if (pathname === '/guide') { const { GuidePage } = await import('./pages/SitePages'); return <GuidePage /> }
   if (pathname === '/app') { const { WorkspacePage } = await import('./pages/WorkspacePage'); return <WorkspacePage /> }
-  if (pathname === '/app/templates') { const { TemplatesPage } = await import('./pages/SitePages'); return <TemplatesPage /> }
+  if (pathname === '/app/templates') { const { TemplatesPage } = await import('./pages/TemplatesPage'); return <TemplatesPage /> }
   if (pathname === '/app/me') { const { PersonalPage } = await import('./pages/SitePages'); return <PersonalPage /> }
   const materialRoute = pathname.match(/^\/app\/projects\/([0-9a-f-]{36})\/materials$/)
   if (materialRoute) { const { MaterialsPage } = await import('./pages/MaterialsPage'); return <MaterialsPage projectId={materialRoute[1]} /> }

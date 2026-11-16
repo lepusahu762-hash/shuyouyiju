@@ -12,6 +12,7 @@ from .database import Database
 from .models import Base, Asset, AITask, now
 from .auth import setup_auth, UserRead, UserCreate
 from .projects import project_router
+from .templates import templates_router
 from .materials import material_router
 from .calculations import calculations_router
 from .ai import ai_router, BUSY
@@ -109,6 +110,7 @@ def create_app(settings: Settings | None = None, ai_provider=None):
                            "columns": settings.max_columns, "files": settings.max_project_files}}
 
     app.include_router(project_router(database, current_user))
+    app.include_router(templates_router(database, current_user))
     app.include_router(material_router(database, settings, current_user))
     app.include_router(calculations_router(database, current_user))
     app.include_router(rules_router(database, current_user))
