@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, ConfigDict
 from sqlalchemy import select, update, func
 from .models import Asset, Project, new_id, now
-from .projects import owned_project
+from .projects import owned_project, project_is_deleted
 from .parsers import parse_file, ParseError
 from .image_files import parse_image
 
@@ -49,7 +49,8 @@ def material_router(database, settings, current_user):
     router = APIRouter(prefix="/api", tags=["materials"])
 
     async def owned_asset(session, aid, user):
-        asset = await session.scalar(select(Asset).join(Project).where(Asset.id == aid, Project.owner_id == user.id))
+        asset = await session.scalar(select(Asset).join(Project).where(
+            Asset.id == aid, Project.owner_id == user.id, ~project_is_deleted))
         if asset is None:
             raise HTTPException(404, "资料不存在或无权访问。")
         return asset

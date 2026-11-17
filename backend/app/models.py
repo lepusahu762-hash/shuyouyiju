@@ -38,6 +38,12 @@ class Project(Base):
     updated_at: Mapped[str] = mapped_column(String, default=now)
 
 
+class DeletedProject(Base):
+    __tablename__ = "deleted_projects"
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), primary_key=True)
+    deleted_at: Mapped[str] = mapped_column(String, default=now)
+
+
 class ProjectTemplate(Base):
     __tablename__ = "project_templates"
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)

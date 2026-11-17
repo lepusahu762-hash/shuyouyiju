@@ -70,6 +70,16 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .goal-tag { background: #f3f5fa; color: #62728a; border-radius: 5px; padding: 5px 8px; font-size: 12px; }
 .table-action { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; background: transparent; color: #6585c4; font-size: 12px; padding: 6px; }
 .table-action .icon { width: 13px; }
+.table-action-danger { color: #a7393f; }
+.work-dialog .button-danger { background: #ab3940; border-color: #ab3940; color: #fff; }
+.work-dialog .button-danger:hover:not(:disabled) { background: #922e34; border-color: #922e34; }
+.project-list-notice { margin-top: 12px; color: #365c49; font-size: 12px; overflow-wrap: anywhere; }
+.deleted-projects { margin-top: 18px; border: 1px solid #e6ebf3; border-radius: 8px; background: #fff; padding: 10px 14px; font-size: 12px; color: #475c80; }
+.deleted-projects summary { cursor: pointer; padding-block: 5px; }
+.deleted-projects .count-badge { margin-left: 5px; }
+.deleted-projects ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.deleted-projects li { display: flex; justify-content: space-between; align-items: center; gap: 14px; border-top: 1px solid #edf0f6; overflow-wrap: anywhere; }
+.deleted-projects > p { margin: 10px 0 4px; }
 .workspace-empty { background: #fff; border: 1px solid #e6ebf3; border-radius: 10px; text-align: center; padding: 75px 25px 70px; }
 .empty-icon { display: inline-flex; justify-content: center; align-items: center; width: 58px; height: 58px; border-radius: 15px; background: #f1f5ff; color: #5f7198; }
 .empty-icon .icon { height: 28px; width: 28px; }
@@ -101,7 +111,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .goal-options span { display: flex; flex-direction: column; gap: 7px; }
 .goal-options strong { font-size: 13px; font-weight: 500; color: #566d94; }
 .goal-options small { font-size: 12px; color: #687180; }
-.dialog-help { font-size: 12px; line-height: 1.85; color: #667182; margin-top: 18px; }
+.dialog-help { font-size: 12px; line-height: 1.85; color: #667182; margin-top: 18px; overflow-wrap: anywhere; }
 .work-dialog-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px; }
 .work-dialog-actions .button { font-size: 12px; min-height: 42px; padding-inline: 18px; gap: 10px; }
 .paste-dialog { width: min(680px, calc(100% - 32px)); }
