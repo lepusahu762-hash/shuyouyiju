@@ -345,12 +345,7 @@
 .auth-mode button[aria-pressed='true'] { color: #456ada; }
 .auth-mode button[aria-pressed='true']::after { content: ''; position: absolute; height: 2px; background: #5c7fe9; left: 0; right: 0; bottom: -1px; border-radius: 2px; }
 .auth-form-section h1 { font-size: 28px; font-weight: 600; letter-spacing: -.7px; line-height: 1.5; }
-.auth-subtitle { color: #949cab; font-size: 12px; line-height: 1.8; margin-top: 10px; }
-.auth-service-note { display: flex; gap: 9px; padding: 13px 14px; background: #f6f8fc; border-radius: 7px; margin-block: 24px; }
-.auth-service-note > .icon { width: 15px; height: 15px; color: #97a7c3; margin-top: 2px; }
-.auth-service-note p { font-size: 11px; line-height: 1.85; }
-.auth-service-note strong { display: block; color: #798ba8; font-weight: 500; margin-bottom: 4px; }
-.auth-service-note span { color: #8d9ab0; }
+.auth-subtitle { color: #949cab; font-size: 12px; line-height: 1.8; margin: 10px 0 24px; }
 .form-field { margin-bottom: 19px; }
 .form-field > label { display: block; font-size: 13px; margin-bottom: 9px; color: #656f81; }
 .form-field input { width: 100%; border: 1px solid #e1e5ed; border-radius: 7px; padding: 13px 14px; min-height: 46px; color: #52617c; background: #fff; font-size: 13px; outline-offset: 2px; }
@@ -378,8 +373,7 @@
 .section-description, .section-heading > p:not(.section-kicker), .case-body p, .hero-description { color: #687382; }
 .report-paper > p, .finding-float p, .result-explanation, .rule-card blockquote, .dialog-description, .faq-list details > p { color: #6f7b8f; }
 .source-table th, .source-table td { color: #687992; }
-.auth-subtitle, .auth-service-note span, .auth-button-note, .auth-alternative > span, .auth-story-description, .field-help { color: #718098; }
-.auth-service-note strong { color: #607596; }
+.auth-subtitle, .auth-button-note, .auth-alternative > span, .auth-story-description, .field-help { color: #718098; }
 /* Tablet */
 @media (max-width: 1100px) {
   .section-shell { width: calc(100% - 64px); }
@@ -483,7 +477,6 @@
   .auth-equation { padding-inline: 8px; }
   .auth-equation span { font-size: 20px; }
   .auth-equation strong { font-size: 23px; }
-  .auth-service-note { padding-inline: 10px; }
 }
 /* Phone: keep evidence readable, with no clipped miniature desktop */
 @media (max-width: 680px) {
@@ -643,8 +636,6 @@
   .auth-form-section h1 { font-size: 27px; }
   .auth-mode { margin-bottom: 25px; }
   .auth-mode button { font-size: 14px; }
-  .auth-service-note { padding: 13px 12px; }
-  .auth-service-note p { font-size: 11px; }
   .form-field input { font-size: 16px; }
   .form-field input::placeholder { font-size: 12px; }
   .auth-footer { padding: 23px 24px; font-size: 9px; }
