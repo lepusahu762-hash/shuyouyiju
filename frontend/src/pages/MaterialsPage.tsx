@@ -5,6 +5,7 @@ import type { Asset, Preview, Project } from '../api'
 import { WorkShell, RequestError } from '../components/WorkShell'
 import { FieldsEditor, RulesEditor } from '../components/MaterialEditors'
 import { RuleConfirmation } from '../components/RuleConfirmation'
+import { DemoRuleCard } from '../components/DemoRules'
 import { RuleLibrary } from '../components/RuleLibrary'
 import { ProjectTemplatePanel } from '../components/ProjectTemplatePanel'
 import { Icon } from '../components/ui'
@@ -15,7 +16,7 @@ const statusText = { uploaded: '已接收，等待解析', parsing: '正在解�
 function Materials({ projectId }: { projectId: string }) {
   const [ruleEpoch,setRuleEpoch]=useState(0)
   const [ruleContextEpoch,setRuleContextEpoch]=useState(0)
-  const [confirmRules,setConfirmRules]=useState(location.hash==='#confirm-rules')
+  const [ruleEntry, setRuleEntry] = useState<'default' | 'manual' | null>(location.hash === '#confirm-rules' ? 'default' : null)
   const [project, setProject] = useState<Project | null>(null)
   const [assets, setAssets] = useState<Asset[]>([])
   const [selectedId, setSelectedId] = useState(new URLSearchParams(window.location.search).get('asset') ?? '')
@@ -104,8 +105,19 @@ function Materials({ projectId }: { projectId: string }) {
     const params = new URLSearchParams({ asset: selectedId, sheet: sheet?.id ?? 's1' })
     if (new URLSearchParams(window.location.search).has('row')) params.set('row', String(linkedRow))
     if (linkedParagraph.current) { params.set('paragraph', linkedParagraph.current); params.set('offset', String(offset)) }
-    window.history.replaceState(null, '', window.location.pathname + '?' + params.toString())
+    window.history.replaceState(null, '', window.location.pathname + '?' + params.toString() + window.location.hash)
   }, [selectedId, sheet?.id, linkedRow, offset])
+  useEffect(() => {
+    const followHash = () => setRuleEntry(current => location.hash === '#confirm-rules' ? current ?? 'default' : null)
+    window.addEventListener('hashchange', followHash)
+    return () => window.removeEventListener('hashchange', followHash)
+  }, [])
+  const projectAvailable = !!project
+  useEffect(() => {
+    if (!projectAvailable || !ruleEntry) return
+    const frame = requestAnimationFrame(() => document.getElementById('confirm-rules')?.scrollIntoView({ block: 'start', behavior: 'instant' }))
+    return () => cancelAnimationFrame(frame)
+  }, [projectAvailable, ruleEntry])
   useEffect(() => {
     if (!assetId || assetStatus !== 'ready') return
     const controller = new AbortController()
@@ -171,9 +183,28 @@ function Materials({ projectId }: { projectId: string }) {
     } catch (cause) { setReportError((cause as Error).message) }
     finally { setSavingReport(false) }
   }
+  function openRules(entry: 'default' | 'manual' = 'default') {
+    setRuleEntry(entry)
+    if (location.hash !== '#confirm-rules') history.pushState(null, '', location.pathname + location.search + '#confirm-rules')
+    if (ruleEntry === entry) document.getElementById('confirm-rules')?.scrollIntoView({ block: 'start', behavior: 'instant' })
+  }
+  function closeRules() {
+    setRuleEntry(null)
+    history.replaceState(null, '', location.pathname + location.search)
+  }
+  const ruleEditor = <RuleConfirmation key={ruleContextEpoch} projectId={projectId} assets={assets}
+    onSaved={() => setRuleEpoch(value => value + 1)} onClose={closeRules} />
   if (loading && !project) return <div className="work-loading" role="status">正在读取项目与资料…</div>
   if (!project) return <><RequestError message={error || '项目不存在或无权访问。'} retry={() => void load()} /><a className="text-link" href="/app"><Icon name="back" />返回工作空间</a></>
-  return <><div className="materials-heading"><div><a href="/app" className="material-back"><Icon name="back" />全部项目</a><h1>{project.name}</h1><p>{project.goal === 'analysis' ? '分析数据' : '核验已有报告'}<span>·</span>{assets.length} 份资料<span>·</span>创建于 {displayDate(project.created_at)}</p></div><div className="material-top-actions"><button className="button button-secondary small" onClick={()=>{setConfirmRules(true);location.hash='confirm-rules'}}>确认统计规则</button><button className="button button-secondary small" onClick={event => { setPasteKind('report'); pasteTrigger.current = event.currentTarget; setReportError(''); pasteDialog.current?.showModal() }}><Icon name="edit" />粘贴报告</button><button className="button button-secondary small" onClick={event=>{setPasteKind('rule');pasteTrigger.current=event.currentTarget;setReportError('');pasteDialog.current?.showModal()}}>补充规则说明</button><button className="button button-primary small" onClick={() => input.current?.click()}><Icon name="plus" />上传资料</button></div></div>
+  return <><div className="materials-heading"><div><a href="/app" className="material-back"><Icon name="back" />全部项目</a><h1>{project.name}</h1><p>{project.goal === 'analysis' ? '分析数据' : '核验已有报告'}<span>·</span>{assets.length} 份资料<span>·</span>创建于 {displayDate(project.created_at)}</p></div><div className="material-top-actions"><button className="button button-secondary small" onClick={() => openRules()}>确认统计规则</button><button className="button button-secondary small" onClick={event => { setPasteKind('report'); pasteTrigger.current = event.currentTarget; setReportError(''); pasteDialog.current?.showModal() }}><Icon name="edit" />粘贴报告</button><button className="button button-secondary small" onClick={event=>{setPasteKind('rule');pasteTrigger.current=event.currentTarget;setReportError('');pasteDialog.current?.showModal()}}>补充规则说明</button><button className="button button-primary small" onClick={() => input.current?.click()}><Icon name="plus" />上传资料</button></div></div>
+    <div id="confirm-rules">
+      {ruleEntry === 'manual' ? ruleEditor : <DemoRuleCard projectId={projectId} assets={assets}
+        revision={ruleEpoch + ruleContextEpoch} fallback={ruleEntry ? ruleEditor : null}
+        onManual={() => openRules('manual')} onSaved={async () => {
+          invalidateAssetReads()
+          await Promise.all([refreshAssets(), refreshRuleContext(true)])
+        }} />}
+    </div>
     <ProjectTemplatePanel projectId={projectId} prepare={(template, button) => {
       if (reportText.trim() && !window.confirm('当前有未保存的文本草稿。是否用模板规则草稿替换？')) return
       setPasteKind('rule'); pasteTrigger.current = button; setReportError('')
@@ -181,7 +212,6 @@ function Materials({ projectId }: { projectId: string }) {
       pasteDialog.current?.showModal()
     }} />
     {error && <RequestError message={error} retry={() => { setError(''); void refreshAssets().catch(cause => setError((cause as Error).message)) }} />}
-    {confirmRules&&<>{ruleContextEpoch>0&&<p className="calc-warning">资料说明或规则资料指定已更新。规则编辑已读取新依据，需重新逐项确认；旧快照保留。</p>}<RuleConfirmation key={ruleContextEpoch} projectId={projectId} assets={assets} onSaved={()=>setRuleEpoch(n=>n+1)} onClose={()=>{setConfirmRules(false);history.replaceState(null,'',location.pathname+location.search)}}/></>}
     <div className="mobile-material-tabs" role="group" aria-label="资料页视图">{[['files', '资料列表'], ['preview', '内容预览'], ['rules', '字段与规则']].map(([id, name]) => <button key={id} aria-pressed={mobilePanel === id} onClick={() => setMobilePanel(id)}>{name}</button>)}</div>
     <input ref={input} className="sr-only" tabIndex={-1} type="file" multiple accept=".csv,.xlsx,.docx,.png,.jpg,.jpeg" aria-label="选择资料文件" onChange={event => addFiles(event.target.files)} />
     <div className={`material-columns panel-${mobilePanel}`}><aside className="file-panel"><div className="panel-top"><h2>项目资料</h2><span>{assets.length}</span></div><button className="upload-drop" onClick={() => input.current?.click()} onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); addFiles(event.dataTransfer.files) }}><Icon name="plus" /><strong>点击或拖入文件</strong><span>CSV · XLSX · DOCX · PNG/JPEG</span></button><p className="upload-limits">每份 ≤ {limits ? Math.floor(limits.upload_bytes / 1024 / 1024) : '…'} MiB，每项目 {limits?.files ?? '…'} 份。<br />图片最多8 MiB；PDF导入和 XLS 暂不支持。</p>
@@ -198,7 +228,7 @@ function Materials({ projectId }: { projectId: string }) {
         <div className="preview-notes">{selected.summary.notes?.map(note => <p key={note}><Icon name="info" />{note}</p>)}</div>
         {sheet && <details className="data-issues" open={sheet.issues.length > 0}><summary><Icon name="info" />数据体检<span>{sheet.issues.length ? `${sheet.issues.length} 项提示` : '未发现空值或表头问题'}</span></summary>{sheet.issues.map((issue, i) => <div key={i}><strong>{issue.message}</strong>{issue.locations.length > 0 && <p>位置：{issue.locations.join('、')}{issue.count > issue.locations.length ? '…（仅列出前 20 处）' : ''}</p>}</div>)}<p>仅检查能够明确识别的问题；未执行清洗或判断统计结论。</p></details>}
       </>}<details className="asset-source"><summary>文件来源标识与完整性</summary><dl><dt>资料 ID</dt><dd>{selected.id}</dd><dt>SHA-256</dt><dd>{selected.sha256}</dd><dt>上传时间</dt><dd>{displayDate(selected.created_at)}</dd></dl></details>
-    </>}</section><aside className="inspector-panel" aria-label="字段与统计规则">{selected?.kind === 'table' && selected.status === 'ready' && <FieldsEditor key={selected.id} asset={selected} sheet={sheet} onDirty={setFieldDirty} onSaved={(fields, version) => setAssets(current => current.map(asset => asset.id === selected.id ? { ...asset, annotations: fields, annotation_version: version } : asset))} />}<RulesEditor key={project.id} project={project} onSaved={()=>refreshRuleContext(true)} /><RuleLibrary key={ruleEpoch} projectId={projectId} assets={assets} onRolesChanged={()=>refreshRuleContext()} onConfirm={()=>{setConfirmRules(true);location.hash='confirm-rules';requestAnimationFrame(()=>document.getElementById('confirm-rules')?.scrollIntoView({block:'start'}))}} /></aside></div>
+    </>}</section><aside className="inspector-panel" aria-label="字段与统计规则">{selected?.kind === 'table' && selected.status === 'ready' && <FieldsEditor key={selected.id} asset={selected} sheet={sheet} onDirty={setFieldDirty} onSaved={(fields, version) => setAssets(current => current.map(asset => asset.id === selected.id ? { ...asset, annotations: fields, annotation_version: version } : asset))} />}<RulesEditor key={project.id} project={project} onSaved={()=>refreshRuleContext(true)} /><RuleLibrary key={ruleEpoch} projectId={projectId} assets={assets} onRolesChanged={()=>refreshRuleContext()} onConfirm={() => openRules()} /></aside></div>
     <dialog ref={pasteDialog} className="work-dialog paste-dialog" aria-labelledby="paste-title" onCancel={event => { if (savingReport) event.preventDefault() }} onClose={() => pasteTrigger.current?.focus()}><form onSubmit={saveReport}><div className="work-dialog-heading"><h2 id="paste-title">{pasteKind==='rule'?'保存规则文本':'粘贴报告文本'}</h2><button type="button" className="icon-button" aria-label="关闭粘贴报告" disabled={savingReport} onClick={() => pasteDialog.current?.close()}><Icon name="close" /></button></div><label className="work-field">{pasteKind==='rule'?'规则资料名称':'报告名称'}<input autoFocus value={reportName} maxLength={120} disabled={savingReport} placeholder="例如：校园调查报告草稿" onChange={event => setReportName(event.target.value)} /></label><label className="work-field">{pasteKind==='rule'?'规则正文':'报告正文'}<textarea rows={10} maxLength={1000000} value={reportText} disabled={savingReport} placeholder="粘贴报告正文，按非空行建立可定位段落。" onChange={event => setReportText(event.target.value)} /></label><p className="dialog-help">保存原始文本，每个非空行建立稳定来源标识。{pasteKind==='rule'&&'保存后请勾选为规则资料，再独立确认结构化规则；保存文本本身不会确认口径。'}最多 100 万字符、20000 行。</p>{reportError && <p className="field-error" role="alert">{reportError}</p>}<div className="work-dialog-actions"><button type="button" className="button button-secondary" disabled={savingReport} onClick={() => pasteDialog.current?.close()}>取消</button><button className="button button-primary" disabled={savingReport}>{savingReport ? '正在保存…' : pasteKind==='rule'?'保存规则文本':'保存报告'}<Icon name="check" /></button></div></form></dialog>
   </>
 }

@@ -1,0 +1,41 @@
+.demo-rules > :is(p, dl, details, .button) {
+  margin: 0.75rem 0 0;
+}
+
+.demo-rule-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.demo-rules-values {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 0.6rem;
+}
+
+.demo-rules-values > div {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e2e9f4;
+  border-radius: 0.5rem;
+  background: #f8faff;
+  overflow-wrap: anywhere;
+}
+
+.demo-rules-values dt {
+  color: #485975;
+  font-size: 0.8125rem;
+}
+
+.demo-rules-values dd {
+  margin: 0.15rem 0 0;
+}
+
+.demo-rules details > fieldset {
+  min-width: 0;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  border: 0;
+}

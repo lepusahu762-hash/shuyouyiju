@@ -6,6 +6,8 @@ import { RuleSetup, PlanFields, PlanRuleCheck } from './RuleConstraints'
 import { RuleRetrievalEvidence } from './RuleRetrievalEvidence'
 import { CalculationEvidence } from './CalculationEvidence'
 import { RequestError } from './WorkShell'
+import { DemoVerificationConfirm } from './DemoRules'
+import { checkedDemoPlan, currentDemoRule, demoCitationIds, unifiedDemo, useDemoRuleHead, type UnifiedDemo } from '../unifiedDemo'
 import './ImageVerification.css'
 
 type Region={x:number;y:number;width:number;height:number}
@@ -40,6 +42,35 @@ function ImagePlan({task,tables,onChange}:{task:ImageTask;tables:Asset[];onChang
   {error&&<RequestError message={error} retry={()=>setError('')}/>}
   <button className="button button-primary" disabled={busy||!meaning||!note.trim()||checked!==JSON.stringify(plan)||!task.payload.rule_snapshot} onClick={()=>void execute()}>{busy?'正在计算完整工作表…':'确认方案，计算所选图片数字'}</button>
  </section>
+}
+
+function demoImageTarget(task: ImageTask, demo: UnifiedDemo) {
+ const target = task.payload.target
+ if (!task.stale && task.source.asset_id === demo.image.id && task.source.sha256 === demo.image.sha256
+  && task.payload.recognition_confirmed && task.payload.selection_hash && target?.explicit && target.bbox
+  && target.category === '满意' && target.metric === demo.spec.metric && Number(target.value) === 50
+  && /50\s*[%％]/.test(target.label) && ['%', '％', 'percent'].includes(target.unit ?? '')
+  && (!target.period || target.period.replace(/\s+/g, '') === '不限定期间')) return target
+}
+
+function ImageVerificationPlan({ task, assets, onChange }: { task: ImageTask; assets: Asset[]; onChange: (task: ImageTask) => void }) {
+ const demo = unifiedDemo(assets)
+ const target = demo && demoImageTarget(task, demo)
+ const head = useDemoRuleHead(task.project_id, !!target, task.context_hash)?.head ?? null
+ const snapshot = demo && currentDemoRule(head, demo)
+ const manual = <ImagePlan task={task} tables={assets.filter(asset => asset.kind === 'table')} onChange={onChange} />
+ if (!demo || !target || !snapshot || !demoCitationIds(snapshot, task.payload.citations).length) return manual
+
+ const note = `已核对图中“满意”类别与分子条件，单位为百分比。${target.period ? '图中标注不限定期间。' : '图中期间留空，演示规则不限定期间。'}`
+ return <section className="calc-card image-plan"><DemoVerificationConfirm demo={demo} snapshot={snapshot}
+  target={`满意 · ${target.label}`} note={note} onConfirm={async () => {
+   const path = `/image-tasks/${task.id}`
+   const checked = await checkedDemoPlan(task, path, demo, snapshot, fresh =>
+    fresh.payload.selection_hash === task.payload.selection_hash && JSON.stringify(demoImageTarget(fresh, demo)) === JSON.stringify(target))
+   onChange(await api<ImageTask>(`${path}/confirm`, { method: 'POST', body: JSON.stringify({
+    ...checked, selection_hash: task.payload.selection_hash, meaning_confirmed: true, applicability_note: note,
+   }) }))
+  }}>{manual}</DemoVerificationConfirm></section>
 }
 
 export function ImageVerification({projectId}:{projectId:string}){
@@ -89,7 +120,7 @@ export function ImageVerification({projectId}:{projectId:string}){
  <label className="calc-confirm"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/><span>我已对照原图确认当前标签、类别、单位、期间及高亮位置。识别确认不等于数字核验通过。</span></label>
  <button className="button button-primary" disabled={busy||!confirmed}>保存识别确认并查找规则</button></form>}
  {task.payload.related_report&&<details><summary>已关联的真实报告原句（可选来源）</summary><blockquote>{task.payload.related_report.paragraph.text}</blockquote><a href={`/app/projects/${projectId}/materials?asset=${task.payload.related_report.asset_id}&paragraph=${encodeURIComponent(task.payload.related_report.paragraph.id)}&offset=${Math.floor(task.payload.related_report.paragraph_index/50)*50}`}>{task.payload.related_report.name} · {task.payload.related_report.paragraph.location} ↗</a></details>}<details><summary>模型原始识别与人工修改记录</summary><p>{config?.model} · {config?.region} · 模型调用尝试 {task.request_count}/6</p><pre>{JSON.stringify(task.payload.raw_recognition,null,2)}</pre><pre>{JSON.stringify(task.payload.selection_history,null,2)}</pre><p>原始模型识别不会被人工修正覆盖；人工修正后的成功不计为模型原始识别正确。</p></details></>}
- </section><div className="image-work-right">{targetDirty&&<p className="calc-warning">识别内容或所选类别已修改，当前为未保存草稿。请重新保存识别确认，再检查计算方案；旧确认不能用于此草稿。</p>}{!targetDirty&&task?.payload.target&&!task.run_id&&(task.status==='awaiting_confirmation'||task.stale&&task.saved_status==='awaiting_confirmation')&&<ImagePlan key={task.id+task.payload.rule_snapshot?.id+task.payload.selection_hash} task={task} tables={assets.filter(a=>a.kind==='table')} onChange={chooseTask}/>}
+ </section><div className="image-work-right">{targetDirty&&<p className="calc-warning">识别内容或所选类别已修改，当前为未保存草稿。请重新保存识别确认，再检查计算方案；旧确认不能用于此草稿。</p>}{!targetDirty&&task?.payload.target&&!task.run_id&&(task.status==='awaiting_confirmation'||task.stale&&task.saved_status==='awaiting_confirmation')&&<ImageVerificationPlan key={task.id+task.payload.rule_snapshot?.id+task.payload.selection_hash} task={task} assets={assets} onChange={chooseTask}/>}
  <section className="calc-card image-result"><h2>单条结果与证据</h2><p>图片识别：{targetDirty?'修改后待重新确认':task?.payload.recognition_confirmed?'已由用户确认':'尚未确认'} · 数字核验：{task?.stale?'依据已变化，待重新核验':task?.result?.status==='consistent'?'所选单条与数据一致':task?.result?.status==='different'?'存在差异':'尚未完成'}</p>
  <div className="ai-tabs" role="tablist">{[['comparison','比较结果'],['rows','原始数据'],['rules','规则原文']].map(([v,n])=><button role="tab" aria-selected={tab===v} key={v} onClick={()=>setTab(v)}>{n}</button>)}</div>
  {tab==='comparison'&&(task?.result&&task.run?<><p className="image-number">图片标注 <b>{task.result.reported_value}%</b></p><p>{task.stale?'按生成时确认规则计算':'按当前确认规则计算'} <strong>{task.result.calculated_value===null?'无可用值':task.result.calculated_value+'%'}</strong></p><p>{task.result.difference_pp===null?task.result.message:Number(task.result.difference_pp)<0?`图片值比计算值高${Math.abs(Number(task.result.difference_pp))}个百分点`:Number(task.result.difference_pp)>0?`图片值比计算值低${task.result.difference_pp}个百分点`:'所选单条百分比与数据一致'}</p><p className="ai-formula">{task.run.result.numerator} ÷ {task.run.result.denominator} × 100% = {task.run.result.display_value===null?'无有效值':task.run.result.display_value+'%'}</p><p>完整工作表{task.run.result.total}条记录／行；仅核验当前选中标签，不代表整张图或报告通过。</p><p>{task.result.comparison_rule}</p>{task.stale&&<p className="calc-warning">上方为生成时保存结果，当前依据已变，请新建任务重新确认；历史没有重算或覆盖。</p>}<details><summary>确认说明与精确值</summary><p>{task.payload.confirmation?.applicability_note}</p><p>未舍入值：{task.run.result.unrounded_decimal}</p><pre>{JSON.stringify(task.run.spec,null,2)}</pre></details></>:<div className="empty-panel"><h3>还没有可用的数字核验结果。</h3><p>先确认明确标签，再核对规则与计算方案。没有标签或依据时显示待确认／证据不足。</p></div>)}

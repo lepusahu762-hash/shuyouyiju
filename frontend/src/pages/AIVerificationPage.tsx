@@ -10,6 +10,16 @@ import { PlanFields, PlanRuleCheck, RuleComparison, RuleSetup, RuleStatus } from
 import { CalculationEvidence } from '../components/CalculationEvidence'
 import { ImageVerification } from '../components/ImageVerification'
 import { RuleRetrievalEvidence } from '../components/RuleRetrievalEvidence'
+import { DemoVerificationConfirm } from '../components/DemoRules'
+import { checkedDemoPlan, currentDemoRule, demoCitationIds, demoReportText, unifiedDemo, useDemoRuleHead, type UnifiedDemo } from '../unifiedDemo'
+
+function demoReportCandidate(task: AITask, demo: UnifiedDemo) {
+  const candidate = task.payload.candidates?.[task.payload.selected ?? -1]
+  if (!task.stale && task.source.asset_id === demo.report.id && task.source.paragraph.text === demoReportText
+    && !task.payload.questions?.length && candidate?.supported && candidate.unit === 'percent'
+    && Number(candidate.reported_value) === 50 && candidate.metric === demo.spec.metric
+    && /50\s*[%％]/.test(candidate.quote) && task.source.excerpt.includes(candidate.quote)) return candidate
+}
 
 function PlanEditor({ task, tables, busy, submit, onBound }: { task: AITask; tables: Asset[]; busy: boolean; submit: (body: unknown) => Promise<void>; onBound: (task: AITask) => void }) {
   const candidate = task.payload.candidates?.[task.payload.selected ?? 0]
@@ -35,6 +45,27 @@ function PlanEditor({ task, tables, busy, submit, onBound }: { task: AITask; tab
     <label className="calc-confirm"><input type="checkbox" checked={plan.confirmed} onChange={event => setPlan(value => ({ ...value, confirmed: event.target.checked }))} /><span>我已核对原文 {candidate?.reported_value}%、规则、字段、范围、空值和精度。仅核验这一条记录占比，不表示整篇报告通过。</span></label>
     <button className="button button-primary calc-run-button" disabled={busy || checkedPlan !== JSON.stringify({ ...plan, confirmed: false }) || !plan.confirmed || !rulesConfirmed || !ruleIds.length || !sheet || !plan.numerator.length}>确认方案，执行真实计算</button><p className="calc-help">修改设置后需要重新确认。已保存且未变化的方案在失败重试时直接复用，不重复要求确认。</p>
   </form></>
+}
+
+function VerificationPlan({ task, assets, tables, busy, submit, onBound }: {
+  task: AITask; assets: Asset[]; tables: Asset[]; busy: boolean;
+  submit: (body: unknown) => Promise<void>; onBound: (task: AITask) => void;
+}) {
+  const demo = unifiedDemo(assets)
+  const candidate = demo && demoReportCandidate(task, demo)
+  const head = useDemoRuleHead(task.project_id, !!candidate, task.context_hash)?.head ?? null
+  const snapshot = demo && currentDemoRule(head, demo)
+  const manual = <PlanEditor task={task} tables={tables} busy={busy} submit={submit} onBound={onBound} />
+  if (!demo || !candidate || !snapshot || !demoCitationIds(snapshot, task.payload.citations).length) return manual
+
+  const note = '原句指向有效记录满意率。此次采用全部有效记录为分母、其中满意记录为分子，统计不限期间。'
+  return <DemoVerificationConfirm demo={demo} snapshot={snapshot} target={candidate.quote} note={note} disabled={busy}
+    onConfirm={async () => {
+      const checked = await checkedDemoPlan(task, `/ai-tasks/${task.id}`, demo, snapshot, fresh =>
+        fresh.payload.selected === task.payload.selected && fresh.source.paragraph.id === task.source.paragraph.id
+        && JSON.stringify(demoReportCandidate(fresh, demo)) === JSON.stringify(candidate))
+      await submit({ ...checked, resolution: note, rules_confirmed: true, reported_value: candidate.reported_value })
+    }}>{manual}</DemoVerificationConfirm>
 }
 
 function TaskEvidence({ task }: { task: AITask }) {
@@ -152,7 +183,7 @@ function AIVerification({ projectId }: { projectId: string }) {
         {task.status === 'cancelled' && <p className="calc-help">取消后不再继续工具步骤；已发出的模型请求可能仍计费。可以重新选择片段开始新任务。</p>}
       </div>}</section>
     <div className="ai-right" aria-label="核验方案与证据">{!task ? <section className="calc-card ai-welcome"><p className="calc-step">03 → 04 · 方案与证据</p><h2>从一句话，到可以复核的证据。</h2><p>选择原文 → 提取陈述 → 检索规则<br />检查方案 → 确认后计算 → 比较并保存</p><div>AI 负责建议<br /><b>数字由真实数据计算，口径由你确认。</b></div><a className="text-link" href={`/app/projects/${projectId}/calculations`}>也可以直接使用手动计算与核验 ↗</a></section> : <>
-      {task.status === 'awaiting_confirmation' && <section className="calc-card"><PlanEditor task={task} tables={tables} busy={busy} submit={body => perform(`/ai-tasks/${task.id}/confirm`, body)} onBound={selectTask} key={task.id+(task.payload.rule_snapshot?.id ?? "unbound")} /></section>}
+      {task.status === 'awaiting_confirmation' && <section className="calc-card"><VerificationPlan task={task} assets={bundle.assets} tables={tables} busy={busy} submit={body => perform(`/ai-tasks/${task.id}/confirm`, body)} onBound={selectTask} key={task.id+(task.payload.rule_snapshot?.id ?? "unbound")} /></section>}
       {task.status !== 'awaiting_confirmation' && <section className="calc-card">{task.payload.rule_snapshot && (task.payload.confirmed_plan || task.payload.draft_plan || task.payload.plan) ? <RuleComparison task={task} tables={tables} plan={(task.payload.confirmed_plan ?? task.payload.draft_plan ?? task.payload.plan)!} check={task.rule_check} /> : <RuleStatus check={task.rule_check} />}{task.status === 'stale' && task.payload.plan && !task.run_id && task.rule_check.status !== 'legacy' && <RuleSetup task={task} tables={tables} onBound={selectTask} />}</section>}
       <section className="calc-card ai-evidence-card" id="verification-evidence"><p className="calc-step">04 · 可追溯的结论</p><TaskEvidence task={task} key={task.id} /></section>
       <details className="calc-card ai-audit"><summary>本次真实调用摘要与保存信息</summary><p>模型请求 {task.request_count}/{bundle.config.max_requests} 次（含失败和重试）</p><p className="calc-help">{task.payload.model.model} · {task.payload.model.region} · 提示词 {task.payload.prompt_version}<br />开始 {displayDate(task.created_at)}；最近更新 {displayDate(task.updated_at)}<br />工具调用 {task.tool_count}/{bundle.config.max_tool_calls}。仅显示实际返回和执行的事件，不展示模型内部推理。</p>{task.trace.map((t, i) => <div key={i}><b>{t.event === 'model_response' ? '模型响应' : t.event === 'tool_result' ? '工具计算结果' : `调用 ${t.name}`}</b><small>{displayDate(t.at)}</small><pre>{JSON.stringify(t.summary ?? t.usage ?? t.result, null, 2)}</pre></div>)}<code>{task.id}</code></details>
