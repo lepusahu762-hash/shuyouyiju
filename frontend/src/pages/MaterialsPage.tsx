@@ -5,6 +5,7 @@ import type { Asset, Preview, Project } from '../api'
 import { WorkShell, RequestError } from '../components/WorkShell'
 import { FieldsEditor, RulesEditor } from '../components/MaterialEditors'
 import { RuleConfirmation } from '../components/RuleConfirmation'
+import { DemoRuleCard } from '../components/DemoRules'
 import { RuleLibrary } from '../components/RuleLibrary'
 import { ProjectTemplatePanel } from '../components/ProjectTemplatePanel'
 import { Icon } from '../components/ui'
@@ -174,6 +175,10 @@ function Materials({ projectId }: { projectId: string }) {
   if (loading && !project) return <div className="work-loading" role="status">正在读取项目与资料…</div>
   if (!project) return <><RequestError message={error || '项目不存在或无权访问。'} retry={() => void load()} /><a className="text-link" href="/app"><Icon name="back" />返回工作空间</a></>
   return <><div className="materials-heading"><div><a href="/app" className="material-back"><Icon name="back" />全部项目</a><h1>{project.name}</h1><p>{project.goal === 'analysis' ? '分析数据' : '核验已有报告'}<span>·</span>{assets.length} 份资料<span>·</span>创建于 {displayDate(project.created_at)}</p></div><div className="material-top-actions"><button className="button button-secondary small" onClick={()=>{setConfirmRules(true);location.hash='confirm-rules'}}>确认统计规则</button><button className="button button-secondary small" onClick={event => { setPasteKind('report'); pasteTrigger.current = event.currentTarget; setReportError(''); pasteDialog.current?.showModal() }}><Icon name="edit" />粘贴报告</button><button className="button button-secondary small" onClick={event=>{setPasteKind('rule');pasteTrigger.current=event.currentTarget;setReportError('');pasteDialog.current?.showModal()}}>补充规则说明</button><button className="button button-primary small" onClick={() => input.current?.click()}><Icon name="plus" />上传资料</button></div></div>
+    <DemoRuleCard projectId={projectId} assets={assets} revision={ruleEpoch + ruleContextEpoch} onSaved={async () => {
+      invalidateAssetReads()
+      await Promise.all([refreshAssets(), refreshRuleContext(true)])
+    }} />
     <ProjectTemplatePanel projectId={projectId} prepare={(template, button) => {
       if (reportText.trim() && !window.confirm('当前有未保存的文本草稿。是否用模板规则草稿替换？')) return
       setPasteKind('rule'); pasteTrigger.current = button; setReportError('')
