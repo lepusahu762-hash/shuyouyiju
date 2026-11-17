@@ -22,7 +22,6 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .sidebar-bottom > span { display: block; font-size: 12px; color: #69717e; line-height: 1.9; margin-top: 8px; }
 .sidebar-bottom > a { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #62718d; margin-top: 20px; }
 .sidebar-bottom .icon { width: 12px; }
-.sidebar-meta { margin-top: 12px; padding: 12px; color: #798398; font-size: 11px; line-height: 1.8; border-top: 1px solid #edf0f5; }
 .workspace-project-name { max-width: 360px; color: #566782; font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .project-context { display: flex; align-items: center; gap: 15px; min-width: 0; padding: 10px 0 14px; }
 .project-context > div { display: flex; align-items: baseline; gap: 9px; min-width: 0; }
