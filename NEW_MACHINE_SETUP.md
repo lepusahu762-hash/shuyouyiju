@@ -10,6 +10,14 @@
 
 v0.15历史记录：曾在忽略的隔离目录仅复制源码（无.env/data/.venv/node_modules），新建venv、联网执行完整pip安装和npm ci、生产构建通过；当时隔离服务启动动作被自动审批拒绝，未验证该副本的网页登录全流程。**本次离线交接的最新验证请以包根VALIDATION.md为准；同一台Windows上的干净验证仍不代表队友电脑或Linux已验收。** 团队应在另一台机器照下列步骤检查。
 
+## 2026-11-17从零验证补充
+
+本次在仓库外短路径仅解出Git已跟踪源码，新建Python3.13.11虚拟环境，按锁安装（使用本机包缓存）、pip check、npm ci、build、lint成功。复制无密钥.env.example，使用独立空数据库启动普通app.main:app及生产预览；浏览器实际完成注册、建项目、三份资料解析、规则文本指定、九项逐项来源确认、手动4÷10=40%、刷新和后台重启恢复。模型未配置，真实请求0次。完整条件和限制见[检查记录](docs/SUBMISSION_CHECK.md)。
+
+不要将干净验证副本放在原仓库忽略的artifacts目录内：本次oxlint会因此跳过全部文件，提示No files found，不能算lint通过。请使用仓库外短路径（例如D:/Projects/shuyouyiju），不要复制原node_modules/venv/data。已有安装和下载缓存参与本次验证，不代表全新电脑断网可安装；其他系统仍需实测。
+
+生成器重新生成的DOCX/PNG可能容器字节不同，演示指纹预填不会保证命中。正常手动来源确认不依赖特定指纹；不要通过改白名单或复制作者数据库来绕过。
+
 ## 获取源码：离线包或GitHub二选一
 
 **没有GitHub账号优先用离线包**：按包根START_HERE及[离线协作](docs/OFFLINE_HANDOFF.md)从history/shuyouyiju.bundle恢复workspace。安装Git本身不要求GitHub账户；恢复完整历史后直接进入下面的共用依赖安装。不要另行GitHub登录，不复制作者.git配置或数据库。
