@@ -21,34 +21,57 @@ export const demoRuleText = '独立合成参赛演示，非真实调查。使用
 export type RuleHead = { items: RuleSnapshot[]; current_id: string | null; current_valid: boolean; context_hash: string }
 
 export function useDemoRuleHead(projectId: string, enabled: boolean, revision = '') {
-  const [head, setHead] = useState<{ key: string; value: RuleHead } | null>(null)
+  const [result, setResult] = useState<{ key: string; head: RuleHead | null; error: string } | null>(null)
   const key = `${projectId}:${revision}`
   useEffect(() => {
     if (!enabled) return
     const controller = new AbortController()
     api<RuleHead>(`/projects/${projectId}/rule-snapshots`, { signal: controller.signal })
-      .then(value => setHead({ key, value })).catch(() => {})
+      .then(head => {
+        if (!controller.signal.aborted) setResult({ key, head, error: '' })
+      })
+      .catch(cause => {
+        if (!controller.signal.aborted) setResult({ key, head: null, error: (cause as Error).message })
+      })
     return () => controller.abort()
   }, [enabled, key, projectId])
-  return enabled && head?.key === key ? head.value : null
+  return enabled && result?.key === key ? result : null
 }
 
-export function unifiedDemo(assets: Asset[]) {
-  function unique(kind: keyof typeof names) {
-    const matches = assets.filter(asset => asset.name === names[kind])
-    const [asset] = matches
-    if (matches.length === 1 && asset.kind === kind && asset.status === 'ready') return asset
+export function inspectUnifiedDemo(assets: Asset[]) {
+  const tableFiles = assets.filter(asset => asset.name === names.table)
+  const reportFiles = assets.filter(asset => asset.name === names.report)
+  const imageFiles = assets.filter(asset => asset.name === names.image)
+  if (!tableFiles.length && !reportFiles.length && !imageFiles.length) return { demo: null, issue: '' }
+  if ([tableFiles, reportFiles, imageFiles].some(files => files.length > 1)) {
+    return { demo: null, issue: '当前项目有重复同名的演示资料。请使用每种演示文件只上传一次的项目。' }
   }
-
-  const table = unique('table'), report = unique('report'), image = unique('image')
-  if (!table || !report || !image || !fixtureHashes.some(hashes =>
-    table.sha256 === hashes[names.table] && report.sha256 === hashes[names.report] && image.sha256 === hashes[names.image])) return null
+  const [table] = tableFiles, [report] = reportFiles, [image] = imageFiles
+  if (!table || !report || !image) {
+    const missing = [!table && names.table, !report && names.report, !image && names.image].filter(Boolean)
+    return { demo: null, issue: `启用演示预填还需要在本项目上传 ${missing.join('、')}。` }
+  }
+  const demoAssets = [table, report, image]
+  const failed = demoAssets.filter(asset => asset.status === 'failed')
+  if (failed.length) {
+    return { demo: null, issue: `请重试解析这几份演示资料：${failed.map(asset => asset.name).join('、')}。` }
+  }
+  const notReady = demoAssets.filter(asset => asset.status !== 'ready')
+  if (notReady.length) {
+    return { demo: null, issue: `这几份演示资料尚未解析完成：${notReady.map(asset => asset.name).join('、')}。` }
+  }
+  if (table.kind !== 'table' || report.kind !== 'report' || image.kind !== 'image' || !fixtureHashes.some(hashes =>
+    table.sha256 === hashes[names.table] && report.sha256 === hashes[names.report] && image.sha256 === hashes[names.image])) {
+    return { demo: null, issue: '这组文件的指纹与登记的演示资料不同。请使用练习包里的三份原件，或核对后登记这组文件。' }
+  }
 
   const sheet = table.summary.sheets?.find(item => item.name === 'CSV 数据')
   const scope = sheet?.columns.find(column => column.name === '纳入状态')
   const numerator = sheet?.columns.find(column => column.name === '反馈等级')
   const group = sheet?.columns.find(column => column.name === '所属学院')
-  if (!sheet || sheet.row_count !== 12 || !scope || !numerator || !group) return null
+  if (!sheet || sheet.row_count !== 12 || !scope || !numerator || !group) {
+    return { demo: null, issue: '请检查演示 CSV 是否已解析为含 12 条记录的「CSV 数据」表，以及字段是否齐全。' }
+  }
 
   const spec: RuleSpec = {
     asset_id: table.id,
@@ -61,7 +84,11 @@ export function unifiedDemo(assets: Asset[]) {
     null_policy: 'keep',
     precision: 0,
   }
-  return { table, report, image, sheet, group, spec }
+  return { demo: { table, report, image, sheet, group, spec }, issue: '' }
+}
+
+export function unifiedDemo(assets: Asset[]) {
+  return inspectUnifiedDemo(assets).demo
 }
 
 export type UnifiedDemo = NonNullable<ReturnType<typeof unifiedDemo>>

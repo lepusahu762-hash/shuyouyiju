@@ -5,13 +5,17 @@ let responder;
 const moduleMock={exports:{}};
 const compiled=stripTypeScriptTypes(fs.readFileSync(path.join(src,'unifiedDemo.ts'),'utf8'))
  .replace(/^import .*$/gm,'').replace(/\bexport /g,'')
- +'\nmodule.exports={unifiedDemo,currentDemoRule,demoCitationIds,checkedDemoPlan};';
+ +'\nmodule.exports={unifiedDemo,inspectUnifiedDemo,currentDemoRule,demoCitationIds,checkedDemoPlan};';
 vm.runInNewContext(compiled,{module:moduleMock,fixtureHashes:hashes,api:(...args)=>responder(...args)});
 const f=moduleMock.exports;
 const names=['统一演示_12条.csv','统一演示_报告50.docx','统一演示_满意50.png'];
 function assets(){return names.map((name,i)=>({id:'asset-'+i,name,kind:['table','report','image'][i],status:'ready',sha256:hashes.at(-1)[name],summary:i?{}:{sheets:[{id:'s1',name:'CSV 数据',row_count:12,columns:[{id:'c1',name:'所属学院'},{id:'c2',name:'纳入状态'},{id:'c3',name:'反馈等级'}]}]}}))}
 async function main(){
  const originals=assets(),demo=f.unifiedDemo(originals);assert.ok(demo);
+ assert.match(f.inspectUnifiedDemo([...originals,{...originals[2],id:'duplicate-image'}]).issue,/重复同名/);
+ assert.match(f.inspectUnifiedDemo(originals.slice(0,2)).issue,/还需要/);
+ const failed=structuredClone(originals);failed[2].status='failed';assert.match(f.inspectUnifiedDemo(failed).issue,/重试解析/);
+ const unknown=structuredClone(originals);unknown[1].sha256='0'.repeat(64);assert.match(f.inspectUnifiedDemo(unknown).issue,/指纹/);
  for(const [label,change]of [
  ['changed bytes',a=>a[1].sha256='0'.repeat(64)],['renamed',a=>a[0].name='用户自己的表格.csv'],
  ['duplicate',a=>a.push({...a[0],id:'duplicate'})],['not ready',a=>a[2].status='failed'],

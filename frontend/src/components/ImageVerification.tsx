@@ -56,7 +56,7 @@ function demoImageTarget(task: ImageTask, demo: UnifiedDemo) {
 function ImageVerificationPlan({ task, assets, onChange }: { task: ImageTask; assets: Asset[]; onChange: (task: ImageTask) => void }) {
  const demo = unifiedDemo(assets)
  const target = demo && demoImageTarget(task, demo)
- const head = useDemoRuleHead(task.project_id, !!target, task.context_hash)
+ const head = useDemoRuleHead(task.project_id, !!target, task.context_hash)?.head ?? null
  const snapshot = demo && currentDemoRule(head, demo)
  const manual = <ImagePlan task={task} tables={assets.filter(asset => asset.kind === 'table')} onChange={onChange} />
  if (!demo || !target || !snapshot || !demoCitationIds(snapshot, task.payload.citations).length) return manual

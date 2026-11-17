@@ -53,7 +53,7 @@ function VerificationPlan({ task, assets, tables, busy, submit, onBound }: {
 }) {
   const demo = unifiedDemo(assets)
   const candidate = demo && demoReportCandidate(task, demo)
-  const head = useDemoRuleHead(task.project_id, !!candidate, task.context_hash)
+  const head = useDemoRuleHead(task.project_id, !!candidate, task.context_hash)?.head ?? null
   const snapshot = demo && currentDemoRule(head, demo)
   const manual = <PlanEditor task={task} tables={tables} busy={busy} submit={submit} onBound={onBound} />
   if (!demo || !candidate || !snapshot || !demoCitationIds(snapshot, task.payload.citations).length) return manual
