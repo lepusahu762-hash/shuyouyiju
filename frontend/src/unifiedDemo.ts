@@ -122,8 +122,11 @@ export function currentDemoRule(head: RuleHead | null, demo: UnifiedDemo) {
 }
 
 export function demoCitationIds(snapshot: RuleSnapshot, citations: Citation[] = []) {
-  const sourceIds = new Set(Object.values(snapshot.sources).map(source => source.paragraph_id))
-  return citations.filter(citation => sourceIds.has(citation.citation_id)).map(citation => citation.citation_id)
+  const sources = Object.values(snapshot.sources)
+  return citations.filter(citation => sources.some(source =>
+    source.paragraph_id === citation.citation_id && source.asset_id === citation.asset_id
+    && source.sha256 === citation.sha256 && source.version === citation.version
+  )).map(citation => citation.citation_id)
 }
 
 type PendingTask = {

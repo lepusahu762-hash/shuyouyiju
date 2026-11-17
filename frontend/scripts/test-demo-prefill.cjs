@@ -22,12 +22,25 @@ async function main(){
  ['wrong schema',a=>a[0].summary.sheets[0].columns[0].name='其他'],['wrong row count',a=>a[0].summary.sheets[0].row_count=13]]){
   const a=structuredClone(originals);change(a);assert.equal(f.unifiedDemo(a),null,label);
  }
- const rule={id:'rule1',constraints:demo.spec,sources:{metric:{paragraph_id:'p1'}}};
+ const rule={id:'rule1',constraints:demo.spec,sources:{metric:{paragraph_id:'p1',asset_id:'rules',sha256:'rule-sha',version:'v1'}}};
  let head={items:[rule],current_id:rule.id,current_valid:true};
  assert.equal(f.currentDemoRule(head,demo).id,rule.id);
  assert.equal(f.currentDemoRule({...head,current_valid:false},demo),null);
  assert.equal(f.currentDemoRule({...head,items:[{...rule,constraints:{...demo.spec,null_policy:'exclude'}}]},demo),null);
- const citations=[{citation_id:'p1'},{citation_id:'forged'}];assert.deepEqual(Array.from(f.demoCitationIds(rule,citations)),['p1']);
+ const realCitation={citation_id:'p1',asset_id:'rules',sha256:'rule-sha',version:'v1'};
+ const citations=[realCitation,{citation_id:'forged'}];
+ for(const patch of [{asset_id:'other'},{sha256:'changed'},{version:'v2'}]) assert.equal(f.demoCitationIds(rule,[{...realCitation,...patch}]).length,0);
+ const page=fs.readFileSync(path.join(src,'pages/AIVerificationPage.tsx'),'utf8');
+ const candidateSource=page.slice(page.indexOf('function demoReportCandidate'),page.indexOf('function PlanEditor'));
+ const candidateModule={exports:{}};
+ vm.runInNewContext(stripTypeScriptTypes(candidateSource)+'\nmodule.exports=demoReportCandidate;',{module:candidateModule,demoReportText:'本独立合成演示中，有效记录满意率为50%。'});
+ const pick=candidateModule.exports;
+ const candidate={supported:true,unit:'percent',reported_value:'50',metric:'模型的近义指标',quote:'有效记录满意率为50%'};
+ const demoTask={stale:false,rule_check:{status:'needs_confirmation'},source:{asset_id:demo.report.id,paragraph:{text:'本独立合成演示中，有效记录满意率为50%。'},excerpt:'本独立合成演示中，有效记录满意率为50%。'},payload:{selected:0,candidates:[candidate],questions:['请确认范围']}};
+ assert.equal(pick(demoTask,demo),candidate);
+ assert.equal(pick({...demoTask,stale:true},demo),undefined);
+ assert.equal(pick({...demoTask,rule_check:{status:'legacy'}},demo),undefined);
+ assert.equal(pick({...demoTask,payload:{...demoTask.payload,candidates:[{...candidate,unit:'percentage_point'}]}},demo),undefined);assert.deepEqual(Array.from(f.demoCitationIds(rule,citations)),['p1']);
  const task={id:'t',project_id:'p',status:'awaiting_confirmation',stale:false,run_id:null,context_hash:'ctx',payload:{rule_snapshot:rule,citations}};
  let fresh=task,conflict=false,writes=[];
  responder=async(url,opts)=>{if(opts){writes.push(url);return {rule_check:{snapshot_id:rule.id,status:conflict?'conflict':'needs_confirmation',conflicts:conflict?[{}]:[],message:'blocked'}}}return url.endsWith('/rule-snapshots')?head:fresh};
