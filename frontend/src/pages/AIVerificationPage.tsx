@@ -15,9 +15,11 @@ import { checkedDemoPlan, currentDemoRule, demoCitationIds, demoReportText, unif
 
 function demoReportCandidate(task: AITask, demo: UnifiedDemo) {
   const candidate = task.payload.candidates?.[task.payload.selected ?? -1]
-  if (!task.stale && task.source.asset_id === demo.report.id && task.source.paragraph.text === demoReportText
-    && !task.payload.questions?.length && candidate?.supported && candidate.unit === 'percent'
-    && Number(candidate.reported_value) === 50 && candidate.metric === demo.spec.metric
+  // The registered report has a single claim. Its original text determines the
+  // target; the model's suggested field names and questions may vary.
+  if (!task.stale && task.rule_check.status !== 'legacy' && task.source.asset_id === demo.report.id
+    && task.source.paragraph.text === demoReportText && candidate?.supported && candidate.unit === 'percent'
+    && Number(candidate.reported_value) === 50
     && /50\s*[%％]/.test(candidate.quote) && task.source.excerpt.includes(candidate.quote)) return candidate
 }
 
@@ -53,12 +55,24 @@ function VerificationPlan({ task, assets, tables, busy, submit, onBound }: {
 }) {
   const demo = unifiedDemo(assets)
   const candidate = demo && demoReportCandidate(task, demo)
-  const head = useDemoRuleHead(task.project_id, !!candidate, task.context_hash)?.head ?? null
-  const snapshot = demo && currentDemoRule(head, demo)
+  const ruleRead = useDemoRuleHead(task.project_id, !!candidate, task.context_hash)
+  const snapshot = demo && currentDemoRule(ruleRead?.head ?? null, demo)
   const manual = <PlanEditor task={task} tables={tables} busy={busy} submit={submit} onBound={onBound} />
-  if (!demo || !candidate || !snapshot || !demoCitationIds(snapshot, task.payload.citations).length) return manual
+  if (!demo || !candidate) return manual
+  if (!ruleRead) return <p role="status">正在读取这条结论可以沿用的规则…</p>
+  if (!snapshot || !demoCitationIds(snapshot, task.payload.citations).length) {
+    const message = ruleRead.error || (!snapshot
+      ? '请先确认当前演示资料的统计口径，保存后可在这里沿用九项规则。'
+      : '这项任务没有找到已确认规则的原文。请核对规则资料，再按当前资料核验。')
+    return <div className="demo-rules">
+      <h2>核对演示口径</h2>
+      <p className="calc-warning">{message}</p>
+      <a className="button button-secondary small" href={`/app/projects/${task.project_id}/materials#confirm-rules`}>查看演示口径</a>
+      <details><summary>手动核对或调整方案</summary>{manual}</details>
+    </div>
+  }
 
-  const note = '原句指向有效记录满意率。此次采用全部有效记录为分母、其中满意记录为分子，统计不限期间。'
+  const note = '按项目已确认的演示规则统计。不限定期间，以全部有效记录为分母，空评价仍计入分母，以其中满意的记录为分子，按记录计数并以 0 位小数比较。'
   return <DemoVerificationConfirm demo={demo} snapshot={snapshot} target={candidate.quote} note={note} disabled={busy}
     onConfirm={async () => {
       const checked = await checkedDemoPlan(task, `/ai-tasks/${task.id}`, demo, snapshot, fresh =>
